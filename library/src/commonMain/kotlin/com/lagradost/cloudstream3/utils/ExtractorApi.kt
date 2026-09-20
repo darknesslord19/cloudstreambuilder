@@ -299,6 +299,7 @@ import com.lagradost.cloudstream3.extractors.Vidavaca
 import com.lagradost.cloudstream3.extractors.Vide0Net
 import com.lagradost.cloudstream3.extractors.Vids
 import com.lagradost.cloudstream3.extractors.Vidsonic
+import com.lagradost.cloudstream3.extractors.Vixeo
 import com.lagradost.cloudstream3.extractors.VkExtractor
 import com.lagradost.cloudstream3.extractors.Voe
 import com.lagradost.cloudstream3.extractors.Voe1
@@ -1291,6 +1292,7 @@ val extractorApis: AtomicMutableList<ExtractorApi> = atomicListOf(
     Ds2play(),
     Ds2video(),
     Vidsonic(),
+    Vixeo(),
     InternetArchive(),
     VidStack(),
     GDMirrorbot(),
