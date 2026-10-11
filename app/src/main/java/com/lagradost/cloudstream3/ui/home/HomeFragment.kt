@@ -429,6 +429,16 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
                         val isPinned =
                             pinnedphashset.contains(currentValidApis[position].name)
                         pinIcon.visibility = if (isPinned) View.VISIBLE else View.GONE
+
+                        // The same settings icon the list of plugins has
+                        val settingsIcon = view.findViewById<ImageView>(R.id.provider_settings)
+                        val openSettings =
+                            ProviderSettings.actionFor(context, currentValidApis.getOrNull(position))
+                        settingsIcon?.visibility = if (openSettings != null) View.VISIBLE else View.GONE
+                        settingsIcon?.setOnClickListener(
+                            if (openSettings != null) View.OnClickListener { openSettings() } else null
+                        )
+                        settingsIcon?.isClickable = openSettings != null
                         return view
                     }
                 }
@@ -473,8 +483,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
                         addAll(remainingApis)
                     }
 
-                    val names =
-                        currentValidApis.map { if (isMultiLang) "${getFlagFromIso(it.lang)?.plus(" ") ?: ""}${it.name}" else it.name }
+                    val names = currentValidApis.map {
+                        when {
+                            // The two entries that are no providers have no name to show
+                            it === noneApi -> getString(R.string.none)
+                            it === randomApi -> getString(R.string.home_random)
+                            isMultiLang -> "${getFlagFromIso(it.lang)?.plus(" ") ?: ""}${it.name}"
+                            else -> it.name
+                        }
+                    }
                     val index = currentValidApis.map { it.name }.indexOf(currentApiName)
                     listView?.setItemChecked(index, true)
                     arrayAdapter.addAll(names)

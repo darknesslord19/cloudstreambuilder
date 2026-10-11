@@ -323,6 +323,16 @@
         <item>Kahve</item>
         <item>Zümrüt (AMOLED)</item>
         <item>Gül Kurusu</item>
+        <item>Kızıl</item>
+        <item>Altın</item>
+        <item>Fıstık Yeşili</item>
+        <item>Buz Mavisi</item>
+        <item>İndigo</item>
+        <item>Neon</item>
+        <item>Grafit</item>
+        <item>Kraliyet</item>
+        <item>Mürdüm</item>
+        <item>Krem (Açık)</item>
     </string-array>
     <string-array name="themes_names_values">
         <item>AmoledLight</item>
@@ -344,6 +354,16 @@
         <item>Coffee</item>
         <item>Emerald</item>
         <item>Rose</item>
+        <item>Crimson</item>
+        <item>Gold</item>
+        <item>Lime</item>
+        <item>Ice</item>
+        <item>Indigo</item>
+        <item>Neon</item>
+        <item>Graphite</item>
+        <item>Royal</item>
+        <item>Plum</item>
+        <item>Cream</item>
     </string-array>
 
     <string-array name="extension_statuses">

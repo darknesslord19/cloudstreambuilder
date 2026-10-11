@@ -20,6 +20,12 @@ import java.util.Locale
 
 /** What the add-on code needs from the app, see [AddonPlatform]. */
 class AndroidAddonPlatform(context: Context) : AddonPlatform {
+    companion object {
+        /** How the catalog that comes with the stream sources is shown in this build. */
+        const val CATALOG_NAME = "DarknesNuvio"
+        const val CATALOG_LANGUAGE = "tr"
+    }
+
     private val appContext: Context = context.applicationContext ?: context
 
     private val bridge = AddonHostBridge(
@@ -65,6 +71,18 @@ class AndroidAddonPlatform(context: Context) : AddonPlatform {
         }
         if (active.contains(AllLanguagesName) || active.contains("en")) return "en"
         return active.firstOrNull() ?: "en"
+    }
+
+    override fun catalogDisplayName(): String = CATALOG_NAME
+
+    override fun catalogLanguage(): String? {
+        val active = try {
+            appContext.getApiProviderLangSettings()
+        } catch (t: Throwable) {
+            return null
+        }
+        // Only when Turkish providers are shown, the catalog would be hidden otherwise
+        return if (active.contains(AllLanguagesName) || active.contains(CATALOG_LANGUAGE)) CATALOG_LANGUAGE else null
     }
 
     override fun uiLanguage(): String {

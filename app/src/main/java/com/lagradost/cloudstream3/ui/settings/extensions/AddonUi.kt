@@ -1,10 +1,12 @@
 package com.lagradost.cloudstream3.ui.settings.extensions
 
 import android.app.Activity
+import android.content.Context
 import android.content.DialogInterface
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.lagradost.cloudstream3.CloudStreamApp
+import com.lagradost.cloudstream3.CommonActivity
 import com.lagradost.cloudstream3.CommonActivity.showToast
 import com.lagradost.cloudstream3.R
 import com.lagradost.cloudstream3.addons.AddonEntry
@@ -16,6 +18,7 @@ import com.lagradost.cloudstream3.app
 import com.lagradost.cloudstream3.mvvm.logError
 import com.lagradost.cloudstream3.utils.AppContextUtils.setDefaultFocus
 import com.lagradost.cloudstream3.utils.Coroutines.ioSafe
+import com.lagradost.cloudstream3.utils.SingleSelectionHelper.showDialog
 import com.lagradost.cloudstream3.utils.SingleSelectionHelper.showMultiDialog
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
@@ -40,7 +43,7 @@ object AddonUi {
     /** How a source is shown in the list of repositories. */
     fun toRepositoryData(source: AddonSource): RepositoryData {
         val kind = source.addonKind?.label ?: source.kind
-        return RepositoryData(source.iconUrl, "${source.name} ($kind)", source.url)
+        return RepositoryData(source.iconUrl, "${AddonManager.displayNameOf(source)} ($kind)", source.url)
     }
 
     fun listedSources(): List<RepositoryData> {
@@ -186,6 +189,47 @@ object AddonUi {
         }
     }
 
+    /**
+     * What the settings icon next to a provider on the home page opens.
+     * @param sourcePlugin the sourcePlugin of the provider.
+     * @return null if the provider does not come from a Stremio, Nuvio or SkyStream source.
+     */
+    fun settingsActionFor(context: Context, sourcePlugin: String?): (() -> Unit)? {
+        val source = try {
+            AddonManager.sourceOfProvider(sourcePlugin)
+        } catch (t: Throwable) {
+            logError(t)
+            null
+        } ?: return null
+        return {
+            val activity = (context as? Activity) ?: CommonActivity.activity
+            if (AddonManager.isBuiltInCatalog(source)) openStreamSources(activity, source)
+            else open(activity, source) {}
+        }
+    }
+
+    /**
+     * The built-in catalog has nothing to set itself, what matters to the user is where its
+     * links come from: this opens the stream sources, asking which one if there are several.
+     */
+    private fun openStreamSources(activity: Activity?, catalog: AddonSource) {
+        val act = activity ?: return
+        val sources = AddonManager.streamSources()
+        when (sources.size) {
+            0 -> open(act, catalog) {}
+            1 -> open(act, sources.first()) {}
+            else -> act.showDialog(
+                sources.map { "${AddonManager.displayNameOf(it)} (${it.addonKind?.label ?: it.kind})" },
+                -1,
+                AddonManager.displayNameOf(catalog),
+                false,
+                {},
+            ) { picked ->
+                sources.getOrNull(picked)?.let { open(act, it) {} }
+            }
+        }
+    }
+
     private fun showStremioInfo(activity: Activity, source: AddonSource) {
         val offers = AddonManager.capabilitiesOf(source)
         val labels = offers.map { capability ->
@@ -209,7 +253,7 @@ object AddonUi {
         message.append(source.url)
 
         val builder = AlertDialog.Builder(activity, R.style.AlertDialogCustom)
-            .setTitle(source.name)
+            .setTitle(AddonManager.displayNameOf(source))
             .setMessage(message.toString())
             .setPositiveButton(R.string.ok) { _, _ -> }
         AddonManager.configureUrlOf(source)?.let { configureUrl ->

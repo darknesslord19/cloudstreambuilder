@@ -102,6 +102,37 @@ object AddonManager {
 
     fun getSource(url: String): AddonSource? = getSources().firstOrNull { it.url == url }
 
+    /** The source a provider belongs to, by the tag in its sourcePlugin. Null for other providers. */
+    fun sourceOfProvider(sourcePlugin: String?): AddonSource? {
+        if (sourcePlugin == null || !sourcePlugin.startsWith(TAG_PREFIX)) return null
+        return getSource(sourcePlugin.removePrefix(TAG_PREFIX))
+    }
+
+    /** If [source] is the catalog that is added by itself next to stream sources. */
+    fun isBuiltInCatalog(source: AddonSource): Boolean = source.url == fallbackCatalogUrl
+
+    /**
+     * The name [source] is shown under. The built-in catalog can have a name of its own,
+     * unless the user named it when adding it.
+     */
+    fun displayNameOf(source: AddonSource): String {
+        if (isInitialised && isBuiltInCatalog(source)) {
+            val ownName = stremioBySource[source.url]?.name
+            val brand = platform.catalogDisplayName()
+            if (brand != null && (ownName == null || source.name == ownName)) return brand
+        }
+        return source.name
+    }
+
+    /** Sources that find links: Nuvio repositories and Stremio add-ons with streams. */
+    fun streamSources(): List<AddonSource> = getSources().filter { source ->
+        when (source.addonKind) {
+            AddonKind.NUVIO -> true
+            AddonKind.STREMIO -> stremioBySource[source.url]?.hasResource("stream") == true
+            else -> false
+        }
+    }
+
     fun isAddonUrl(url: String?): Boolean = url != null && getSources().any { it.url == url }
 
     /** The urls of all saved sources. */
@@ -457,8 +488,10 @@ object AddonManager {
                     val addon = StremioAddon(url, manifest)
                     stremioBySource[url] = addon
                     if (addon.catalogs.isNotEmpty()) {
-                        val name = uniqueName(source.name, AddonKind.STREMIO, tag, emptyList())
-                        register(StremioProvider(addon, name, platform.defaultProviderLanguage(), platform.uiLanguage()), tag)
+                        val name = uniqueName(displayNameOf(source), AddonKind.STREMIO, tag, emptyList())
+                        val language = (if (isBuiltInCatalog(source)) platform.catalogLanguage() else null)
+                            ?: platform.defaultProviderLanguage()
+                        register(StremioProvider(addon, name, language, platform.uiLanguage()), tag)
                     }
                 }
             }

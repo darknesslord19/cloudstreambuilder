@@ -1,5 +1,8 @@
 package com.lagradost.cloudstream3.ui.settings.extensions
 
+import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
+import android.animation.ValueAnimator
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.DialogInterface
@@ -7,6 +10,7 @@ import android.os.Build
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -31,6 +35,7 @@ import com.lagradost.cloudstream3.ui.BaseFragment
 import com.lagradost.cloudstream3.ui.result.FOCUS_SELF
 import com.lagradost.cloudstream3.ui.result.setLinearListLayout
 import com.lagradost.cloudstream3.ui.setRecycledViewPool
+import com.lagradost.cloudstream3.ui.settings.AssetPage
 import com.lagradost.cloudstream3.ui.settings.Globals.TV
 import com.lagradost.cloudstream3.ui.settings.Globals.isLayout
 import com.lagradost.cloudstream3.ui.settings.SettingsFragment.Companion.setSystemBarsPadding
@@ -298,6 +303,36 @@ class ExtensionsFragment : BaseFragment<FragmentExtensionsBinding>(
                     binding.repoUrlInput.setText(copiedText)
                 }
             }
+
+            // The list of repositories is a bundled web page, an entry picked there is added
+            // as if its address had been typed into this dialog.
+            binding.listBtt.setOnClickListener {
+                val act = activity ?: return@setOnClickListener
+                AssetPage.show(
+                    act,
+                    "Repolist.html",
+                    onAddRepository = { url, name ->
+                        binding.repoUrlInput.setText(url)
+                        binding.repoNameInput.setText(name ?: "")
+                        binding.applyBtt.performClick()
+                    },
+                    addedUrls = {
+                        RepositoryManager.getRepositories().map { it.url } + AddonManager.sourceUrls()
+                    },
+                )
+            }
+            // A slow pulse draws the eye to the list, it stops with the dialog
+            val listPulse = ObjectAnimator.ofPropertyValuesHolder(
+                binding.listBtt,
+                PropertyValuesHolder.ofFloat(View.SCALE_X, 1f, 1.045f, 1f),
+                PropertyValuesHolder.ofFloat(View.SCALE_Y, 1f, 1.045f, 1f),
+            ).apply {
+                duration = 1600
+                repeatCount = ValueAnimator.INFINITE
+                interpolator = AccelerateDecelerateInterpolator()
+                start()
+            }
+            dialog.setOnDismissListener { listPulse.cancel() }
 
             binding.applyBtt.setOnClickListener secondListener@{
                 val name = binding.repoNameInput.text?.toString()

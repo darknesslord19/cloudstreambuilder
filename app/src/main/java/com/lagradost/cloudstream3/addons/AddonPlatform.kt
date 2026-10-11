@@ -33,6 +33,15 @@ interface AddonPlatform {
      */
     fun defaultProviderLanguage(): String = "en"
 
+    /**
+     * The name the built-in catalog (see AddonManager.fallbackCatalogUrl) is shown under,
+     * null to show it under the name of the add-on.
+     */
+    fun catalogDisplayName(): String? = null
+
+    /** The language the built-in catalog is filed under, null for [defaultProviderLanguage]. */
+    fun catalogLanguage(): String? = null
+
     /** Two letter code of the language the app is shown in, "tr" for Turkish. */
     fun uiLanguage(): String = "en"
 

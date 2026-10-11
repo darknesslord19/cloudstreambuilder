@@ -3,6 +3,9 @@ package com.lagradost.cloudstream3.ui.settings
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
@@ -24,25 +27,38 @@ import com.lagradost.cloudstream3.R
 import com.lagradost.cloudstream3.mvvm.logError
 import java.io.ByteArrayInputStream
 import java.io.IOException
+import org.json.JSONArray
+
+/** The "Developer" page of the settings, the bundled web page assets/about.html. */
+object AboutPage {
+    fun show(activity: Activity) = AssetPage.show(activity, "about.html")
+}
 
 /**
- * The "Developer" page of the settings: shows the bundled web page assets/about.html full screen.
+ * Shows a web page that is bundled in the assets folder full screen, like assets/about.html.
  *
  * The page is a normal web page and can use everything a browser offers (scripts, animations,
  * canvas, storage, media). Files it refers to are read from the assets folder as well, so
  * images, style sheets and scripts can be put next to it. Links that lead somewhere else are
  * opened outside of the app.
  */
-object AboutPage {
+object AssetPage {
     /**
      * The assets are served under a normal https address instead of file://, because browsers
      * switch many features off for pages opened straight from a file.
      */
     private const val HOST = "appassets.androidplatform.net"
-    private const val START_PAGE = "about.html"
 
-    /** What the page can ask the app, as `CloudStream.version()` and so on. */
-    class PageBridge(private val onClose: () -> Unit) {
+    /**
+     * What a page can ask the app, as `CloudStream.version()` and so on.
+     * Every frame of the page can call these, so nothing here may be dangerous to call.
+     */
+    class PageBridge(
+        private val activity: Activity,
+        private val onClose: () -> Unit,
+        private val onAddRepository: ((url: String, name: String?) -> Unit)?,
+        private val addedUrls: () -> List<String>,
+    ) {
         @JavascriptInterface
         fun version(): String = BuildConfig.VERSION_NAME
 
@@ -51,12 +67,68 @@ object AboutPage {
 
         @JavascriptInterface
         fun close() {
-            onClose()
+            activity.runOnUiThread { onClose() }
+        }
+
+        /** If the page was opened from the "Add repository" dialog and can hand an address to it. */
+        @JavascriptInterface
+        fun canAddRepository(): Boolean = onAddRepository != null
+
+        @JavascriptInterface
+        fun addRepository(url: String?) = addRepository(url, null)
+
+        /** Closes the page and adds the repository or add-on at [url], as if the user had typed it. */
+        @JavascriptInterface
+        fun addRepository(url: String?, name: String?) {
+            val address = url?.trim() ?: return
+            if (!address.startsWith("https://") && !address.startsWith("http://") &&
+                !address.startsWith("stremio://") && !address.startsWith("skystream://")
+            ) return
+            val add = onAddRepository ?: return
+            activity.runOnUiThread {
+                onClose()
+                add(address, name?.trim()?.takeIf { it.isNotEmpty() })
+            }
+        }
+
+        /** The addresses that are added already, as a JSON list. */
+        @JavascriptInterface
+        fun addedRepositories(): String {
+            return try {
+                JSONArray(addedUrls()).toString()
+            } catch (t: Throwable) {
+                logError(t)
+                "[]"
+            }
+        }
+
+        @JavascriptInterface
+        fun copy(text: String?) {
+            if (text.isNullOrEmpty()) return
+            activity.runOnUiThread {
+                try {
+                    val clipboard = activity.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
+                    clipboard?.setPrimaryClip(ClipData.newPlainText("CloudStream", text))
+                } catch (t: Throwable) {
+                    logError(t)
+                }
+            }
         }
     }
 
+    /**
+     * @param page name of the file in the assets folder, for example "about.html".
+     * @param onAddRepository given when the page may add repositories, called on the main
+     * thread after the page has closed.
+     * @param addedUrls the addresses the user has added already, the page can mark them.
+     */
     @SuppressLint("SetJavaScriptEnabled")
-    fun show(activity: Activity) {
+    fun show(
+        activity: Activity,
+        page: String,
+        onAddRepository: ((url: String, name: String?) -> Unit)? = null,
+        addedUrls: () -> List<String> = { emptyList() },
+    ) {
         val webView = try {
             WebView(activity)
         } catch (t: Throwable) {
@@ -96,7 +168,7 @@ object AboutPage {
         }
 
         webView.addJavascriptInterface(
-            PageBridge { activity.runOnUiThread { dialog.dismiss() } },
+            PageBridge(activity, { dialog.dismiss() }, onAddRepository, addedUrls),
             "CloudStream"
         )
 
@@ -114,7 +186,7 @@ object AboutPage {
             ): WebResourceResponse? {
                 val url = request?.url ?: return null
                 if (url.host != HOST) return null
-                val path = (url.path ?: "").trimStart('/').ifEmpty { START_PAGE }
+                val path = (url.path ?: "").trimStart('/').ifEmpty { page }
                 return try {
                     val type = mimeTypeOf(path)
                     val isText = type.startsWith("text/") || type.endsWith("javascript") ||
@@ -164,7 +236,7 @@ object AboutPage {
 
         try {
             dialog.show()
-            webView.loadUrl("https://$HOST/$START_PAGE")
+            webView.loadUrl("https://$HOST/$page")
         } catch (t: Throwable) {
             logError(t)
         }

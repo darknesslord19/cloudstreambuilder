@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- Ten extra app themes. Each one has a matching accent colour, used while the
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Twenty extra app themes. Each one has a matching accent colour, used while the
          "primary colour" setting is left on its default. -->
 
     <!-- Gece Mavisi -->
@@ -331,6 +331,338 @@
         <item name="colorAccent">@color/RoseAccent</item>
         <item name="colorOnPrimary">@color/RoseOnAccent</item>
         <item name="android:colorAccent">@color/RoseAccent</item>
+    </style>
+
+    <!-- Kızıl -->
+    <color name="CrimsonPrimaryGrayBackground">#2E1215</color>
+    <color name="CrimsonBitDarkerGrayBackground">#140708</color>
+    <color name="CrimsonGrayBackground">#1D0A0C</color>
+    <color name="CrimsonItemBackground">#250E11</color>
+    <color name="CrimsonTextColor">#F8E9EA</color>
+    <color name="CrimsonIconColor">#B3878B</color>
+    <color name="CrimsonAccent">#FF4D4D</color>
+    <color name="CrimsonAccentDark">#C62828</color>
+    <color name="CrimsonOnAccent">#1A0406</color>
+
+    <style name="CrimsonMode">
+        <item name="primaryGrayBackground">@color/CrimsonPrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/CrimsonBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/CrimsonGrayBackground</item>
+        <item name="boxItemBackground">@color/CrimsonItemBackground</item>
+        <item name="textColor">@color/CrimsonTextColor</item>
+        <item name="grayTextColor">@color/CrimsonIconColor</item>
+        <item name="iconColor">@color/CrimsonIconColor</item>
+        <item name="white">@color/CrimsonTextColor</item>
+        <item name="black">@color/CrimsonBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/CrimsonTextColor</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeCrimson">
+        <item name="colorPrimary">@color/CrimsonAccent</item>
+        <item name="android:colorPrimary">@color/CrimsonAccent</item>
+        <item name="colorPrimaryDark">@color/CrimsonAccentDark</item>
+        <item name="colorAccent">@color/CrimsonAccent</item>
+        <item name="colorOnPrimary">@color/CrimsonOnAccent</item>
+        <item name="android:colorAccent">@color/CrimsonAccent</item>
+    </style>
+
+    <!-- Altın -->
+    <color name="GoldPrimaryGrayBackground">#2A2414</color>
+    <color name="GoldBitDarkerGrayBackground">#0F0D08</color>
+    <color name="GoldGrayBackground">#18140B</color>
+    <color name="GoldItemBackground">#201B0F</color>
+    <color name="GoldTextColor">#F6F0DF</color>
+    <color name="GoldIconColor">#A89B78</color>
+    <color name="GoldAccent">#F5C542</color>
+    <color name="GoldAccentDark">#B8902A</color>
+    <color name="GoldOnAccent">#1A1404</color>
+
+    <style name="GoldMode">
+        <item name="primaryGrayBackground">@color/GoldPrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/GoldBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/GoldGrayBackground</item>
+        <item name="boxItemBackground">@color/GoldItemBackground</item>
+        <item name="textColor">@color/GoldTextColor</item>
+        <item name="grayTextColor">@color/GoldIconColor</item>
+        <item name="iconColor">@color/GoldIconColor</item>
+        <item name="white">@color/GoldTextColor</item>
+        <item name="black">@color/GoldBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/GoldTextColor</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeGold">
+        <item name="colorPrimary">@color/GoldAccent</item>
+        <item name="android:colorPrimary">@color/GoldAccent</item>
+        <item name="colorPrimaryDark">@color/GoldAccentDark</item>
+        <item name="colorAccent">@color/GoldAccent</item>
+        <item name="colorOnPrimary">@color/GoldOnAccent</item>
+        <item name="android:colorAccent">@color/GoldAccent</item>
+    </style>
+
+    <!-- Fıstık Yeşili -->
+    <color name="LimePrimaryGrayBackground">#222D14</color>
+    <color name="LimeBitDarkerGrayBackground">#0D1208</color>
+    <color name="LimeGrayBackground">#141B0C</color>
+    <color name="LimeItemBackground">#1A2310</color>
+    <color name="LimeTextColor">#EEF5E2</color>
+    <color name="LimeIconColor">#94A67A</color>
+    <color name="LimeAccent">#B6E33B</color>
+    <color name="LimeAccentDark">#7FA51F</color>
+    <color name="LimeOnAccent">#141B05</color>
+
+    <style name="LimeMode">
+        <item name="primaryGrayBackground">@color/LimePrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/LimeBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/LimeGrayBackground</item>
+        <item name="boxItemBackground">@color/LimeItemBackground</item>
+        <item name="textColor">@color/LimeTextColor</item>
+        <item name="grayTextColor">@color/LimeIconColor</item>
+        <item name="iconColor">@color/LimeIconColor</item>
+        <item name="white">@color/LimeTextColor</item>
+        <item name="black">@color/LimeBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/LimeTextColor</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeLime">
+        <item name="colorPrimary">@color/LimeAccent</item>
+        <item name="android:colorPrimary">@color/LimeAccent</item>
+        <item name="colorPrimaryDark">@color/LimeAccentDark</item>
+        <item name="colorAccent">@color/LimeAccent</item>
+        <item name="colorOnPrimary">@color/LimeOnAccent</item>
+        <item name="android:colorAccent">@color/LimeAccent</item>
+    </style>
+
+    <!-- Buz Mavisi -->
+    <color name="IcePrimaryGrayBackground">#162A39</color>
+    <color name="IceBitDarkerGrayBackground">#0A141C</color>
+    <color name="IceGrayBackground">#0E1C27</color>
+    <color name="IceItemBackground">#12232F</color>
+    <color name="IceTextColor">#E4F2FA</color>
+    <color name="IceIconColor">#7BA0B8</color>
+    <color name="IceAccent">#6FD3FF</color>
+    <color name="IceAccentDark">#2E9BCB</color>
+    <color name="IceOnAccent">#06202C</color>
+
+    <style name="IceMode">
+        <item name="primaryGrayBackground">@color/IcePrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/IceBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/IceGrayBackground</item>
+        <item name="boxItemBackground">@color/IceItemBackground</item>
+        <item name="textColor">@color/IceTextColor</item>
+        <item name="grayTextColor">@color/IceIconColor</item>
+        <item name="iconColor">@color/IceIconColor</item>
+        <item name="white">@color/IceTextColor</item>
+        <item name="black">@color/IceBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/IceTextColor</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeIce">
+        <item name="colorPrimary">@color/IceAccent</item>
+        <item name="android:colorPrimary">@color/IceAccent</item>
+        <item name="colorPrimaryDark">@color/IceAccentDark</item>
+        <item name="colorAccent">@color/IceAccent</item>
+        <item name="colorOnPrimary">@color/IceOnAccent</item>
+        <item name="android:colorAccent">@color/IceAccent</item>
+    </style>
+
+    <!-- İndigo -->
+    <color name="IndigoPrimaryGrayBackground">#1B1F4A</color>
+    <color name="IndigoBitDarkerGrayBackground">#0B0D24</color>
+    <color name="IndigoGrayBackground">#101335</color>
+    <color name="IndigoItemBackground">#15183D</color>
+    <color name="IndigoTextColor">#E8EAFD</color>
+    <color name="IndigoIconColor">#8A90C8</color>
+    <color name="IndigoAccent">#7C8CFF</color>
+    <color name="IndigoAccentDark">#4B59D6</color>
+    <color name="IndigoOnAccent">#0B0D24</color>
+
+    <style name="IndigoMode">
+        <item name="primaryGrayBackground">@color/IndigoPrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/IndigoBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/IndigoGrayBackground</item>
+        <item name="boxItemBackground">@color/IndigoItemBackground</item>
+        <item name="textColor">@color/IndigoTextColor</item>
+        <item name="grayTextColor">@color/IndigoIconColor</item>
+        <item name="iconColor">@color/IndigoIconColor</item>
+        <item name="white">@color/IndigoTextColor</item>
+        <item name="black">@color/IndigoBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/IndigoTextColor</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeIndigo">
+        <item name="colorPrimary">@color/IndigoAccent</item>
+        <item name="android:colorPrimary">@color/IndigoAccent</item>
+        <item name="colorPrimaryDark">@color/IndigoAccentDark</item>
+        <item name="colorAccent">@color/IndigoAccent</item>
+        <item name="colorOnPrimary">@color/IndigoOnAccent</item>
+        <item name="android:colorAccent">@color/IndigoAccent</item>
+    </style>
+
+    <!-- Neon -->
+    <color name="NeonPrimaryGrayBackground">#24123C</color>
+    <color name="NeonBitDarkerGrayBackground">#0D0718</color>
+    <color name="NeonGrayBackground">#150B26</color>
+    <color name="NeonItemBackground">#1B0E30</color>
+    <color name="NeonTextColor">#F5E9FF</color>
+    <color name="NeonIconColor">#A184C4</color>
+    <color name="NeonAccent">#FF2E97</color>
+    <color name="NeonAccentDark">#C2116B</color>
+    <color name="NeonOnAccent">#1A0412</color>
+
+    <style name="NeonMode">
+        <item name="primaryGrayBackground">@color/NeonPrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/NeonBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/NeonGrayBackground</item>
+        <item name="boxItemBackground">@color/NeonItemBackground</item>
+        <item name="textColor">@color/NeonTextColor</item>
+        <item name="grayTextColor">@color/NeonIconColor</item>
+        <item name="iconColor">@color/NeonIconColor</item>
+        <item name="white">@color/NeonTextColor</item>
+        <item name="black">@color/NeonBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/NeonTextColor</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeNeon">
+        <item name="colorPrimary">@color/NeonAccent</item>
+        <item name="android:colorPrimary">@color/NeonAccent</item>
+        <item name="colorPrimaryDark">@color/NeonAccentDark</item>
+        <item name="colorAccent">@color/NeonAccent</item>
+        <item name="colorOnPrimary">@color/NeonOnAccent</item>
+        <item name="android:colorAccent">@color/NeonAccent</item>
+    </style>
+
+    <!-- Grafit -->
+    <color name="GraphitePrimaryGrayBackground">#2A2A2A</color>
+    <color name="GraphiteBitDarkerGrayBackground">#121212</color>
+    <color name="GraphiteGrayBackground">#1A1A1A</color>
+    <color name="GraphiteItemBackground">#1E1E1E</color>
+    <color name="GraphiteTextColor">#EDEDED</color>
+    <color name="GraphiteIconColor">#9E9E9E</color>
+    <color name="GraphiteAccent">#B0BEC5</color>
+    <color name="GraphiteAccentDark">#78909C</color>
+    <color name="GraphiteOnAccent">#121212</color>
+
+    <style name="GraphiteMode">
+        <item name="primaryGrayBackground">@color/GraphitePrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/GraphiteBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/GraphiteGrayBackground</item>
+        <item name="boxItemBackground">@color/GraphiteItemBackground</item>
+        <item name="textColor">@color/GraphiteTextColor</item>
+        <item name="grayTextColor">@color/GraphiteIconColor</item>
+        <item name="iconColor">@color/GraphiteIconColor</item>
+        <item name="white">@color/GraphiteTextColor</item>
+        <item name="black">@color/GraphiteBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/GraphiteTextColor</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeGraphite">
+        <item name="colorPrimary">@color/GraphiteAccent</item>
+        <item name="android:colorPrimary">@color/GraphiteAccent</item>
+        <item name="colorPrimaryDark">@color/GraphiteAccentDark</item>
+        <item name="colorAccent">@color/GraphiteAccent</item>
+        <item name="colorOnPrimary">@color/GraphiteOnAccent</item>
+        <item name="android:colorAccent">@color/GraphiteAccent</item>
+    </style>
+
+    <!-- Kraliyet -->
+    <color name="RoyalPrimaryGrayBackground">#18225A</color>
+    <color name="RoyalBitDarkerGrayBackground">#0A1030</color>
+    <color name="RoyalGrayBackground">#0E163F</color>
+    <color name="RoyalItemBackground">#121B4A</color>
+    <color name="RoyalTextColor">#EEF0FA</color>
+    <color name="RoyalIconColor">#8C97C9</color>
+    <color name="RoyalAccent">#E8B64C</color>
+    <color name="RoyalAccentDark">#B0842A</color>
+    <color name="RoyalOnAccent">#0A1030</color>
+
+    <style name="RoyalMode">
+        <item name="primaryGrayBackground">@color/RoyalPrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/RoyalBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/RoyalGrayBackground</item>
+        <item name="boxItemBackground">@color/RoyalItemBackground</item>
+        <item name="textColor">@color/RoyalTextColor</item>
+        <item name="grayTextColor">@color/RoyalIconColor</item>
+        <item name="iconColor">@color/RoyalIconColor</item>
+        <item name="white">@color/RoyalTextColor</item>
+        <item name="black">@color/RoyalBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/RoyalTextColor</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeRoyal">
+        <item name="colorPrimary">@color/RoyalAccent</item>
+        <item name="android:colorPrimary">@color/RoyalAccent</item>
+        <item name="colorPrimaryDark">@color/RoyalAccentDark</item>
+        <item name="colorAccent">@color/RoyalAccent</item>
+        <item name="colorOnPrimary">@color/RoyalOnAccent</item>
+        <item name="android:colorAccent">@color/RoyalAccent</item>
+    </style>
+
+    <!-- Mürdüm -->
+    <color name="PlumPrimaryGrayBackground">#371A38</color>
+    <color name="PlumBitDarkerGrayBackground">#1A0A1A</color>
+    <color name="PlumGrayBackground">#241026</color>
+    <color name="PlumItemBackground">#2C142D</color>
+    <color name="PlumTextColor">#F8E8F8</color>
+    <color name="PlumIconColor">#B288B4</color>
+    <color name="PlumAccent">#D36BE0</color>
+    <color name="PlumAccentDark">#9C3FAA</color>
+    <color name="PlumOnAccent">#1A0A1A</color>
+
+    <style name="PlumMode">
+        <item name="primaryGrayBackground">@color/PlumPrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/PlumBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/PlumGrayBackground</item>
+        <item name="boxItemBackground">@color/PlumItemBackground</item>
+        <item name="textColor">@color/PlumTextColor</item>
+        <item name="grayTextColor">@color/PlumIconColor</item>
+        <item name="iconColor">@color/PlumIconColor</item>
+        <item name="white">@color/PlumTextColor</item>
+        <item name="black">@color/PlumBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/PlumTextColor</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemePlum">
+        <item name="colorPrimary">@color/PlumAccent</item>
+        <item name="android:colorPrimary">@color/PlumAccent</item>
+        <item name="colorPrimaryDark">@color/PlumAccentDark</item>
+        <item name="colorAccent">@color/PlumAccent</item>
+        <item name="colorOnPrimary">@color/PlumOnAccent</item>
+        <item name="android:colorAccent">@color/PlumAccent</item>
+    </style>
+
+    <!-- Krem (Açık) -->
+    <color name="CreamPrimaryGrayBackground">#E6DAC6</color>
+    <color name="CreamBitDarkerGrayBackground">#F6EFE3</color>
+    <color name="CreamGrayBackground">#EFE6D6</color>
+    <color name="CreamItemBackground">#EDE3D2</color>
+    <color name="CreamTextColor">#2B2118</color>
+    <color name="CreamIconColor">#6E5E4C</color>
+    <color name="CreamAccent">#A8642A</color>
+    <color name="CreamAccentDark">#7E4A1C</color>
+    <color name="CreamOnAccent">#FFFFFF</color>
+
+    <style name="CreamMode">
+        <item name="primaryGrayBackground">@color/CreamPrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/CreamBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/CreamGrayBackground</item>
+        <item name="boxItemBackground">@color/CreamItemBackground</item>
+        <item name="textColor">@color/CreamTextColor</item>
+        <item name="grayTextColor">@color/CreamIconColor</item>
+        <item name="iconColor">@color/CreamIconColor</item>
+        <item name="white">@color/CreamTextColor</item>
+        <item name="black">@color/CreamBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/CreamTextColor</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeCream">
+        <item name="colorPrimary">@color/CreamAccent</item>
+        <item name="android:colorPrimary">@color/CreamAccent</item>
+        <item name="colorPrimaryDark">@color/CreamAccentDark</item>
+        <item name="colorAccent">@color/CreamAccent</item>
+        <item name="colorOnPrimary">@color/CreamOnAccent</item>
+        <item name="android:colorAccent">@color/CreamAccent</item>
     </style>
 
 </resources>

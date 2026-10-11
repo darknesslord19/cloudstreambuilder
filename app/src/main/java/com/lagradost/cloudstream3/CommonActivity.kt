@@ -351,6 +351,16 @@ object CommonActivity {
         "Coffee" to (R.style.CoffeeMode to R.style.OverlayPrimaryColorThemeCoffee),
         "Emerald" to (R.style.EmeraldMode to R.style.OverlayPrimaryColorThemeEmerald),
         "Rose" to (R.style.RoseMode to R.style.OverlayPrimaryColorThemeRose),
+        "Crimson" to (R.style.CrimsonMode to R.style.OverlayPrimaryColorThemeCrimson),
+        "Gold" to (R.style.GoldMode to R.style.OverlayPrimaryColorThemeGold),
+        "Lime" to (R.style.LimeMode to R.style.OverlayPrimaryColorThemeLime),
+        "Ice" to (R.style.IceMode to R.style.OverlayPrimaryColorThemeIce),
+        "Indigo" to (R.style.IndigoMode to R.style.OverlayPrimaryColorThemeIndigo),
+        "Neon" to (R.style.NeonMode to R.style.OverlayPrimaryColorThemeNeon),
+        "Graphite" to (R.style.GraphiteMode to R.style.OverlayPrimaryColorThemeGraphite),
+        "Royal" to (R.style.RoyalMode to R.style.OverlayPrimaryColorThemeRoyal),
+        "Plum" to (R.style.PlumMode to R.style.OverlayPrimaryColorThemePlum),
+        "Cream" to (R.style.CreamMode to R.style.OverlayPrimaryColorThemeCream),
     )
 
     fun loadThemes(act: Activity?) {

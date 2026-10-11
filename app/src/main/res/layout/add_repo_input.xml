@@ -103,6 +103,22 @@
         android:gravity="bottom|end"
         android:orientation="horizontal">
 
+        <!-- Opens the bundled page assets/Repolist.html -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/list_btt"
+            style="@style/WhiteButton"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:nextFocusRight="@id/apply_btt"
+            android:text="@string/repository_list"
+            android:textColor="?attr/colorOnPrimary"
+            app:backgroundTint="?attr/colorPrimary"
+            app:rippleColor="?attr/colorOnPrimary"
+            app:strokeColor="?attr/colorPrimary" />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/apply_btt"
             style="@style/WhiteButton"

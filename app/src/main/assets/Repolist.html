@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Depo listesi</title>
+<!--
+  "Depo ekle" penceresindeki "Depo listesi" düğmesi bu sayfayı tam ekran açar.
+
+  LİSTEYİ DEĞİŞTİRMEK: aşağıdaki REPOS dizisine satır ekleyin.
+    name        : listede görünen ad
+    url         : depo ekle kutusuna yazılan adres (CloudStream deposu, Stremio manifest.json,
+                  Nuvio manifest.json veya SkyStream repo.json)
+    type        : "cloudstream", "stremio", "nuvio" veya "skystream" (rozet ve filtre için)
+    description : kısa açıklama (isteğe bağlı)
+
+  Listeyi uygulamayı yeniden derlemeden değiştirmek isterseniz REMOTE_LIST'e aynı biçimde
+  bir JSON dizisi döndüren adres yazın. Adrese ulaşılamazsa REPOS kullanılır.
+
+  Sayfadan uygulamaya: CloudStream.addRepository(url, name), CloudStream.addedRepositories(),
+  CloudStream.copy(text), CloudStream.close()
+  Bu sayfaya başka sitelerden çerçeve (iframe) koymayın: çerçeveler de depo ekleyebilir.
+-->
+<style>
+  :root {
+    --bg: #07060d;
+    --ink: #f1eefb;
+    --muted: #a59fc0;
+    --line: rgba(190, 170, 255, .16);
+    --card: rgba(24, 20, 44, .66);
+    --violet: #9d6bff;
+    --ember: #ff6a3d;
+    --ok: #4cd6a0;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    overflow-x: hidden;
+  }
+  .glow {
+    position: fixed; inset: -25% -30% auto -30%; height: 60vh; pointer-events: none;
+    background:
+      radial-gradient(40% 46% at 28% 42%, rgba(157, 107, 255, .30), transparent 70%),
+      radial-gradient(34% 40% at 74% 30%, rgba(255, 106, 61, .16), transparent 70%);
+    filter: blur(30px);
+    animation: drift 16s ease-in-out infinite alternate;
+  }
+  @keyframes drift {
+    from { transform: translate3d(-3%, -2%, 0) scale(1); }
+    to   { transform: translate3d(4%, 3%, 0) scale(1.12); }
+  }
+
+  .bar {
+    position: sticky; top: 0; z-index: 3;
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px;
+    background: linear-gradient(rgba(7, 6, 13, .92), rgba(7, 6, 13, .72));
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .bar h1 { margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -.2px; flex: 1; }
+  .icon-btn {
+    width: 44px; height: 44px; flex: none; border-radius: 50%;
+    border: 1px solid var(--line); background: rgba(255, 255, 255, .04); color: var(--ink);
+    font-size: 20px; line-height: 1; display: grid; place-items: center;
+  }
+  .icon-btn:active { transform: scale(.92); }
+
+  main { position: relative; z-index: 1; max-width: 560px; margin: 0 auto; padding: 16px 16px 40px; }
+  .hint { color: var(--muted); font-size: 14px; margin: 2px 2px 14px; }
+
+  .chips { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 14px; scrollbar-width: none; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip {
+    flex: none; padding: 8px 14px; border-radius: 999px; font: inherit; font-size: 14px;
+    color: var(--muted); background: transparent; border: 1px solid var(--line);
+    transition: background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .chip[aria-pressed="true"] { color: #120c1f; background: var(--violet); border-color: var(--violet); font-weight: 650; }
+
+  .list { display: grid; gap: 12px; }
+  .repo {
+    display: grid; grid-template-columns: 1fr auto; gap: 6px 14px; align-items: center;
+    padding: 16px; border-radius: 18px;
+    border: 1px solid var(--line); background: var(--card);
+    opacity: 0; transform: translateY(14px);
+    animation: rise .55s cubic-bezier(.2, .7, .2, 1) forwards;
+  }
+  @keyframes rise { to { opacity: 1; transform: none; } }
+  .repo h2 { margin: 0; font-size: 17px; font-weight: 700; overflow-wrap: anywhere; }
+  .repo p { margin: 0; grid-column: 1; color: var(--muted); font-size: 14px; }
+  .repo .url { grid-column: 1; color: #7f79a0; font-size: 12px; overflow-wrap: anywhere; }
+  .badge {
+    display: inline-block; vertical-align: 2px; margin-left: 8px; padding: 2px 8px;
+    border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: .04em;
+    color: #cdbcff; border: 1px solid var(--line);
+  }
+  .actions { grid-column: 2; grid-row: 1 / span 3; display: grid; gap: 8px; justify-items: stretch; }
+  .btn {
+    min-width: 92px; min-height: 44px; padding: 0 16px; border-radius: 12px; border: 0;
+    font: inherit; font-weight: 700; color: #120c1f;
+    background: linear-gradient(135deg, #b995ff, var(--violet));
+    transition: transform .12s ease, filter .12s ease;
+  }
+  .btn:active { transform: scale(.95); filter: brightness(1.1); }
+  .btn.ghost { color: var(--ink); background: rgba(255, 255, 255, .06); border: 1px solid var(--line); font-weight: 600; }
+  .btn.done { color: var(--ok); background: rgba(76, 214, 160, .10); border: 1px solid rgba(76, 214, 160, .35); }
+
+  .empty { text-align: center; color: var(--muted); padding: 48px 12px; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 28px; z-index: 5;
+    transform: translate(-50%, 20px); opacity: 0; pointer-events: none;
+    padding: 10px 16px; border-radius: 999px; font-size: 14px;
+    background: #f1eefb; color: #120c1f;
+    transition: opacity .2s ease, transform .2s ease;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .glow, .repo { animation: none; }
+    .repo { opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+<div class="glow" aria-hidden="true"></div>
+
+<div class="bar">
+  <h1>Depo listesi</h1>
+  <button class="icon-btn" id="close" aria-label="Kapat">&#x2715;</button>
+</div>
+
+<main>
+  <p class="hint" id="hint">Eklemek istediğiniz deponun yanındaki düğmeye dokunun.</p>
+  <div class="chips" id="chips" role="group" aria-label="Tür"></div>
+  <div class="list" id="list"></div>
+</main>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function () {
+  // ----------------------------------------------------------------------------------------
+  // The list. Add your repositories here, one object per repository.
+  var REPOS = [
+    {
+      name: "Cinemeta",
+      url: "https://v3-cinemeta.strem.io/manifest.json",
+      type: "stremio",
+      description: "Stremio'nun resmî film ve dizi kataloğu. Bağlantı vermez, yalnızca gezinmek içindir."
+    }
+  ];
+
+  // Optional: an address that answers with a list in the same shape, "" to use REPOS only.
+  var REMOTE_LIST = "";
+  // ----------------------------------------------------------------------------------------
+
+  var TYPES = { cloudstream: "CloudStream", stremio: "Stremio", nuvio: "Nuvio", skystream: "SkyStream" };
+  var app = window.CloudStream;
+  var canAdd = false, added = [];
+  try { canAdd = !!(app && app.canAddRepository && app.canAddRepository()); } catch (e) {}
+  try { if (app && app.addedRepositories) added = JSON.parse(app.addedRepositories()) || []; } catch (e) {}
+
+  var listEl = document.getElementById('list');
+  var chipsEl = document.getElementById('chips');
+  var toastEl = document.getElementById('toast');
+  var filter = "all", repos = [], toastTimer = 0;
+
+  if (!canAdd) document.getElementById('hint').textContent = "Adresi kopyalayıp \"Depo ekle\" kutusuna yapıştırın.";
+
+  document.getElementById('close').addEventListener('click', function () {
+    if (app && app.close) app.close(); else window.close();
+  });
+
+  function toast(text) {
+    toastEl.textContent = text;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 1600);
+  }
+
+  function el(tag, className, text) {
+    var node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text != null) node.textContent = text;
+    return node;
+  }
+
+  function clean(list) {
+    var out = [], seen = {};
+    (Array.isArray(list) ? list : []).forEach(function (item) {
+      if (!item || typeof item.url !== 'string' || !/^(https?|stremio|skystream):\/\//.test(item.url)) return;
+      if (seen[item.url]) return;
+      seen[item.url] = true;
+      out.push({
+        name: String(item.name || item.url),
+        url: item.url.trim(),
+        type: TYPES[String(item.type || '').toLowerCase()] ? String(item.type).toLowerCase() : "cloudstream",
+        description: item.description ? String(item.description) : ""
+      });
+    });
+    return out;
+  }
+
+  function copy(text) {
+    try {
+      if (app && app.copy) { app.copy(text); toast("Adres kopyalandı"); return; }
+      if (navigator.clipboard) { navigator.clipboard.writeText(text); toast("Adres kopyalandı"); }
+    } catch (e) {}
+  }
+
+  function renderChips() {
+    chipsEl.textContent = "";
+    var present = {};
+    repos.forEach(function (r) { present[r.type] = true; });
+    var keys = Object.keys(TYPES).filter(function (k) { return present[k]; });
+    if (keys.length < 2) return;
+    [["all", "Tümü"]].concat(keys.map(function (k) { return [k, TYPES[k]]; })).forEach(function (pair) {
+      var chip = el('button', 'chip', pair[1]);
+      chip.type = 'button';
+      chip.setAttribute('aria-pressed', String(filter === pair[0]));
+      chip.addEventListener('click', function () { filter = pair[0]; renderChips(); renderList(); });
+      chipsEl.appendChild(chip);
+    });
+  }
+
+  function renderList() {
+    listEl.textContent = "";
+    var shown = repos.filter(function (r) { return filter === "all" || r.type === filter; });
+    if (!shown.length) {
+      listEl.appendChild(el('div', 'empty', "Listede henüz depo yok."));
+      return;
+    }
+    shown.forEach(function (repo, index) {
+      var card = el('article', 'repo');
+      card.style.animationDelay = Math.min(index * 60, 480) + 'ms';
+
+      var title = el('h2', null, repo.name);
+      title.appendChild(el('span', 'badge', TYPES[repo.type]));
+      card.appendChild(title);
+      if (repo.description) card.appendChild(el('p', null, repo.description));
+      card.appendChild(el('div', 'url', repo.url));
+
+      var actions = el('div', 'actions');
+      var isAdded = added.indexOf(repo.url) !== -1;
+      if (isAdded) {
+        var done = el('button', 'btn done', "Eklendi");
+        done.type = 'button'; done.disabled = true;
+        actions.appendChild(done);
+      } else if (canAdd) {
+        var add = el('button', 'btn', "Ekle");
+        add.type = 'button';
+        add.addEventListener('click', function () { app.addRepository(repo.url, repo.name); });
+        actions.appendChild(add);
+      }
+      var copyBtn = el('button', 'btn ghost', "Kopyala");
+      copyBtn.type = 'button';
+      copyBtn.addEventListener('click', function () { copy(repo.url); });
+      actions.appendChild(copyBtn);
+      card.appendChild(actions);
+
+      listEl.appendChild(card);
+    });
+  }
+
+  function show(list) { repos = clean(list); renderChips(); renderList(); }
+
+  show(REPOS);
+  if (REMOTE_LIST) {
+    fetch(REMOTE_LIST, { cache: 'no-store' })
+      .then(function (response) { return response.ok ? response.json() : null; })
+      .then(function (list) { if (clean(list).length) show(list); })
+      .catch(function () {});
+  }
+})();
+</script>
+</body>
+</html>
