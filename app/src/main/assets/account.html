@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bilgilerim</title>
+<!--
+  Ayarlar > Bilgilerim. Yalnızca erişim listesi açıkken görünür.
+  Uygulamaya: Access.info() -> { deviceId, name, expires, remaining, hasPassword }, Access.logout()
+-->
+<style>
+  :root {
+    --bg: #0b0709; --ink: #fbeef3; --muted: #b79aa6; --line: rgba(255, 190, 215, .16);
+    --rose: #f27ba5; --card: rgba(26, 15, 20, .82); --danger: #ff5a4d;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0; min-height: 100vh; background: var(--bg); color: var(--ink);
+    font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  .glow {
+    position: fixed; inset: -25% -30% auto -30%; height: 55vh; pointer-events: none;
+    background: radial-gradient(42% 46% at 50% 40%, rgba(242, 123, 165, .26), transparent 70%);
+    filter: blur(30px);
+  }
+  .bar {
+    position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 8px; padding: 12px 12px;
+    background: linear-gradient(rgba(11, 7, 9, .94), rgba(11, 7, 9, .7));
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  }
+  .bar h1 { margin: 0; font-size: 22px; font-weight: 700; }
+  .icon-btn {
+    width: 44px; height: 44px; border: 0; border-radius: 50%; background: none; color: var(--ink);
+    display: grid; place-items: center;
+  }
+  .icon-btn:active { background: rgba(255, 255, 255, .08); }
+  .icon-btn svg { width: 24px; height: 24px; fill: currentColor; }
+
+  main { position: relative; z-index: 1; max-width: 520px; margin: 0 auto; padding: 8px 16px 40px; }
+  .card {
+    border: 1px solid var(--line); border-radius: 22px; background: var(--card);
+    opacity: 0; transform: translateY(16px); animation: rise .6s cubic-bezier(.2, .7, .2, 1) forwards;
+  }
+  @keyframes rise { to { opacity: 1; transform: none; } }
+  .row { display: flex; align-items: center; gap: 16px; padding: 16px 18px; }
+  .row + .row { border-top: 1px solid var(--line); }
+  .badge {
+    flex: none; width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center;
+    background: rgba(242, 123, 165, .14); color: var(--rose);
+  }
+  .badge svg { width: 24px; height: 24px; fill: currentColor; }
+  .row div { flex: 1; min-width: 0; }
+  .row small { display: block; color: var(--muted); font-size: 14px; }
+  .row b { display: block; font-size: 18px; font-weight: 700; overflow-wrap: anywhere; }
+
+  .logout {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; min-height: 54px; margin-top: 18px; border: 0; border-radius: 16px;
+    font: inherit; font-size: 17px; font-weight: 750; color: #fff; background: var(--danger);
+    transition: transform .12s ease;
+  }
+  .logout:active { transform: scale(.98); }
+  .logout svg { width: 22px; height: 22px; fill: currentColor; }
+  [hidden] { display: none !important; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 20px); opacity: 0;
+    padding: 10px 16px; border-radius: 999px; font-size: 14px; background: var(--ink); color: #2a0f1a;
+    transition: opacity .2s ease, transform .2s ease; pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  @media (prefers-reduced-motion: reduce) { .card { animation: none; opacity: 1; transform: none; } }
+</style>
+</head>
+<body>
+<div class="glow" aria-hidden="true"></div>
+<div class="bar">
+  <button class="icon-btn" id="back" aria-label="Geri">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11H7.800l5.600-5.600L12 4l-8 8 8 8 1.400-1.400L7.800 13H20v-2z"/></svg>
+  </button>
+  <h1>Bilgilerim</h1>
+</div>
+
+<main>
+  <section class="card">
+    <div class="row">
+      <span class="badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-3.300 0-8 1.700-8 5v1h16v-1c0-3.300-4.700-5-8-5z"/></svg></span>
+      <div><small>Ad</small><b id="name">—</b></div>
+    </div>
+    <div class="row">
+      <span class="badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 1H7a2 2 0 0 0-2 2v18a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zm0 18H7V5h10v14zm-5 3a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/></svg></span>
+      <div><small>Cihaz Kimliği</small><b id="device">—</b></div>
+      <button class="icon-btn" id="copy" aria-label="Kimliği kopyala">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 1H4a2 2 0 0 0-2 2v14h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/></svg>
+      </button>
+    </div>
+    <div class="row">
+      <span class="badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16H5V9h14v11zm-3-8h-4v4h4v-4z"/></svg></span>
+      <div><small>Bitiş Tarihi</small><b id="expires">—</b></div>
+    </div>
+    <div class="row">
+      <span class="badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2v6l4 4-4 4v6h12v-6l-4-4 4-4V2H6zm10 14.500V20H8v-3.500l4-4 4 4zM12 11.500l-4-4V4h8v3.500l-4 4z"/></svg></span>
+      <div><small>Kalan Süre</small><b id="remaining">—</b></div>
+    </div>
+  </section>
+
+  <button class="logout" id="logout" hidden>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l1.400-1.400L8.800 13H20v-2H8.800l2.600-2.600L10 7l-5 5 5 5zM4 5h8V3H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8v-2H4V5z"/></svg>
+    Çıkış yap
+  </button>
+</main>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function () {
+  var access = window.Access || {
+    info: function () {
+      return JSON.stringify({ deviceId: "1e256221b241974e", name: "Örnek Kullanıcı", expires: "30.12.2080",
+        remaining: "54 yıl 94 gün kaldı", hasPassword: true });
+    },
+    logout: function () {}
+  };
+  var app = window.CloudStream;
+  var info = {};
+  try { info = JSON.parse(access.info()) || {}; } catch (e) {}
+
+  document.getElementById('name').textContent = info.name || "—";
+  document.getElementById('device').textContent = info.deviceId || "—";
+  document.getElementById('expires').textContent = info.expires || "Süresiz";
+  document.getElementById('remaining').textContent = info.remaining || "—";
+  // Without a password there is nothing to log out of, the device itself is the key
+  document.getElementById('logout').hidden = !info.hasPassword;
+
+  var toastEl = document.getElementById('toast'), toastTimer = 0;
+  document.getElementById('copy').addEventListener('click', function () {
+    try {
+      if (app && app.copy) app.copy(info.deviceId || "");
+      else if (navigator.clipboard) navigator.clipboard.writeText(info.deviceId || "");
+      toastEl.textContent = "Kimlik kopyalandı"; toastEl.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 1600);
+    } catch (e) {}
+  });
+  document.getElementById('back').addEventListener('click', function () {
+    if (app && app.close) app.close(); else window.close();
+  });
+  document.getElementById('logout').addEventListener('click', function () { try { access.logout(); } catch (e) {} });
+})();
+</script>
+</body>
+</html>

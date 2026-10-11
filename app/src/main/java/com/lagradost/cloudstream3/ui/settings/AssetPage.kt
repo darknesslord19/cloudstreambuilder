@@ -31,7 +31,9 @@ import org.json.JSONArray
 
 /** The "Developer" page of the settings, the bundled web page assets/about.html. */
 object AboutPage {
-    fun show(activity: Activity) = AssetPage.show(activity, "about.html")
+    fun show(activity: Activity) {
+        AssetPage.show(activity, "about.html")
+    }
 }
 
 /**
@@ -116,26 +118,59 @@ object AssetPage {
         }
     }
 
+    /** An open page, for the code that opened it. */
+    class Handle internal constructor(private val dialog: Dialog, private val webView: WebView) {
+        val isOpen: Boolean get() = dialog.isShowing
+
+        fun close() {
+            webView.post {
+                try {
+                    if (dialog.isShowing) dialog.dismiss()
+                } catch (t: Throwable) {
+                    logError(t)
+                }
+            }
+        }
+
+        /** Runs a piece of JavaScript in the page, from any thread. */
+        fun runScript(script: String) {
+            webView.post {
+                try {
+                    if (dialog.isShowing) webView.evaluateJavascript(script, null)
+                } catch (t: Throwable) {
+                    logError(t)
+                }
+            }
+        }
+    }
+
     /**
      * @param page name of the file in the assets folder, for example "about.html".
      * @param onAddRepository given when the page may add repositories, called on the main
      * thread after the page has closed.
      * @param addedUrls the addresses the user has added already, the page can mark them.
+     * @param cancelable false for a page the user has to get through: back then leaves the app
+     * instead of closing the page, and the page cannot close itself.
+     * @param bridges more objects the page can call, by the name they have in the page.
+     * @return null if the device has no usable WebView.
      */
-    @SuppressLint("SetJavaScriptEnabled")
+    @SuppressLint("SetJavaScriptEnabled", "JavascriptInterface")
     fun show(
         activity: Activity,
         page: String,
         onAddRepository: ((url: String, name: String?) -> Unit)? = null,
         addedUrls: () -> List<String> = { emptyList() },
-    ) {
+        cancelable: Boolean = true,
+        bridges: Map<String, Any> = emptyMap(),
+        quiet: Boolean = false,
+    ): Handle? {
         val webView = try {
             WebView(activity)
         } catch (t: Throwable) {
             // The device has no usable WebView
             logError(t)
-            showToast(R.string.error, Toast.LENGTH_SHORT)
-            return
+            if (!quiet) showToast(R.string.error, Toast.LENGTH_SHORT)
+            return null
         }
 
         val dialog = Dialog(activity, android.R.style.Theme_Black_NoTitleBar)
@@ -168,14 +203,17 @@ object AssetPage {
         }
 
         webView.addJavascriptInterface(
-            PageBridge(activity, { dialog.dismiss() }, onAddRepository, addedUrls),
+            PageBridge(activity, { if (cancelable) dialog.dismiss() }, onAddRepository, addedUrls),
             "CloudStream"
         )
+        for ((name, bridge) in bridges) {
+            webView.addJavascriptInterface(bridge, name)
+        }
 
         webView.webChromeClient = object : WebChromeClient() {
             // window.close() in the page closes the page
             override fun onCloseWindow(window: WebView?) {
-                dialog.dismiss()
+                if (cancelable) dialog.dismiss()
             }
         }
 
@@ -215,13 +253,23 @@ object AssetPage {
         }
 
         dialog.setContentView(container)
+        dialog.setCancelable(cancelable)
         dialog.setOnKeyListener { _, keyCode, event ->
-            // Back first goes back inside the page, then closes it
-            if (keyCode == KeyEvent.KEYCODE_BACK && webView.canGoBack()) {
-                if (event.action == KeyEvent.ACTION_UP) webView.goBack()
-                true
-            } else {
-                false
+            when {
+                keyCode != KeyEvent.KEYCODE_BACK -> false
+                // Back first goes back inside the page, then closes it
+                webView.canGoBack() -> {
+                    if (event.action == KeyEvent.ACTION_UP) webView.goBack()
+                    true
+                }
+
+                !cancelable -> {
+                    // The page stays, the app goes to the background
+                    if (event.action == KeyEvent.ACTION_UP) activity.moveTaskToBack(true)
+                    true
+                }
+
+                else -> false
             }
         }
         dialog.setOnDismissListener {
@@ -234,11 +282,13 @@ object AssetPage {
             }
         }
 
-        try {
+        return try {
             dialog.show()
             webView.loadUrl("https://$HOST/$page")
+            Handle(dialog, webView)
         } catch (t: Throwable) {
             logError(t)
+            null
         }
     }
 

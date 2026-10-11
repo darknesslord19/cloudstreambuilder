@@ -12,11 +12,17 @@ import com.lagradost.cloudstream3.addons.skystream.SkyStreamProvider
 import com.lagradost.cloudstream3.addons.skystream.SkyStreamRepo
 import com.lagradost.cloudstream3.addons.stremio.StremioAddon
 import com.lagradost.cloudstream3.addons.stremio.StremioProvider
+import com.lagradost.cloudstream3.addons.tmdb.TmdbCatalogProvider
 import com.lagradost.cloudstream3.amap
 import com.lagradost.cloudstream3.mapper
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.sync.withPermit
 import java.io.File
 import java.security.MessageDigest
 import java.util.concurrent.ConcurrentHashMap
@@ -34,7 +40,15 @@ object AddonManager {
     private const val SOURCES_KEY = "EXTERNAL_ADDON_SOURCES"
     private const val REFRESHED_KEY_PREFIX = "addon_refreshed/"
     private const val TAG_PREFIX = "external-addon:"
+    private const val BUILT_IN_TAG = TAG_PREFIX + "built-in-catalog"
+    private const val CATALOG_MIGRATED_KEY = "addon_built_in_catalog_v2"
     private const val REFRESH_AFTER_MS = 12L * 60L * 60L * 1000L
+
+    // What scrapers are tried with: Inception as the movie, Breaking Bad S01E01 for series only ones
+    private const val TEST_MOVIE_TMDB_ID = "27205"
+    private const val TEST_SHOW_TMDB_ID = "1396"
+    private const val TEST_TIMEOUT_MS = 30_000L
+    private const val TEST_PARALLEL = 4
 
     /**
      * Manifest of the catalog add-on that is used when the user has none: it is added next
@@ -108,21 +122,14 @@ object AddonManager {
         return getSource(sourcePlugin.removePrefix(TAG_PREFIX))
     }
 
-    /** If [source] is the catalog that is added by itself next to stream sources. */
-    fun isBuiltInCatalog(source: AddonSource): Boolean = source.url == fallbackCatalogUrl
+    /** If a provider with this sourcePlugin is the catalog that comes with the stream sources. */
+    fun isBuiltInCatalogProvider(sourcePlugin: String?): Boolean = sourcePlugin == BUILT_IN_TAG
 
-    /**
-     * The name [source] is shown under. The built-in catalog can have a name of its own,
-     * unless the user named it when adding it.
-     */
-    fun displayNameOf(source: AddonSource): String {
-        if (isInitialised && isBuiltInCatalog(source)) {
-            val ownName = stremioBySource[source.url]?.name
-            val brand = platform.catalogDisplayName()
-            if (brand != null && (ownName == null || source.name == ownName)) return brand
-        }
-        return source.name
-    }
+    /** The name the built-in catalog is shown under. */
+    fun builtInCatalogName(): String = (if (isInitialised) platform.catalogDisplayName() else null) ?: "TMDB"
+
+    /** The name [source] is shown under. */
+    fun displayNameOf(source: AddonSource): String = source.name
 
     /** Sources that find links: Nuvio repositories and Stremio add-ons with streams. */
     fun streamSources(): List<AddonSource> = getSources().filter { source ->
@@ -296,7 +303,7 @@ object AddonManager {
             activate(source)
             markRefreshed(source.url)
         }
-        val addedCatalog = ensureCatalog()
+        val addedCatalog = mutex.withLock { ensureCatalog() }
         platform.providersChanged()
         return Result(source, failed, addedCatalog)
     }
@@ -313,7 +320,7 @@ object AddonManager {
             saveSources(getSources().map { if (it.url == url) updated else it })
             activate(updated)
         }
-        val addedCatalog = ensureCatalog()
+        val addedCatalog = mutex.withLock { ensureCatalog() }
         platform.providersChanged()
         return Result(updated, failed, addedCatalog)
     }
@@ -328,8 +335,52 @@ object AddonManager {
             } catch (t: Throwable) {
                 Log.w(TAG, "Could not delete the files of $url: ${t.message}")
             }
+            ensureCatalog()
         }
         platform.providersChanged()
+    }
+
+    /** How one scraper did in [testScrapers]. */
+    class ScraperCheck(
+        val id: String,
+        val name: String,
+        /** Links it found for the test title */
+        val links: Int,
+        val millis: Long,
+        /** What went wrong, null if the scraper ran through */
+        val error: String?,
+    )
+
+    /**
+     * Runs every switched-on scraper of the Nuvio repository at [url] against a title every
+     * site should have, to see which of them answer at the moment. A scraper without links
+     * is not necessarily broken, its site may just not have this one title.
+     */
+    suspend fun testScrapers(url: String): List<ScraperCheck> = coroutineScope {
+        val slots = Semaphore(TEST_PARALLEL)
+        (nuvioBySource[url] ?: emptyList()).map { scraper ->
+            async {
+                slots.withPermit {
+                    val started = System.currentTimeMillis()
+                    try {
+                        val results = if (scraper.supports("movie")) {
+                            scraper.getStreams(TEST_MOVIE_TMDB_ID, "movie", null, null, TEST_TIMEOUT_MS)
+                        } else {
+                            scraper.getStreams(TEST_SHOW_TMDB_ID, "tv", 1, 1, TEST_TIMEOUT_MS)
+                        }
+                        val links = results.count { it.isObject && (it.text("url") != null || it.text("infoHash") != null) }
+                        ScraperCheck(scraper.id, scraper.name, links, System.currentTimeMillis() - started, null)
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (t: Throwable) {
+                        ScraperCheck(
+                            scraper.id, scraper.name, 0, System.currentTimeMillis() - started,
+                            t.message ?: t.javaClass.simpleName
+                        )
+                    }
+                }
+            }
+        }.awaitAll()
     }
 
     /** The scrapers or plugins of a source, read from what was last downloaded. */
@@ -488,10 +539,8 @@ object AddonManager {
                     val addon = StremioAddon(url, manifest)
                     stremioBySource[url] = addon
                     if (addon.catalogs.isNotEmpty()) {
-                        val name = uniqueName(displayNameOf(source), AddonKind.STREMIO, tag, emptyList())
-                        val language = (if (isBuiltInCatalog(source)) platform.catalogLanguage() else null)
-                            ?: platform.defaultProviderLanguage()
-                        register(StremioProvider(addon, name, language, platform.uiLanguage()), tag)
+                        val name = uniqueName(source.name, AddonKind.STREMIO, tag, emptyList())
+                        register(StremioProvider(addon, name, platform.defaultProviderLanguage(), platform.uiLanguage()), tag)
                     }
                 }
             }
@@ -589,25 +638,25 @@ object AddonManager {
 
     /**
      * Stream sources only find links for a title, they have no list of titles themselves.
-     * If the user has such sources but nothing with a catalog, the official Cinemeta catalog
-     * of Stremio is added, otherwise there would be nothing to browse.
+     * While the user has such sources the built-in catalog is there to browse, a provider
+     * that lists The Movie Database in the language of the app.
+     * @return true if the catalog was switched on by this call.
      */
-    private suspend fun ensureCatalog(): Boolean {
-        val hasStreamSource = AddonRegistry.nuvio.isNotEmpty() ||
+    private fun ensureCatalog(): Boolean {
+        val wanted = AddonRegistry.nuvio.isNotEmpty() ||
                 AddonRegistry.stremio.any { it.hasResource("stream") }
-        val hasCatalog = AddonRegistry.stremio.any { it.catalogs.isNotEmpty() }
-        if (!hasStreamSource || hasCatalog) return false
-        if (isAddonUrl(fallbackCatalogUrl)) return false
-        return try {
-            val cinemeta = detect(fallbackCatalogUrl) ?: return false
-            add(cinemeta, null, emptyList())
-            true
-        } catch (e: CancellationException) {
-            throw e
-        } catch (t: Throwable) {
-            Log.w(TAG, "Cinemeta could not be added: ${t.message}")
-            false
+        val present = APIHolder.allProviders.withLock {
+            APIHolder.allProviders.any { it.sourcePlugin == BUILT_IN_TAG }
         }
+        if (wanted == present) return false
+        if (!wanted) {
+            unregister(BUILT_IN_TAG)
+            return false
+        }
+        val name = uniqueName(builtInCatalogName(), AddonKind.NUVIO, BUILT_IN_TAG, emptyList())
+        val language = platform.catalogLanguage() ?: platform.defaultProviderLanguage()
+        register(TmdbCatalogProvider(name, language, platform.uiLanguage()), BUILT_IN_TAG)
+        return true
     }
 
     // ------------------------------------------------------------ start up and updates
@@ -616,6 +665,21 @@ object AddonManager {
     suspend fun loadAll() {
         if (!isInitialised) return
         mutex.withLock {
+            // Earlier versions added the Cinemeta add-on as the catalog, the built-in one replaces it
+            if (platform.getValue(CATALOG_MIGRATED_KEY) == null) {
+                platform.setValue(CATALOG_MIGRATED_KEY, "1")
+                val old = getSources().firstOrNull { it.url == fallbackCatalogUrl }
+                if (old != null) {
+                    deactivate(old.url)
+                    saveSources(getSources().filter { it.url != old.url })
+                    platform.setValue(REFRESHED_KEY_PREFIX + sha1(old.url), null)
+                    try {
+                        storeOf(old.url).dir.deleteRecursively()
+                    } catch (t: Throwable) {
+                        Log.w(TAG, "Could not delete the files of ${old.url}: ${t.message}")
+                    }
+                }
+            }
             for (source in getSources()) {
                 try {
                     activate(source)
@@ -623,6 +687,7 @@ object AddonManager {
                     Log.e(TAG, "Could not load ${source.url}: ${t.message}")
                 }
             }
+            ensureCatalog()
         }
     }
 

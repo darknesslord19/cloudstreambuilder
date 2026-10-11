@@ -12,6 +12,14 @@
             android:key="@string/app_theme_key"
             android:title="@string/app_theme_settings" />
         <Preference
+            android:icon="@drawable/title_24px"
+            android:key="fork_app_font"
+            android:title="@string/app_font_settings" />
+        <Preference
+            android:icon="@drawable/extension_24px"
+            android:key="fork_app_icon"
+            android:title="@string/app_icon_settings" />
+        <Preference
             android:icon="@drawable/ic_baseline_tv_24"
             android:key="@string/app_layout_key"
             android:title="@string/app_layout" />

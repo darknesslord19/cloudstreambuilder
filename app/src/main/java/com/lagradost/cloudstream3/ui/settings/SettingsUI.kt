@@ -3,11 +3,15 @@ package com.lagradost.cloudstream3.ui.settings
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
+import androidx.preference.Preference
 import androidx.preference.PreferenceManager
 import androidx.preference.SeekBarPreference
 import com.lagradost.cloudstream3.CloudStreamApp.Companion.getActivity
+import com.lagradost.cloudstream3.CommonActivity
 import com.lagradost.cloudstream3.MainActivity
+import com.lagradost.cloudstream3.fork.Looks
 import com.lagradost.cloudstream3.R
 import com.lagradost.cloudstream3.SearchQuality
 import com.lagradost.cloudstream3.mvvm.logError
@@ -145,13 +149,21 @@ class SettingsUI : BasePreferenceFragmentCompat() {
             val currentLayout =
                 settingsManager.getString(getString(R.string.app_theme_key), prefValues.first())
 
-            activity?.showBottomDialog(
-                prefNames.toList(),
-                prefValues.indexOf(currentLayout),
-                getString(R.string.app_theme_settings),
-                true,
-                {}
-            ) {
+            // Every theme is listed with a small picture of its colours
+            val act = activity ?: return@setOnPreferenceClickListener true
+            val accent = settingsManager.getString(getString(R.string.primary_color_key), "Normal")
+            val options = prefNames.mapIndexed { index, name ->
+                val value = prefValues[index]
+                Looks.Option(
+                    name,
+                    palette = Looks.paletteOf(
+                        act,
+                        CommonActivity.themeStyleOf(act, value),
+                        CommonActivity.accentStyleOf(value, accent),
+                    )
+                )
+            }
+            Looks.pick(act, getString(R.string.app_theme_settings), options, prefValues.indexOf(currentLayout)) {
                 try {
                     settingsManager.edit {
                         putString(getString(R.string.app_theme_key), prefValues[it])
@@ -162,6 +174,43 @@ class SettingsUI : BasePreferenceFragmentCompat() {
                 }
             }
             return@setOnPreferenceClickListener true
+        }
+
+        findPreference<Preference>(Looks.FONT_KEY)?.let { pref ->
+            pref.summary = context?.let { Looks.currentFont(it).label }
+            pref.setOnPreferenceClickListener {
+                val act = activity ?: return@setOnPreferenceClickListener true
+                val current = Looks.fonts.indexOf(Looks.currentFont(act))
+                Looks.pick(act, getString(R.string.app_font_settings), Looks.fontOptions(act), current) { picked ->
+                    try {
+                        settingsManager.edit { putString(Looks.FONT_KEY, Looks.fonts[picked].key) }
+                        activity?.recreate()
+                    } catch (e: Exception) {
+                        logError(e)
+                    }
+                }
+                return@setOnPreferenceClickListener true
+            }
+        }
+
+        findPreference<Preference>(Looks.ICON_KEY)?.let { pref ->
+            pref.summary = context?.let { getString(Looks.currentIcon(it).label) }
+            pref.setOnPreferenceClickListener {
+                val act = activity ?: return@setOnPreferenceClickListener true
+                val current = Looks.icons.indexOf(Looks.currentIcon(act))
+                Looks.pick(act, getString(R.string.app_icon_settings), Looks.iconOptions(act), current) { picked ->
+                    val chosen = Looks.icons[picked]
+                    if (picked == current) return@pick
+                    // Changing the icon closes the app, so the user is told first
+                    AlertDialog.Builder(act, R.style.AlertDialogCustom)
+                        .setTitle(R.string.app_icon_settings)
+                        .setMessage(R.string.app_icon_restart_note)
+                        .setPositiveButton(R.string.ok) { _, _ -> Looks.applyIcon(act, chosen) }
+                        .setNegativeButton(R.string.cancel) { _, _ -> }
+                        .show()
+                }
+                return@setOnPreferenceClickListener true
+            }
         }
         getPref(R.string.primary_color_key)?.setOnPreferenceClickListener {
             val prefNames = resources.getStringArray(R.array.themes_overlay_names).toMutableList()

@@ -76,6 +76,8 @@ import com.lagradost.cloudstream3.CommonActivity.setActivityInstance
 import com.lagradost.cloudstream3.CommonActivity.showToast
 import com.lagradost.cloudstream3.CommonActivity.updateLocale
 import com.lagradost.cloudstream3.addons.android.AndroidAddons
+import com.lagradost.cloudstream3.fork.AccessGate
+import com.lagradost.cloudstream3.fork.Announcements
 import com.lagradost.cloudstream3.CommonActivity.updateTheme
 import com.lagradost.cloudstream3.actions.temp.fcast.FcastManager
 import com.lagradost.cloudstream3.databinding.ActivityMainBinding
@@ -642,6 +644,7 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
         super.onResume()
         afterPluginsLoadedEvent += ::onAllPluginsLoaded
         setActivityInstance(this)
+        AccessGate.onResume(this)
         try {
             if (isCastApiAvailable()) {
                 mSessionManager?.addSessionManagerListener(mSessionManagerListener)
@@ -1992,6 +1995,10 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
         ioSafe {
             runAutoUpdate()
         }
+
+        // The optional access list of this build, and what the developer has to announce
+        AccessGate.onAppStart(this)
+        Announcements.check(this)
 
         FcastManager().init(this, false)
 

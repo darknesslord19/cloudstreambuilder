@@ -10,6 +10,10 @@
         app:key="@string/episode_sync_enabled_key" />
 
     <PreferenceCategory android:title="@string/pref_category_defaults">
+        <Preference
+            android:icon="@drawable/ic_baseline_language_24"
+            android:key="fork_link_preference"
+            android:title="@string/link_preference" />
         <!--        <Preference-->
         <!--            android:icon="@drawable/ic_baseline_hd_24"-->
         <!--            android:key="@string/quality_pref_key"-->

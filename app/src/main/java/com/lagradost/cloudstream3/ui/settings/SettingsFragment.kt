@@ -15,6 +15,7 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.lagradost.cloudstream3.BuildConfig
 import com.lagradost.cloudstream3.R
 import com.lagradost.cloudstream3.databinding.MainSettingsBinding
+import com.lagradost.cloudstream3.fork.AccessGate
 import com.lagradost.cloudstream3.mvvm.logError
 import com.lagradost.cloudstream3.mvvm.safe
 import com.lagradost.cloudstream3.syncproviders.AccountManager
@@ -249,6 +250,26 @@ class SettingsFragment : BaseFragment<MainSettingsBinding>(
                 if (isLayout(TV)) {
                     isFocusable = true
                     isFocusableInTouchMode = true
+                }
+            }
+
+            // The account row belongs to the access list, without the list there is no account
+            settingsAccountInfo.apply {
+                val act = activity
+                val showAccount = try {
+                    act != null && AccessGate.showsAccount(act)
+                } catch (t: Throwable) {
+                    logError(t)
+                    false
+                }
+                visibility = if (showAccount) View.VISIBLE else View.GONE
+                if (showAccount && act != null) {
+                    settingsAccountInfoSummary.text = AccessGate.accountSummary(act)
+                    setOnClickListener { AccessGate.showAccount(act) }
+                    if (isLayout(TV)) {
+                        isFocusable = true
+                        isFocusableInTouchMode = true
+                    }
                 }
             }
 

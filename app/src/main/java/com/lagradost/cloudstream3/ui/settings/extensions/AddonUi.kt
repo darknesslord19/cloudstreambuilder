@@ -167,7 +167,28 @@ object AddonUi {
         AndroidAddons.ensureInitialised(act)
         when (source.addonKind) {
             AddonKind.STREMIO -> showStremioInfo(act, source)
-            AddonKind.NUVIO, AddonKind.SKYSTREAM -> ioSafe {
+            AddonKind.NUVIO -> act.showDialog(
+                listOf(act.getString(R.string.addon_choose_entries), act.getString(R.string.addon_test_entries)),
+                -1,
+                AddonManager.displayNameOf(source),
+                false,
+                {},
+            ) { picked ->
+                if (picked == 1) testScrapers(act, source, onChanged) else chooseEntries(act, source, onChanged)
+            }
+
+            AddonKind.SKYSTREAM -> chooseEntries(act, source, onChanged)
+
+            null -> {}
+        }
+    }
+
+    /** Lets the user change which scrapers or plugins of a repository are switched on. */
+    private fun chooseEntries(act: Activity, shown: AddonSource, onChanged: () -> Unit) {
+        run {
+            ioSafe {
+                // What is switched on may have changed since the list was drawn
+                val source = AddonManager.getSource(shown.url) ?: shown
                 val entries = AddonManager.entriesOf(source)
                 if (entries.isEmpty()) {
                     showToast(R.string.no_plugins_found_error, Toast.LENGTH_LONG)
@@ -184,8 +205,6 @@ object AddonUi {
                 }
                 onChanged()
             }
-
-            null -> {}
         }
     }
 
@@ -195,16 +214,16 @@ object AddonUi {
      * @return null if the provider does not come from a Stremio, Nuvio or SkyStream source.
      */
     fun settingsActionFor(context: Context, sourcePlugin: String?): (() -> Unit)? {
-        val source = try {
-            AddonManager.sourceOfProvider(sourcePlugin)
+        val activityOf = { (context as? Activity) ?: CommonActivity.activity }
+        return try {
+            if (AddonManager.isBuiltInCatalogProvider(sourcePlugin)) {
+                return { openStreamSources(activityOf()) }
+            }
+            val source = AddonManager.sourceOfProvider(sourcePlugin) ?: return null
+            return { open(activityOf(), source) {} }
         } catch (t: Throwable) {
             logError(t)
             null
-        } ?: return null
-        return {
-            val activity = (context as? Activity) ?: CommonActivity.activity
-            if (AddonManager.isBuiltInCatalog(source)) openStreamSources(activity, source)
-            else open(activity, source) {}
         }
     }
 
@@ -212,20 +231,75 @@ object AddonUi {
      * The built-in catalog has nothing to set itself, what matters to the user is where its
      * links come from: this opens the stream sources, asking which one if there are several.
      */
-    private fun openStreamSources(activity: Activity?, catalog: AddonSource) {
+    private fun openStreamSources(activity: Activity?) {
         val act = activity ?: return
         val sources = AddonManager.streamSources()
         when (sources.size) {
-            0 -> open(act, catalog) {}
+            0 -> showToast(R.string.no_plugins_found_error, Toast.LENGTH_LONG)
             1 -> open(act, sources.first()) {}
             else -> act.showDialog(
                 sources.map { "${AddonManager.displayNameOf(it)} (${it.addonKind?.label ?: it.kind})" },
                 -1,
-                AddonManager.displayNameOf(catalog),
+                AddonManager.builtInCatalogName(),
                 false,
                 {},
             ) { picked ->
                 sources.getOrNull(picked)?.let { open(act, it) {} }
+            }
+        }
+    }
+
+    /** Tries every switched-on scraper of a Nuvio repository and shows which of them answer. */
+    private fun testScrapers(activity: Activity, source: AddonSource, onChanged: () -> Unit) {
+        showToast(R.string.addon_test_running, Toast.LENGTH_LONG)
+        ioSafe {
+            val checks = try {
+                AddonManager.testScrapers(source.url)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (t: Throwable) {
+                logError(t)
+                emptyList()
+            }
+            if (checks.isEmpty()) {
+                showToast(R.string.no_plugins_found_error, Toast.LENGTH_LONG)
+                return@ioSafe
+            }
+            val working = checks.filter { it.links > 0 }
+            val lines = checks.sortedWith(compareBy({ it.links == 0 }, { it.name.lowercase() })).map { check ->
+                val seconds = String.format(java.util.Locale.ROOT, "%.1f", check.millis / 1000.0)
+                when {
+                    check.links > 0 -> activity.getString(R.string.addon_test_ok, check.name, check.links, seconds)
+                    check.error != null -> activity.getString(R.string.addon_test_error, check.name, check.error.take(60))
+                    else -> activity.getString(R.string.addon_test_none, check.name)
+                }
+            }
+            val message = lines.joinToString("\n") + "\n\n" + activity.getString(R.string.addon_test_note)
+            activity.runOnUiThread {
+                if (activity.isFinishing || activity.isDestroyed) return@runOnUiThread
+                try {
+                    val builder = AlertDialog.Builder(activity, R.style.AlertDialogCustom)
+                        .setTitle(activity.getString(R.string.addon_test_title, working.size, checks.size))
+                        .setMessage(message)
+                        .setPositiveButton(R.string.ok) { _, _ -> }
+                    // Offered only if it leaves something switched on
+                    if (working.isNotEmpty() && working.size < checks.size) {
+                        builder.setNeutralButton(R.string.addon_test_disable_failed) { _, _ ->
+                            ioSafe {
+                                try {
+                                    val result = AddonManager.setEnabled(source.url, working.map { it.id })
+                                    if (result != null) report(activity, result, added = false)
+                                } catch (t: Throwable) {
+                                    logError(t)
+                                }
+                                onChanged()
+                            }
+                        }
+                    }
+                    builder.show().setDefaultFocus(DialogInterface.BUTTON_POSITIVE)
+                } catch (t: Throwable) {
+                    logError(t)
+                }
             }
         }
     }

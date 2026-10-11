@@ -1,6 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. Material3 -->
     <style name="AppTheme" parent="Theme.Material3.Dark.NoActionBar">
+        <!-- The font of the app, the widget styles below read it. See fork_fonts.xml -->
+        <item name="appFont">@font/google_sans</item>
         <item name="android:windowBackground">@drawable/splash_background</item>
         <item name="android:colorEdgeEffect">?attr/textColor</item>
 
@@ -97,9 +99,9 @@
         <item name="textColor">@color/chip_color_text</item>
         <item name="android:textColor">@color/chip_color_text</item>
         <item name="checkedIconTint">@color/chip_color_text</item>
-        <item name="fontFamily">@font/google_sans</item>
+        <item name="fontFamily">?attr/appFont</item>
         <item name="chipIconTint">@color/chip_color_text</item>
-        <item name="android:fontFamily">@font/google_sans</item>
+        <item name="android:fontFamily">?attr/appFont</item>
         <item name="android:tag">@string/tv_no_focus_tag</item>
         <item name="chipMinTouchTargetSize">0dp</item>
         <item name="checkedIconVisible">false</item>
@@ -467,7 +469,7 @@
         <item name="android:searchIcon">@drawable/search_icon</item>
         <item name="android:queryHint">@string/search_hint</item>
         <item name="android:background">@color/transparent</item>
-        <item name="android:fontFamily">@font/google_sans</item>
+        <item name="android:fontFamily">?attr/appFont</item>
         <item name="closeIcon">@drawable/ic_baseline_close_24</item>
     </style>
 
@@ -509,19 +511,19 @@
 
     <style name="TabNoCaps" parent="TextAppearance.Design.Tab">
         <item name="textAllCaps">false</item>
-        <item name="fontFamily">@font/google_sans</item>
+        <item name="fontFamily">?attr/appFont</item>
     </style>
 
     <style name="AppTextViewStyle" parent="android:Widget.TextView">
-        <item name="android:fontFamily">@font/google_sans</item>
+        <item name="android:fontFamily">?attr/appFont</item>
     </style>
 
     <style name="AppButtonStyle" parent="android:Widget.Holo.Button">
-        <item name="android:fontFamily">@font/google_sans</item>
+        <item name="android:fontFamily">?attr/appFont</item>
     </style>
 
     <style name="AppEditStyle" parent="android:Widget.EditText">
-        <item name="android:fontFamily">@font/google_sans</item>
+        <item name="android:fontFamily">?attr/appFont</item>
     </style>
 
     <style name="ResultInfoText">
@@ -538,7 +540,7 @@
     </style>
 
     <style name="AppMaterialButtonStyle" parent="Widget.MaterialComponents.Button">
-        <item name="android:fontFamily">@font/google_sans</item>
+        <item name="android:fontFamily">?attr/appFont</item>
     </style>
 
     <style name="Theme.Widget.Tabs" parent="Widget.MaterialComponents.TabLayout.Colored">

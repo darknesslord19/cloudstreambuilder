@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The font of the whole app. The theme and the styles that name a font read this
+         attribute, a font overlay only has to change it. -->
+    <attr name="appFont" format="reference|string" />
+
+    <style name="FontOverlayGoogleSans">
+        <item name="appFont">@font/google_sans</item>
+    </style>
+
+    <style name="FontOverlayRoboto">
+        <item name="appFont">sans-serif</item>
+    </style>
+
+    <style name="FontOverlayRobotoLight">
+        <item name="appFont">sans-serif-light</item>
+    </style>
+
+    <style name="FontOverlayRobotoMedium">
+        <item name="appFont">sans-serif-medium</item>
+    </style>
+
+    <style name="FontOverlayRobotoCondensed">
+        <item name="appFont">sans-serif-condensed</item>
+    </style>
+
+    <style name="FontOverlayPoppins">
+        <item name="appFont">@font/poppins_regular</item>
+    </style>
+
+    <style name="FontOverlayOpenSans">
+        <item name="appFont">@font/open_sans</item>
+    </style>
+
+    <style name="FontOverlayUbuntu">
+        <item name="appFont">@font/ubuntu_regular</item>
+    </style>
+
+    <style name="FontOverlayNetflixSans">
+        <item name="appFont">@font/netflix_sans</item>
+    </style>
+
+    <style name="FontOverlayFutura">
+        <item name="appFont">@font/futura</item>
+    </style>
+
+    <style name="FontOverlayVerdana">
+        <item name="appFont">@font/verdana</item>
+    </style>
+
+    <style name="FontOverlayTrebuchet">
+        <item name="appFont">@font/trebuchet_ms</item>
+    </style>
+
+    <style name="FontOverlayLucidaGrande">
+        <item name="appFont">@font/lucida_grande</item>
+    </style>
+
+    <style name="FontOverlayConsolas">
+        <item name="appFont">@font/consola</item>
+    </style>
+
+    <style name="FontOverlayMonospace">
+        <item name="appFont">monospace</item>
+    </style>
+
+    <style name="FontOverlayNotoSerif">
+        <item name="appFont">serif</item>
+    </style>
+
+    <style name="FontOverlayStix">
+        <item name="appFont">@font/stix_general</item>
+    </style>
+
+    <style name="FontOverlayCutiveMono">
+        <item name="appFont">serif-monospace</item>
+    </style>
+
+    <style name="FontOverlayComingSoon">
+        <item name="appFont">casual</item>
+    </style>
+
+    <style name="FontOverlayDancingScript">
+        <item name="appFont">cursive</item>
+    </style>
+
+    <color name="fork_icon_background">#000000</color>
+</resources>

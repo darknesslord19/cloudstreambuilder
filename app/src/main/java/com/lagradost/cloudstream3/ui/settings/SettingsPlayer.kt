@@ -1,5 +1,7 @@
 package com.lagradost.cloudstream3.ui.settings
 
+import androidx.preference.Preference
+import com.lagradost.cloudstream3.fork.LinkPreference
 import android.os.Bundle
 import android.text.format.Formatter.formatShortFileSize
 import android.view.View
@@ -151,6 +153,24 @@ class SettingsPlayer : BasePreferenceFragmentCompat() {
         }
 
         getPref(R.string.hide_player_control_names_key)?.hideOn(TV)
+
+        findPreference<Preference>(LinkPreference.KEY)?.let { pref ->
+            val names = listOf(
+                getString(R.string.link_preference_none),
+                getString(R.string.link_preference_dub),
+                getString(R.string.link_preference_sub),
+            )
+            val ctx = context
+            if (ctx != null) pref.summary = names.getOrNull(LinkPreference.get(ctx))
+            pref.setOnPreferenceClickListener {
+                val current = context?.let { LinkPreference.get(it) } ?: LinkPreference.NONE
+                activity?.showBottomDialog(names, current, getString(R.string.link_preference), true, {}) { picked ->
+                    context?.let { LinkPreference.set(it, picked) }
+                    pref.summary = names.getOrNull(picked)
+                }
+                return@setOnPreferenceClickListener true
+            }
+        }
 
         getPref(R.string.quality_pref_key)?.setOnPreferenceClickListener {
             val prefValues = Qualities.entries.map { it.value }.reversed().toMutableList()

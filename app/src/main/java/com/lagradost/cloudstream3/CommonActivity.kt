@@ -32,6 +32,7 @@ import androidx.preference.PreferenceManager
 import com.google.android.gms.cast.framework.CastSession
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.navigationrail.NavigationRailView
+import com.lagradost.cloudstream3.fork.Looks
 import com.lagradost.cloudstream3.CloudStreamApp.Companion.getKey
 import com.lagradost.cloudstream3.CloudStreamApp.Companion.removeKey
 import com.lagradost.cloudstream3.actions.OpenInAppAction
@@ -363,61 +364,72 @@ object CommonActivity {
         "Cream" to (R.style.CreamMode to R.style.OverlayPrimaryColorThemeCream),
     )
 
+    /** The style of the app theme saved as [themeName]. */
+    fun themeStyleOf(act: Activity, themeName: String?): Int {
+        return when (themeName) {
+            "System" -> mapSystemTheme(act)
+            "Black" -> R.style.AppTheme
+            "Light" -> R.style.LightMode
+            "Amoled" -> R.style.AmoledMode
+            "AmoledLight" -> R.style.AmoledModeLight
+            "Monet" -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+                R.style.MonetMode else R.style.AppTheme
+
+            "Dracula" -> R.style.DraculaMode
+            "Lavender" -> R.style.LavenderMode
+            "SilentBlue" -> R.style.SilentBlueMode
+
+            else -> extraThemes[themeName]?.first ?: R.style.AppTheme
+        }
+    }
+
+    /** The style of the primary colour saved as [colorName], for the theme saved as [themeName]. */
+    fun accentStyleOf(themeName: String?, colorName: String?): Int {
+        return when (colorName) {
+            "Normal" -> extraThemes[themeName]?.second ?: R.style.OverlayPrimaryColorNormal
+            "DandelionYellow" -> R.style.OverlayPrimaryColorDandelionYellow
+            "CarnationPink" -> R.style.OverlayPrimaryColorCarnationPink
+            "Orange" -> R.style.OverlayPrimaryColorOrange
+            "DarkGreen" -> R.style.OverlayPrimaryColorDarkGreen
+            "Maroon" -> R.style.OverlayPrimaryColorMaroon
+            "NavyBlue" -> R.style.OverlayPrimaryColorNavyBlue
+            "Grey" -> R.style.OverlayPrimaryColorGrey
+            "White" -> R.style.OverlayPrimaryColorWhite
+            "CoolBlue" -> R.style.OverlayPrimaryColorCoolBlue
+            "Brown" -> R.style.OverlayPrimaryColorBrown
+            "Purple" -> R.style.OverlayPrimaryColorPurple
+            "Green" -> R.style.OverlayPrimaryColorGreen
+            "GreenApple" -> R.style.OverlayPrimaryColorGreenApple
+            "Red" -> R.style.OverlayPrimaryColorRed
+            "Banana" -> R.style.OverlayPrimaryColorBanana
+            "Party" -> R.style.OverlayPrimaryColorParty
+            "Pink" -> R.style.OverlayPrimaryColorPink
+            "Lavender" -> R.style.OverlayPrimaryColorLavender
+            "Monet" -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+                R.style.OverlayPrimaryColorMonet else R.style.OverlayPrimaryColorNormal
+
+            "Monet2" -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+                R.style.OverlayPrimaryColorMonetTwo else R.style.OverlayPrimaryColorNormal
+
+            else -> R.style.OverlayPrimaryColorNormal
+        }
+    }
+
     fun loadThemes(act: Activity?) {
         if (act == null) return
         val settingsManager = PreferenceManager.getDefaultSharedPreferences(act)
 
         val themeName = settingsManager.getString(act.getString(R.string.app_theme_key), "AmoledLight")
             ?: "AmoledLight"
-        val currentTheme =
-            when (themeName) {
-                "System" -> mapSystemTheme(act)
-                "Black" -> R.style.AppTheme
-                "Light" -> R.style.LightMode
-                "Amoled" -> R.style.AmoledMode
-                "AmoledLight" -> R.style.AmoledModeLight
-                "Monet" -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-                    R.style.MonetMode else R.style.AppTheme
-
-                "Dracula" -> R.style.DraculaMode
-                "Lavender" -> R.style.LavenderMode
-                "SilentBlue" -> R.style.SilentBlueMode
-
-                else -> extraThemes[themeName]?.first ?: R.style.AppTheme
-            }
-
-        val currentOverlayTheme =
-            when (settingsManager.getString(act.getString(R.string.primary_color_key), "Normal")) {
-                "Normal" -> extraThemes[themeName]?.second ?: R.style.OverlayPrimaryColorNormal
-                "DandelionYellow" -> R.style.OverlayPrimaryColorDandelionYellow
-                "CarnationPink" -> R.style.OverlayPrimaryColorCarnationPink
-                "Orange" -> R.style.OverlayPrimaryColorOrange
-                "DarkGreen" -> R.style.OverlayPrimaryColorDarkGreen
-                "Maroon" -> R.style.OverlayPrimaryColorMaroon
-                "NavyBlue" -> R.style.OverlayPrimaryColorNavyBlue
-                "Grey" -> R.style.OverlayPrimaryColorGrey
-                "White" -> R.style.OverlayPrimaryColorWhite
-                "CoolBlue" -> R.style.OverlayPrimaryColorCoolBlue
-                "Brown" -> R.style.OverlayPrimaryColorBrown
-                "Purple" -> R.style.OverlayPrimaryColorPurple
-                "Green" -> R.style.OverlayPrimaryColorGreen
-                "GreenApple" -> R.style.OverlayPrimaryColorGreenApple
-                "Red" -> R.style.OverlayPrimaryColorRed
-                "Banana" -> R.style.OverlayPrimaryColorBanana
-                "Party" -> R.style.OverlayPrimaryColorParty
-                "Pink" -> R.style.OverlayPrimaryColorPink
-                "Lavender" -> R.style.OverlayPrimaryColorLavender
-                "Monet" -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-                    R.style.OverlayPrimaryColorMonet else R.style.OverlayPrimaryColorNormal
-
-                "Monet2" -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-                    R.style.OverlayPrimaryColorMonetTwo else R.style.OverlayPrimaryColorNormal
-
-                else -> R.style.OverlayPrimaryColorNormal
-            }
+        val currentTheme = themeStyleOf(act, themeName)
+        val currentOverlayTheme = accentStyleOf(
+            themeName, settingsManager.getString(act.getString(R.string.primary_color_key), "Normal")
+        )
 
         act.theme.applyStyle(currentTheme, true)
         act.theme.applyStyle(currentOverlayTheme, true)
+        // The font the user chose for the whole app
+        act.theme.applyStyle(Looks.fontOverlay(act), true)
         appliedTheme = currentTheme
         appliedColor = currentOverlayTheme
         act.updateTv()

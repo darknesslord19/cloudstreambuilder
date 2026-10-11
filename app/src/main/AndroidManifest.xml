@@ -80,11 +80,11 @@
         android:banner="@mipmap/ic_banner"
         android:fullBackupContent="@xml/backup_descriptor"
         android:dataExtractionRules="@xml/data_extraction_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_fork_rose"
         android:label="@string/app_name"
         android:largeHeap="true"
         android:pageSizeCompat="enabled"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_fork_rose"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
@@ -164,12 +164,7 @@
             android:name=".ui.account.AccountSelectActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboard|keyboardHidden"
             android:exported="true">
-            <intent-filter android:exported="true">
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
-            </intent-filter>
+            <!-- The launcher entries are the activity-alias elements below, one per app icon -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -243,6 +238,158 @@
                     android:scheme="https" />
             </intent-filter>
         </activity>
+
+        <!-- One launcher entry per app icon, exactly one of them is enabled. The user picks
+             the icon in the settings, see fork/Looks.kt -->
+        <activity-alias
+            android:name=".IconRose"
+            android:enabled="true"
+            android:exported="true"
+            android:icon="@mipmap/ic_fork_rose"
+            android:roundIcon="@mipmap/ic_fork_rose"
+            android:targetActivity=".ui.account.AccountSelectActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".IconBlue"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_fork_blue"
+            android:roundIcon="@mipmap/ic_fork_blue"
+            android:targetActivity=".ui.account.AccountSelectActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".IconRed"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_fork_red"
+            android:roundIcon="@mipmap/ic_fork_red"
+            android:targetActivity=".ui.account.AccountSelectActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".IconOrange"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_fork_orange"
+            android:roundIcon="@mipmap/ic_fork_orange"
+            android:targetActivity=".ui.account.AccountSelectActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".IconGold"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_fork_gold"
+            android:roundIcon="@mipmap/ic_fork_gold"
+            android:targetActivity=".ui.account.AccountSelectActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".IconGreen"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_fork_green"
+            android:roundIcon="@mipmap/ic_fork_green"
+            android:targetActivity=".ui.account.AccountSelectActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".IconTeal"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_fork_teal"
+            android:roundIcon="@mipmap/ic_fork_teal"
+            android:targetActivity=".ui.account.AccountSelectActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".IconPurple"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_fork_purple"
+            android:roundIcon="@mipmap/ic_fork_purple"
+            android:targetActivity=".ui.account.AccountSelectActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".IconPink"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_fork_pink"
+            android:roundIcon="@mipmap/ic_fork_pink"
+            android:targetActivity=".ui.account.AccountSelectActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".IconSilver"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_fork_silver"
+            android:roundIcon="@mipmap/ic_fork_silver"
+            android:targetActivity=".ui.account.AccountSelectActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
 
         <receiver
             android:name=".receivers.VideoDownloadRestartReceiver"

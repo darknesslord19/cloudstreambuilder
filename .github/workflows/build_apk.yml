@@ -39,7 +39,22 @@ jobs:
       uses: gradle/actions/setup-gradle@v5
 
     - name: Build
-      run: ./gradlew assembleStableRelease
+      run: |
+        set -o pipefail
+        ./gradlew assembleStableRelease 2>&1 | tee build.log
+
+    # The errors of a failed build, where they can be read without opening the run
+    - name: Publish the log of a failed build
+      if: failure()
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        grep -n -E "^e: |error:|FAILED|What went wrong|Caused by" build.log | head -200 > build-errors.txt || true
+        tail -n 120 build.log >> build-errors.txt || true
+        gh release view build-log --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1 || \
+          gh release create build-log --repo "${GITHUB_REPOSITORY}" --prerelease --target "${GITHUB_SHA}" \
+            --title "Derleme günlüğü" --notes "Başarısız olan son derlemenin hata çıktısı."
+        gh release upload build-log build-errors.txt --repo "${GITHUB_REPOSITORY}" --clobber
 
     - name: Name the APK
       run: |

@@ -10,6 +10,7 @@ import com.lagradost.cloudstream3.mvvm.Resource
 import com.lagradost.cloudstream3.mvvm.launchSafe
 import com.lagradost.cloudstream3.mvvm.logError
 import com.lagradost.cloudstream3.mvvm.safeApiCall
+import com.lagradost.cloudstream3.fork.LinkPreference
 import com.lagradost.cloudstream3.ui.player.source_priority.QualityDataHelper.getLinkPriority
 import com.lagradost.cloudstream3.ui.result.ResultEpisode
 import com.lagradost.cloudstream3.utils.Coroutines.ioSafe
@@ -68,7 +69,7 @@ data class VideoState(
     fun sortLinks(qualityProfile: Int): List<VideoLink> {
         return sortedLinks[qualityProfile] ?: links.sortedBy { link ->
             // negative because we want to sort highest quality first
-            -getLinkPriority(qualityProfile, link.first)
+            -(getLinkPriority(qualityProfile, link.first) + LinkPreference.bonus(link.first))
         }.also { value -> sortedLinks[qualityProfile] = value }
     }
 

@@ -56,6 +56,32 @@
                     tools:text="Quick Brown Fox" />
             </LinearLayout>
 
+            <!-- Only shown while the access list of this build is switched on -->
+            <LinearLayout
+                android:id="@+id/settings_account_info"
+                style="@style/SettingsRow"
+                android:nextFocusDown="@id/settings_general"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <ImageView
+                    style="@style/SettingsRowIcon"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/account_circle_24px" />
+
+                <LinearLayout style="@style/SettingsRowTexts">
+
+                    <TextView
+                        style="@style/SettingsRowTitle"
+                        android:text="@string/access_account" />
+
+                    <TextView
+                        android:id="@+id/settings_account_info_summary"
+                        style="@style/SettingsRowSummary"
+                        tools:text="Name • 54 years 94 days left" />
+                </LinearLayout>
+            </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/settings_general"
                 style="@style/SettingsRow"

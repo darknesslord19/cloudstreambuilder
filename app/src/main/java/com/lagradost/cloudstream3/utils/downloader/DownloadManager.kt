@@ -40,6 +40,7 @@ import com.lagradost.cloudstream3.ui.player.LOADTYPE_INAPP_DOWNLOAD
 import com.lagradost.cloudstream3.ui.player.RepoLinkGenerator
 import com.lagradost.cloudstream3.ui.player.SubtitleData
 import com.lagradost.cloudstream3.ui.player.source_priority.QualityDataHelper
+import com.lagradost.cloudstream3.fork.LinkPreference
 import com.lagradost.cloudstream3.ui.player.source_priority.QualityDataHelper.getLinkPriority
 import com.lagradost.cloudstream3.ui.result.ExtractorSubtitleLink
 import com.lagradost.cloudstream3.ui.result.ResultEpisode
@@ -2083,7 +2084,7 @@ object VideoDownloadManager {
 
             val sortedLinks = currentLinks.sortedBy { link ->
                 // Negative, because the highest priority should be first
-                -getLinkPriority(profile.id, link)
+                -(getLinkPriority(profile.id, link) + LinkPreference.bonus(link))
             }
 
             downloadEpisodeWithLinks(
