@@ -12,7 +12,7 @@
     <color name="MidnightBlueIconColor">#7D8FB3</color>
     <color name="MidnightBlueAccent">#4C8DFF</color>
     <color name="MidnightBlueAccentDark">#2A5FCC</color>
-    <color name="MidnightBlueOnAccent">#FFFFFF</color>
+    <color name="MidnightBlueOnAccent">#0B1220</color>
 
     <style name="MidnightBlueMode">
         <item name="primaryGrayBackground">@color/MidnightBluePrimaryGrayBackground</item>
@@ -111,7 +111,7 @@
     <color name="WineIconColor">#B08590</color>
     <color name="WineAccent">#E0486A</color>
     <color name="WineAccentDark">#A82848</color>
-    <color name="WineOnAccent">#FFFFFF</color>
+    <color name="WineOnAccent">#180A0E</color>
 
     <style name="WineMode">
         <item name="primaryGrayBackground">@color/WinePrimaryGrayBackground</item>
@@ -144,7 +144,7 @@
     <color name="PurpleNightIconColor">#9483BD</color>
     <color name="PurpleNightAccent">#9D6BFF</color>
     <color name="PurpleNightAccentDark">#6B3FD1</color>
-    <color name="PurpleNightOnAccent">#FFFFFF</color>
+    <color name="PurpleNightOnAccent">#120C1F</color>
 
     <style name="PurpleNightMode">
         <item name="primaryGrayBackground">@color/PurpleNightPrimaryGrayBackground</item>
@@ -174,7 +174,7 @@
     <color name="NordGrayBackground">#3B4252</color>
     <color name="NordItemBackground">#3B4252</color>
     <color name="NordTextColor">#ECEFF4</color>
-    <color name="NordIconColor">#8FA1BD</color>
+    <color name="NordIconColor">#A7B4CC</color>
     <color name="NordAccent">#88C0D0</color>
     <color name="NordAccentDark">#5E81AC</color>
     <color name="NordOnAccent">#2E3440</color>
