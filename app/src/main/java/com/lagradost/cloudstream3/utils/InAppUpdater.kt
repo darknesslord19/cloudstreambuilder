@@ -128,7 +128,13 @@ object InAppUpdater {
     private suspend fun getForkUpdate(): Update {
         val none = Update(false, null, null, null, null)
         val json = try {
-            mapper.readTree(app.get(UPDATE_INFO_URL).text)
+            val answer = mapper.readTree(app.get(UPDATE_INFO_URL).text)
+            // The object may have been saved as a text, that is with quotes around it
+            if (answer != null && answer.isTextual && answer.asText().trim().startsWith("{")) {
+                mapper.readTree(answer.asText())
+            } else {
+                answer
+            }
         } catch (e: Exception) {
             Log.e(LOG_TAG, Log.getStackTraceString(e))
             null

@@ -12,6 +12,11 @@ on:
 permissions:
   contents: write
 
+# A newer push replaces a build that is still running
+concurrency:
+  group: build-apk
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
