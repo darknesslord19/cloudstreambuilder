@@ -784,4 +784,19 @@
     </plurals>
     <string name="player_is_live">Live</string>
 
+    <!-- Stremio, Nuvio and SkyStream sources, added through the "Add repository" dialog -->
+    <string name="addon_address_hint">The address of a CloudStream repository, a Stremio add-on, a Nuvio repository or a SkyStream repository</string>
+    <string name="addon_pick_entries">%s: choose what to switch on</string>
+    <string name="addon_nothing_selected">Nothing was selected, so nothing was added</string>
+    <string name="addon_added">%s was added</string>
+    <string name="addon_added_with_catalog">%s was added. The Cinemeta catalog was added as well, so there is something to browse.</string>
+    <string name="addon_saved">%s was saved</string>
+    <string name="addon_downloads_failed">Could not be downloaded: %s</string>
+    <string name="addon_offers">Offers: %s</string>
+    <string name="addon_offers_catalog">catalog</string>
+    <string name="addon_offers_details">details</string>
+    <string name="addon_offers_streams">streams</string>
+    <string name="addon_offers_subtitles">subtitles</string>
+    <string name="addon_no_catalog_note">This add-on has no catalog of its own. Its links appear when you open a title from a catalog add-on such as Cinemeta.</string>
+    <string name="addon_configure">Configure</string>
 </resources>

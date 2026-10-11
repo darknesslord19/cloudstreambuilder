@@ -75,6 +75,7 @@ import com.lagradost.cloudstream3.CommonActivity.screenHeight
 import com.lagradost.cloudstream3.CommonActivity.setActivityInstance
 import com.lagradost.cloudstream3.CommonActivity.showToast
 import com.lagradost.cloudstream3.CommonActivity.updateLocale
+import com.lagradost.cloudstream3.addons.android.AndroidAddons
 import com.lagradost.cloudstream3.CommonActivity.updateTheme
 import com.lagradost.cloudstream3.actions.temp.fcast.FcastManager
 import com.lagradost.cloudstream3.databinding.ActivityMainBinding
@@ -1349,10 +1350,19 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
             }
         } else if (lastError == null) {
             ioSafe {
+                // Stremio, Nuvio and SkyStream sources are read from local files only, so they
+                // are in place before the home page asks for its provider.
+                AndroidAddons.loadSaved(this@MainActivity)
+
                 DataStoreHelper.currentHomePage?.let { homeApi ->
                     mainPluginsLoadedEvent.invoke(loadSinglePlugin(this@MainActivity, homeApi))
                 } ?: run {
                     mainPluginsLoadedEvent.invoke(false)
+                }
+
+                ioSafe {
+                    // Looks for new versions of those sources, at most twice a day
+                    AndroidAddons.refreshInBackground(this@MainActivity)
                 }
 
                 ioSafe {

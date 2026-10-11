@@ -90,7 +90,8 @@ class ExtensionsViewModel : ViewModel() {
         ?: emptyArray()) + PREBUILT_REPOSITORIES
 
     fun loadRepositories() {
-        val urls = repos()
+        // Stremio, Nuvio and SkyStream sources are listed after the CloudStream repositories
+        val urls = repos() + AddonUi.listedSources()
         _repositories.postValue(urls)
     }
 }

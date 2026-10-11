@@ -749,4 +749,20 @@
     <string name="player_is_live">Canlı</string>
     <string name="skip_type_preview">Ön Gösterim</string>
     <string name="video_singular">Video</string>
+
+    <!-- Stremio, Nuvio ve SkyStream kaynakları, "Depo ekle" penceresinden eklenir -->
+    <string name="addon_address_hint">CloudStream deposu, Stremio eklentisi, Nuvio deposu veya SkyStream deposu adresi</string>
+    <string name="addon_pick_entries">%s: açılacakları seçin</string>
+    <string name="addon_nothing_selected">Hiçbir şey seçilmediği için ekleme yapılmadı</string>
+    <string name="addon_added">%s eklendi</string>
+    <string name="addon_added_with_catalog">%s eklendi. Gezinecek içerik olması için Cinemeta kataloğu da eklendi.</string>
+    <string name="addon_saved">%s kaydedildi</string>
+    <string name="addon_downloads_failed">İndirilemedi: %s</string>
+    <string name="addon_offers">Sundukları: %s</string>
+    <string name="addon_offers_catalog">katalog</string>
+    <string name="addon_offers_details">detaylar</string>
+    <string name="addon_offers_streams">yayınlar</string>
+    <string name="addon_offers_subtitles">altyazılar</string>
+    <string name="addon_no_catalog_note">Bu eklentinin kendi kataloğu yok. Bağlantıları, Cinemeta gibi bir katalog eklentisinden bir içerik açtığınızda görünür.</string>
+    <string name="addon_configure">Yapılandır</string>
 </resources>

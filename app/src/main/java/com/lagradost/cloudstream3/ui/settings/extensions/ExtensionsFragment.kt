@@ -20,6 +20,8 @@ import androidx.navigation.fragment.findNavController
 import com.lagradost.cloudstream3.CommonActivity.showToast
 import com.lagradost.cloudstream3.MainActivity.Companion.afterRepositoryLoadedEvent
 import com.lagradost.cloudstream3.R
+import com.lagradost.cloudstream3.addons.AddonManager
+import com.lagradost.cloudstream3.addons.android.AndroidAddons
 import com.lagradost.cloudstream3.databinding.AddRepoInputBinding
 import com.lagradost.cloudstream3.databinding.FragmentExtensionsBinding
 import com.lagradost.cloudstream3.mvvm.observe
@@ -79,6 +81,7 @@ class ExtensionsFragment : BaseFragment<FragmentExtensionsBinding>(
     }
 
     override fun onBindingCreated(binding: FragmentExtensionsBinding) {
+        AndroidAddons.ensureInitialised(binding.root.context)
         setUpToolbar(R.string.extensions)
         setToolBarScrollFlags()
 
@@ -114,10 +117,16 @@ class ExtensionsFragment : BaseFragment<FragmentExtensionsBinding>(
                 }
             }
             adapter = RepoAdapter(false, {
-                findNavController().navigate(
-                    R.id.navigation_settings_extensions_to_navigation_settings_plugins,
-                    PluginsFragment.newInstance(it)
-                )
+                val addonSource = AddonManager.getSource(it.url)
+                if (addonSource != null) {
+                    // A Stremio, Nuvio or SkyStream source has its own dialog instead of a plugin list
+                    AddonUi.open(activity, addonSource) { reloadRepositories() }
+                } else {
+                    findNavController().navigate(
+                        R.id.navigation_settings_extensions_to_navigation_settings_plugins,
+                        PluginsFragment.newInstance(it)
+                    )
+                }
             }, { repo ->
                 // Prompt user before deleting repo
                 main {
@@ -128,10 +137,14 @@ class ExtensionsFragment : BaseFragment<FragmentExtensionsBinding>(
                             when (which) {
                                 DialogInterface.BUTTON_POSITIVE -> {
                                     ioSafe {
-                                        RepositoryManager.removeRepository(
-                                            uiContext.applicationContext,
-                                            repo
-                                        )
+                                        if (AddonManager.isAddonUrl(repo.url)) {
+                                            AddonManager.remove(repo.url)
+                                        } else {
+                                            RepositoryManager.removeRepository(
+                                                uiContext.applicationContext,
+                                                repo
+                                            )
+                                        }
                                         extensionViewModel.loadStats()
                                         extensionViewModel.loadRepositories()
                                     }
@@ -154,7 +167,12 @@ class ExtensionsFragment : BaseFragment<FragmentExtensionsBinding>(
             binding.repoRecyclerView.isVisible = repos.isNotEmpty()
             binding.blankRepoScreen.isVisible = repos.isEmpty()
             (binding.repoRecyclerView.adapter as? RepoAdapter)?.submitList(repos.toList())
-            pluginViewModel.updatePluginList(binding.root.context, repos.toList())
+            // Only CloudStream repositories have a list of .cs3 plugins
+            val addonUrls = AddonManager.sourceUrls()
+            pluginViewModel.updatePluginList(
+                binding.root.context,
+                repos.filterNot { addonUrls.contains(it.url) }
+            )
         }
 
         observeNullable(extensionViewModel.pluginStats) { value ->
@@ -198,7 +216,9 @@ class ExtensionsFragment : BaseFragment<FragmentExtensionsBinding>(
             setRecycledViewPool(PluginAdapter.sharedPool)
             adapter =
                 PluginAdapter(true) {
-                    val urls = extensionViewModel.repositories.value?.toList() ?: emptyList()
+                    val addonUrls = AddonManager.sourceUrls()
+                    val urls = extensionViewModel.repositories.value
+                        ?.filterNot { repo -> addonUrls.contains(repo.url) } ?: emptyList()
                     pluginViewModel.handlePluginAction(activity, urls, it, false)
                 }
         }
@@ -261,6 +281,8 @@ class ExtensionsFragment : BaseFragment<FragmentExtensionsBinding>(
 
             val dialog = builder.create()
             dialog.show()
+            binding.text2.setText(R.string.addon_address_hint)
+            binding.text2.isVisible = true
             (activity?.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager)?.primaryClip?.getItemAt(
                 0
             )?.text?.toString()?.let { copiedText ->
@@ -288,6 +310,24 @@ class ExtensionsFragment : BaseFragment<FragmentExtensionsBinding>(
                 ioSafe {
                     try {
                         val url = RepositoryManager.parseRepoUrl(urlInput)
+
+                        // The address may belong to a Stremio add-on, a Nuvio repository or a
+                        // SkyStream repository instead of a CloudStream repository.
+                        var addonOutcome = AddonUi.tryAdd(activity, url ?: urlInput, name)
+                        if (addonOutcome == AddonUi.Outcome.NOT_AN_ADDON && url.isNullOrBlank()) {
+                            // Not a CloudStream short code either, SkyStream has codes of its own
+                            AddonUi.resolveSkyStreamCode(urlInput)?.let { skyUrl ->
+                                addonOutcome = AddonUi.tryAdd(activity, skyUrl, name)
+                            }
+                        }
+                        if (addonOutcome != AddonUi.Outcome.NOT_AN_ADDON) {
+                            if (addonOutcome == AddonUi.Outcome.ADDED) {
+                                extensionViewModel.loadRepositories()
+                                dialog.dismissSafe(activity)
+                            }
+                            return@ioSafe
+                        }
+
                         if (url.isNullOrBlank()) {
                             showToast(R.string.error_invalid_data, Toast.LENGTH_SHORT)
                             return@ioSafe
