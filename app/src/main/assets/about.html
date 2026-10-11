@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Geliştirici</title>
+<!--
+  Ayarlar > Geliştirici sayfası. Bu dosya uygulamanın içinde tam ekran açılır.
+  İstediğiniz gibi değiştirebilirsiniz: resim, css ve js dosyalarını bu dosyanın yanına
+  (app/src/main/assets) koyup buradan göreli adresle çağırabilirsiniz.
+  Sayfadan uygulamaya: CloudStream.version(), CloudStream.build(), CloudStream.close()
+-->
+<style>
+  :root {
+    --bg: #07060d;
+    --ink: #f1eefb;
+    --muted: #a59fc0;
+    --line: rgba(190, 170, 255, .16);
+    --card: rgba(24, 20, 44, .62);
+    --violet: #9d6bff;
+    --ember: #ff6a3d;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    overflow-x: hidden;
+  }
+  #sky { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  .glow {
+    position: fixed; inset: -20% -30% auto -30%; height: 70vh; pointer-events: none;
+    background:
+      radial-gradient(42% 46% at 30% 40%, rgba(157, 107, 255, .34), transparent 70%),
+      radial-gradient(36% 40% at 72% 30%, rgba(255, 106, 61, .20), transparent 70%);
+    filter: blur(30px);
+    animation: drift 16s ease-in-out infinite alternate;
+  }
+  @keyframes drift {
+    from { transform: translate3d(-3%, -2%, 0) scale(1); }
+    to   { transform: translate3d(4%, 3%, 0) scale(1.12); }
+  }
+
+  main {
+    position: relative; z-index: 1;
+    max-width: 520px; margin: 0 auto;
+    padding: 56px 20px 40px;
+  }
+  .close {
+    position: fixed; z-index: 2; top: 12px; right: 12px;
+    width: 44px; height: 44px; border: 1px solid var(--line); border-radius: 50%;
+    background: rgba(10, 8, 20, .6); color: var(--ink); font-size: 20px; line-height: 1;
+    display: grid; place-items: center;
+  }
+  .close:active { transform: scale(.92); }
+
+  .rise { opacity: 0; transform: translateY(18px); animation: rise .7s cubic-bezier(.2, .7, .2, 1) forwards; }
+  .rise:nth-child(1) { animation-delay: .05s; }
+  .rise:nth-child(2) { animation-delay: .18s; }
+  .rise:nth-child(3) { animation-delay: .31s; }
+  .rise:nth-child(4) { animation-delay: .44s; }
+  .rise:nth-child(5) { animation-delay: .57s; }
+  @keyframes rise { to { opacity: 1; transform: none; } }
+
+  header { text-align: center; margin-bottom: 28px; }
+  .emblem { position: relative; width: 132px; height: 132px; margin: 0 auto 22px; }
+  .emblem .ring {
+    position: absolute; inset: 0; border-radius: 50%;
+    background: conic-gradient(from 0deg, var(--violet), var(--ember), #3a2a7a, var(--violet));
+    animation: spin 9s linear infinite;
+    -webkit-mask: radial-gradient(circle, transparent 58%, #000 59%);
+            mask: radial-gradient(circle, transparent 58%, #000 59%);
+  }
+  .emblem .ring.outer {
+    inset: -12px; opacity: .35; animation-duration: 22s; animation-direction: reverse;
+    -webkit-mask: radial-gradient(circle, transparent 66%, #000 67%, #000 68.5%, transparent 69.5%);
+            mask: radial-gradient(circle, transparent 66%, #000 67%, #000 68.5%, transparent 69.5%);
+  }
+  .emblem .core {
+    position: absolute; inset: 14px; border-radius: 50%;
+    display: grid; place-items: center;
+    background: radial-gradient(circle at 35% 30%, #2a2050, #0d0a1c 70%);
+    box-shadow: inset 0 0 24px rgba(157, 107, 255, .35);
+    font-weight: 800; font-size: 40px; letter-spacing: -1px;
+  }
+  .emblem .core span {
+    background: linear-gradient(135deg, #fff, #c9b3ff 55%, var(--ember));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .role {
+    font-size: 12px; letter-spacing: .28em; text-transform: uppercase; color: var(--muted);
+    margin: 0 0 6px;
+  }
+  h1 { margin: 0; font-size: 34px; line-height: 1.1; letter-spacing: -.5px; font-weight: 800; }
+  .lead { margin: 12px auto 0; max-width: 34ch; color: var(--muted); }
+
+  .card {
+    border: 1px solid var(--line); border-radius: 20px;
+    background: var(--card);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    padding: 18px; margin-top: 14px;
+  }
+  .card h2 {
+    margin: 0 0 12px; font-size: 12px; font-weight: 700; letter-spacing: .2em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .links { display: grid; gap: 10px; }
+  .link {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px; border-radius: 14px; text-decoration: none; color: var(--ink);
+    background: rgba(255, 255, 255, .04); border: 1px solid transparent;
+    transition: transform .15s ease, border-color .15s ease, background .15s ease;
+  }
+  .link:active { transform: scale(.98); border-color: var(--violet); background: rgba(157, 107, 255, .12); }
+  .link svg { width: 24px; height: 24px; flex: none; fill: currentColor; }
+  .link b { display: block; font-weight: 650; }
+  .link small { display: block; color: var(--muted); font-size: 13px; }
+  .link .go { margin-left: auto; color: var(--muted); font-size: 20px; }
+
+  ul.features { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  ul.features li { display: flex; gap: 12px; align-items: baseline; }
+  ul.features li::before {
+    content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--violet), var(--ember)); transform: translateY(-1px);
+  }
+
+  footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 22px; }
+  footer a { color: #cdbcff; }
+  .version {
+    display: inline-block; margin-bottom: 10px; padding: 5px 12px; border-radius: 999px;
+    border: 1px solid var(--line); font-variant-numeric: tabular-nums;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .glow, .emblem .ring, .rise { animation: none; }
+    .rise { opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+<canvas id="sky" aria-hidden="true"></canvas>
+<div class="glow" aria-hidden="true"></div>
+<button class="close" id="close" aria-label="Kapat">&#x2715;</button>
+
+<main>
+  <header class="rise">
+    <div class="emblem" aria-hidden="true">
+      <div class="ring outer"></div>
+      <div class="ring"></div>
+      <div class="core"><span>DL</span></div>
+    </div>
+    <p class="role">Geliştirici</p>
+    <h1>Darkness Lord</h1>
+    <p class="lead">CloudStream'in Stremio, Nuvio ve SkyStream eklentilerini çalıştıran sürümü.</p>
+  </header>
+
+  <section class="card rise">
+    <h2>İletişim</h2>
+    <div class="links">
+      <a class="link" href="https://t.me/darknes_lord">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.9 4.3 18.7 19.5c-.2 1-.9 1.3-1.800.8l-4.800-3.600-2.300 2.300c-.3.3-.5.500-1 .5l.300-4.900 9-8.100c.4-.300-.100-.5-.6-.2L6.400 13.300 1.700 11.800c-1-.3-1-1 .2-1.500L20.500 3.100c.9-.3 1.600.2 1.400 1.200z"/></svg>
+        <span><b>Telegram</b><small>Duyurular ve destek</small></span>
+        <span class="go">&rsaquo;</span>
+      </a>
+      <a class="link" href="https://github.com/darknesslord19/cloudstreambuilder">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.160 19.490c.5.090.680-.220.680-.480v-1.700c-2.780.600-3.370-1.340-3.370-1.340-.450-1.160-1.110-1.470-1.110-1.470-.910-.620.070-.610.070-.610 1 .070 1.530 1.030 1.530 1.030.890 1.530 2.340 1.090 2.910.830.090-.650.350-1.090.630-1.340-2.220-.250-4.550-1.110-4.550-4.940 0-1.090.390-1.980 1.030-2.680-.100-.250-.450-1.270.100-2.650 0 0 .840-.270 2.750 1.020a9.560 9.560 0 0 1 5 0c1.910-1.290 2.750-1.020 2.750-1.020.550 1.380.200 2.400.100 2.650.640.700 1.030 1.590 1.030 2.680 0 3.840-2.340 4.680-4.570 4.930.360.310.680.920.680 1.850v2.750c0 .270.180.580.690.480A10 10 0 0 0 12 2z"/></svg>
+        <span><b>Kaynak kodu</b><small>github.com/darknesslord19</small></span>
+        <span class="go">&rsaquo;</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="card rise">
+    <h2>Bu sürümde</h2>
+    <ul class="features">
+      <li>Stremio eklentileri, Nuvio ve SkyStream depoları "Depo ekle" bölümünden eklenir</li>
+      <li>Türkçe katalog başlıkları</li>
+      <li>On yeni tema</li>
+      <li>Uygulama içinden güncelleme</li>
+    </ul>
+  </section>
+
+  <footer class="rise">
+    <div class="version" id="version">CloudStream</div>
+    <div>
+      CloudStream, <a href="https://github.com/recloudstream/cloudstream">recloudstream</a>
+      ekibinin açık kaynaklı (GPL-3.0) projesidir. Bu uygulama onun değiştirilmiş bir sürümüdür
+      ve resmî sürüm değildir.
+    </div>
+  </footer>
+</main>
+
+<script>
+(function () {
+  // Bridge to the app. In a normal browser it is missing and the page still works.
+  var app = window.CloudStream;
+  try {
+    if (app && app.version) {
+      var build = app.build ? app.build() : 0;
+      document.getElementById('version').textContent =
+        'CloudStream ' + app.version() + (build > 0 ? ' · sürüm ' + build : '');
+    }
+  } catch (e) {}
+  document.getElementById('close').addEventListener('click', function () {
+    if (app && app.close) app.close(); else window.close();
+  });
+
+  // Star field
+  var canvas = document.getElementById('sky');
+  var ctx = canvas.getContext('2d');
+  var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var stars = [], width = 0, height = 0, ratio = 1;
+
+  function resize() {
+    ratio = Math.min(window.devicePixelRatio || 1, 2);
+    width = window.innerWidth; height = window.innerHeight;
+    canvas.width = Math.round(width * ratio); canvas.height = Math.round(height * ratio);
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    var count = Math.round(Math.min(160, width * height / 5200));
+    stars = [];
+    for (var i = 0; i < count; i++) {
+      stars.push({
+        x: Math.random() * width, y: Math.random() * height,
+        r: Math.random() * 1.3 + 0.25,
+        speed: Math.random() * 0.12 + 0.02,
+        phase: Math.random() * Math.PI * 2,
+        warm: Math.random() < 0.12
+      });
+    }
+  }
+
+  function draw(time) {
+    ctx.clearRect(0, 0, width, height);
+    for (var i = 0; i < stars.length; i++) {
+      var s = stars[i];
+      if (!still) {
+        s.y -= s.speed;
+        if (s.y < -2) { s.y = height + 2; s.x = Math.random() * width; }
+      }
+      var twinkle = 0.55 + 0.45 * Math.sin(time / 900 + s.phase);
+      ctx.globalAlpha = still ? 0.7 : twinkle;
+      ctx.fillStyle = s.warm ? '#ffb48f' : '#d9ccff';
+      ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    if (!still) requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', function () { resize(); if (still) draw(0); });
+  resize();
+  if (still) draw(0); else requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>

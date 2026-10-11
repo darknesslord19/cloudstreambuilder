@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Ten extra app themes. Each one has a matching accent colour, used while the
+         "primary colour" setting is left on its default. -->
+
+    <!-- Gece Mavisi -->
+    <color name="MidnightBluePrimaryGrayBackground">#1A2438</color>
+    <color name="MidnightBlueBitDarkerGrayBackground">#0B1220</color>
+    <color name="MidnightBlueGrayBackground">#111A2B</color>
+    <color name="MidnightBlueItemBackground">#141D30</color>
+    <color name="MidnightBlueTextColor">#E6ECF8</color>
+    <color name="MidnightBlueIconColor">#7D8FB3</color>
+    <color name="MidnightBlueAccent">#4C8DFF</color>
+    <color name="MidnightBlueAccentDark">#2A5FCC</color>
+    <color name="MidnightBlueOnAccent">#FFFFFF</color>
+
+    <style name="MidnightBlueMode">
+        <item name="primaryGrayBackground">@color/MidnightBluePrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/MidnightBlueBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/MidnightBlueGrayBackground</item>
+        <item name="boxItemBackground">@color/MidnightBlueItemBackground</item>
+        <item name="textColor">@color/MidnightBlueTextColor</item>
+        <item name="grayTextColor">@color/MidnightBlueIconColor</item>
+        <item name="iconColor">@color/MidnightBlueIconColor</item>
+        <item name="white">@color/MidnightBlueTextColor</item>
+        <item name="black">@color/MidnightBlueBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/MidnightBlueTextColor</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeMidnightBlue">
+        <item name="colorPrimary">@color/MidnightBlueAccent</item>
+        <item name="android:colorPrimary">@color/MidnightBlueAccent</item>
+        <item name="colorPrimaryDark">@color/MidnightBlueAccentDark</item>
+        <item name="colorAccent">@color/MidnightBlueAccent</item>
+        <item name="colorOnPrimary">@color/MidnightBlueOnAccent</item>
+        <item name="android:colorAccent">@color/MidnightBlueAccent</item>
+    </style>
+
+    <!-- Okyanus -->
+    <color name="OceanPrimaryGrayBackground">#12313A</color>
+    <color name="OceanBitDarkerGrayBackground">#071A1F</color>
+    <color name="OceanGrayBackground">#0C242B</color>
+    <color name="OceanItemBackground">#0F2A32</color>
+    <color name="OceanTextColor">#E0F4F4</color>
+    <color name="OceanIconColor">#6FA3AA</color>
+    <color name="OceanAccent">#1EC8C8</color>
+    <color name="OceanAccentDark">#0E8C8C</color>
+    <color name="OceanOnAccent">#04181B</color>
+
+    <style name="OceanMode">
+        <item name="primaryGrayBackground">@color/OceanPrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/OceanBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/OceanGrayBackground</item>
+        <item name="boxItemBackground">@color/OceanItemBackground</item>
+        <item name="textColor">@color/OceanTextColor</item>
+        <item name="grayTextColor">@color/OceanIconColor</item>
+        <item name="iconColor">@color/OceanIconColor</item>
+        <item name="white">@color/OceanTextColor</item>
+        <item name="black">@color/OceanBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/OceanTextColor</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeOcean">
+        <item name="colorPrimary">@color/OceanAccent</item>
+        <item name="android:colorPrimary">@color/OceanAccent</item>
+        <item name="colorPrimaryDark">@color/OceanAccentDark</item>
+        <item name="colorAccent">@color/OceanAccent</item>
+        <item name="colorOnPrimary">@color/OceanOnAccent</item>
+        <item name="android:colorAccent">@color/OceanAccent</item>
+    </style>
+
+    <!-- Orman -->
+    <color name="ForestPrimaryGrayBackground">#1B2E22</color>
+    <color name="ForestBitDarkerGrayBackground">#0C1710</color>
+    <color name="ForestGrayBackground">#122017</color>
+    <color name="ForestItemBackground">#15261B</color>
+    <color name="ForestTextColor">#E6F2E8</color>
+    <color name="ForestIconColor">#7FA58A</color>
+    <color name="ForestAccent">#4CC47A</color>
+    <color name="ForestAccentDark">#2E8B57</color>
+    <color name="ForestOnAccent">#06140B</color>
+
+    <style name="ForestMode">
+        <item name="primaryGrayBackground">@color/ForestPrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/ForestBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/ForestGrayBackground</item>
+        <item name="boxItemBackground">@color/ForestItemBackground</item>
+        <item name="textColor">@color/ForestTextColor</item>
+        <item name="grayTextColor">@color/ForestIconColor</item>
+        <item name="iconColor">@color/ForestIconColor</item>
+        <item name="white">@color/ForestTextColor</item>
+        <item name="black">@color/ForestBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/ForestTextColor</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeForest">
+        <item name="colorPrimary">@color/ForestAccent</item>
+        <item name="android:colorPrimary">@color/ForestAccent</item>
+        <item name="colorPrimaryDark">@color/ForestAccentDark</item>
+        <item name="colorAccent">@color/ForestAccent</item>
+        <item name="colorOnPrimary">@color/ForestOnAccent</item>
+        <item name="android:colorAccent">@color/ForestAccent</item>
+    </style>
+
+    <!-- Bordo -->
+    <color name="WinePrimaryGrayBackground">#331822</color>
+    <color name="WineBitDarkerGrayBackground">#180A0E</color>
+    <color name="WineGrayBackground">#220E15</color>
+    <color name="WineItemBackground">#2A121A</color>
+    <color name="WineTextColor">#F7E9EC</color>
+    <color name="WineIconColor">#B08590</color>
+    <color name="WineAccent">#E0486A</color>
+    <color name="WineAccentDark">#A82848</color>
+    <color name="WineOnAccent">#FFFFFF</color>
+
+    <style name="WineMode">
+        <item name="primaryGrayBackground">@color/WinePrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/WineBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/WineGrayBackground</item>
+        <item name="boxItemBackground">@color/WineItemBackground</item>
+        <item name="textColor">@color/WineTextColor</item>
+        <item name="grayTextColor">@color/WineIconColor</item>
+        <item name="iconColor">@color/WineIconColor</item>
+        <item name="white">@color/WineTextColor</item>
+        <item name="black">@color/WineBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/WineTextColor</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeWine">
+        <item name="colorPrimary">@color/WineAccent</item>
+        <item name="android:colorPrimary">@color/WineAccent</item>
+        <item name="colorPrimaryDark">@color/WineAccentDark</item>
+        <item name="colorAccent">@color/WineAccent</item>
+        <item name="colorOnPrimary">@color/WineOnAccent</item>
+        <item name="android:colorAccent">@color/WineAccent</item>
+    </style>
+
+    <!-- Mor Gece -->
+    <color name="PurpleNightPrimaryGrayBackground">#251A3D</color>
+    <color name="PurpleNightBitDarkerGrayBackground">#120C1F</color>
+    <color name="PurpleNightGrayBackground">#1A122C</color>
+    <color name="PurpleNightItemBackground">#1F1634</color>
+    <color name="PurpleNightTextColor">#EEE8FA</color>
+    <color name="PurpleNightIconColor">#9483BD</color>
+    <color name="PurpleNightAccent">#9D6BFF</color>
+    <color name="PurpleNightAccentDark">#6B3FD1</color>
+    <color name="PurpleNightOnAccent">#FFFFFF</color>
+
+    <style name="PurpleNightMode">
+        <item name="primaryGrayBackground">@color/PurpleNightPrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/PurpleNightBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/PurpleNightGrayBackground</item>
+        <item name="boxItemBackground">@color/PurpleNightItemBackground</item>
+        <item name="textColor">@color/PurpleNightTextColor</item>
+        <item name="grayTextColor">@color/PurpleNightIconColor</item>
+        <item name="iconColor">@color/PurpleNightIconColor</item>
+        <item name="white">@color/PurpleNightTextColor</item>
+        <item name="black">@color/PurpleNightBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/PurpleNightTextColor</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemePurpleNight">
+        <item name="colorPrimary">@color/PurpleNightAccent</item>
+        <item name="android:colorPrimary">@color/PurpleNightAccent</item>
+        <item name="colorPrimaryDark">@color/PurpleNightAccentDark</item>
+        <item name="colorAccent">@color/PurpleNightAccent</item>
+        <item name="colorOnPrimary">@color/PurpleNightOnAccent</item>
+        <item name="android:colorAccent">@color/PurpleNightAccent</item>
+    </style>
+
+    <!-- Nord -->
+    <color name="NordPrimaryGrayBackground">#434C5E</color>
+    <color name="NordBitDarkerGrayBackground">#2E3440</color>
+    <color name="NordGrayBackground">#3B4252</color>
+    <color name="NordItemBackground">#3B4252</color>
+    <color name="NordTextColor">#ECEFF4</color>
+    <color name="NordIconColor">#8FA1BD</color>
+    <color name="NordAccent">#88C0D0</color>
+    <color name="NordAccentDark">#5E81AC</color>
+    <color name="NordOnAccent">#2E3440</color>
+
+    <style name="NordMode">
+        <item name="primaryGrayBackground">@color/NordPrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/NordBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/NordGrayBackground</item>
+        <item name="boxItemBackground">@color/NordItemBackground</item>
+        <item name="textColor">@color/NordTextColor</item>
+        <item name="grayTextColor">@color/NordIconColor</item>
+        <item name="iconColor">@color/NordIconColor</item>
+        <item name="white">@color/NordTextColor</item>
+        <item name="black">@color/NordBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/NordTextColor</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeNord">
+        <item name="colorPrimary">@color/NordAccent</item>
+        <item name="android:colorPrimary">@color/NordAccent</item>
+        <item name="colorPrimaryDark">@color/NordAccentDark</item>
+        <item name="colorAccent">@color/NordAccent</item>
+        <item name="colorOnPrimary">@color/NordOnAccent</item>
+        <item name="android:colorAccent">@color/NordAccent</item>
+    </style>
+
+    <!-- Gün Batımı -->
+    <color name="SunsetPrimaryGrayBackground">#36221A</color>
+    <color name="SunsetBitDarkerGrayBackground">#1A0F0A</color>
+    <color name="SunsetGrayBackground">#241610</color>
+    <color name="SunsetItemBackground">#2C1B14</color>
+    <color name="SunsetTextColor">#FBEDE4</color>
+    <color name="SunsetIconColor">#B8917C</color>
+    <color name="SunsetAccent">#FF7A45</color>
+    <color name="SunsetAccentDark">#C9501F</color>
+    <color name="SunsetOnAccent">#1A0F0A</color>
+
+    <style name="SunsetMode">
+        <item name="primaryGrayBackground">@color/SunsetPrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/SunsetBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/SunsetGrayBackground</item>
+        <item name="boxItemBackground">@color/SunsetItemBackground</item>
+        <item name="textColor">@color/SunsetTextColor</item>
+        <item name="grayTextColor">@color/SunsetIconColor</item>
+        <item name="iconColor">@color/SunsetIconColor</item>
+        <item name="white">@color/SunsetTextColor</item>
+        <item name="black">@color/SunsetBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/SunsetTextColor</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeSunset">
+        <item name="colorPrimary">@color/SunsetAccent</item>
+        <item name="android:colorPrimary">@color/SunsetAccent</item>
+        <item name="colorPrimaryDark">@color/SunsetAccentDark</item>
+        <item name="colorAccent">@color/SunsetAccent</item>
+        <item name="colorOnPrimary">@color/SunsetOnAccent</item>
+        <item name="android:colorAccent">@color/SunsetAccent</item>
+    </style>
+
+    <!-- Kahve -->
+    <color name="CoffeePrimaryGrayBackground">#2F261F</color>
+    <color name="CoffeeBitDarkerGrayBackground">#17120E</color>
+    <color name="CoffeeGrayBackground">#201A15</color>
+    <color name="CoffeeItemBackground">#271F19</color>
+    <color name="CoffeeTextColor">#F2E9E0</color>
+    <color name="CoffeeIconColor">#A8937F</color>
+    <color name="CoffeeAccent">#C89B6D</color>
+    <color name="CoffeeAccentDark">#94683C</color>
+    <color name="CoffeeOnAccent">#17120E</color>
+
+    <style name="CoffeeMode">
+        <item name="primaryGrayBackground">@color/CoffeePrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/CoffeeBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/CoffeeGrayBackground</item>
+        <item name="boxItemBackground">@color/CoffeeItemBackground</item>
+        <item name="textColor">@color/CoffeeTextColor</item>
+        <item name="grayTextColor">@color/CoffeeIconColor</item>
+        <item name="iconColor">@color/CoffeeIconColor</item>
+        <item name="white">@color/CoffeeTextColor</item>
+        <item name="black">@color/CoffeeBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/CoffeeTextColor</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeCoffee">
+        <item name="colorPrimary">@color/CoffeeAccent</item>
+        <item name="android:colorPrimary">@color/CoffeeAccent</item>
+        <item name="colorPrimaryDark">@color/CoffeeAccentDark</item>
+        <item name="colorAccent">@color/CoffeeAccent</item>
+        <item name="colorOnPrimary">@color/CoffeeOnAccent</item>
+        <item name="android:colorAccent">@color/CoffeeAccent</item>
+    </style>
+
+    <!-- Zümrüt (AMOLED) -->
+    <color name="EmeraldPrimaryGrayBackground">#0E1F18</color>
+    <color name="EmeraldBitDarkerGrayBackground">#000000</color>
+    <color name="EmeraldGrayBackground">#07130E</color>
+    <color name="EmeraldItemBackground">#0A1812</color>
+    <color name="EmeraldTextColor">#E4F5EC</color>
+    <color name="EmeraldIconColor">#6FA08A</color>
+    <color name="EmeraldAccent">#00D68F</color>
+    <color name="EmeraldAccentDark">#009E69</color>
+    <color name="EmeraldOnAccent">#00140D</color>
+
+    <style name="EmeraldMode">
+        <item name="primaryGrayBackground">@color/EmeraldPrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/EmeraldBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/EmeraldGrayBackground</item>
+        <item name="boxItemBackground">@color/EmeraldItemBackground</item>
+        <item name="textColor">@color/EmeraldTextColor</item>
+        <item name="grayTextColor">@color/EmeraldIconColor</item>
+        <item name="iconColor">@color/EmeraldIconColor</item>
+        <item name="white">@color/EmeraldTextColor</item>
+        <item name="black">@color/EmeraldBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/EmeraldTextColor</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeEmerald">
+        <item name="colorPrimary">@color/EmeraldAccent</item>
+        <item name="android:colorPrimary">@color/EmeraldAccent</item>
+        <item name="colorPrimaryDark">@color/EmeraldAccentDark</item>
+        <item name="colorAccent">@color/EmeraldAccent</item>
+        <item name="colorOnPrimary">@color/EmeraldOnAccent</item>
+        <item name="android:colorAccent">@color/EmeraldAccent</item>
+    </style>
+
+    <!-- Gül Kurusu -->
+    <color name="RosePrimaryGrayBackground">#38252D</color>
+    <color name="RoseBitDarkerGrayBackground">#1C1216</color>
+    <color name="RoseGrayBackground">#26181E</color>
+    <color name="RoseItemBackground">#2F1E25</color>
+    <color name="RoseTextColor">#F8E8EE</color>
+    <color name="RoseIconColor">#B58C9B</color>
+    <color name="RoseAccent">#F27BA5</color>
+    <color name="RoseAccentDark">#C24F78</color>
+    <color name="RoseOnAccent">#2A0F1A</color>
+
+    <style name="RoseMode">
+        <item name="primaryGrayBackground">@color/RosePrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/RoseBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/RoseGrayBackground</item>
+        <item name="boxItemBackground">@color/RoseItemBackground</item>
+        <item name="textColor">@color/RoseTextColor</item>
+        <item name="grayTextColor">@color/RoseIconColor</item>
+        <item name="iconColor">@color/RoseIconColor</item>
+        <item name="white">@color/RoseTextColor</item>
+        <item name="black">@color/RoseBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/RoseTextColor</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeRose">
+        <item name="colorPrimary">@color/RoseAccent</item>
+        <item name="android:colorPrimary">@color/RoseAccent</item>
+        <item name="colorPrimaryDark">@color/RoseAccentDark</item>
+        <item name="colorAccent">@color/RoseAccent</item>
+        <item name="colorOnPrimary">@color/RoseOnAccent</item>
+        <item name="android:colorAccent">@color/RoseAccent</item>
+    </style>
+
+</resources>

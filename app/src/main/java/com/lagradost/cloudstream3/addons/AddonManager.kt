@@ -458,7 +458,7 @@ object AddonManager {
                     stremioBySource[url] = addon
                     if (addon.catalogs.isNotEmpty()) {
                         val name = uniqueName(source.name, AddonKind.STREMIO, tag, emptyList())
-                        register(StremioProvider(addon, name, platform.defaultProviderLanguage()), tag)
+                        register(StremioProvider(addon, name, platform.defaultProviderLanguage(), platform.uiLanguage()), tag)
                     }
                 }
             }

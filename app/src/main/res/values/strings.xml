@@ -799,4 +799,6 @@
     <string name="addon_offers_subtitles">subtitles</string>
     <string name="addon_no_catalog_note">This add-on has no catalog of its own. Its links appear when you open a title from a catalog add-on such as Cinemeta.</string>
     <string name="addon_configure">Configure</string>
+    <string name="developer">Developer</string>
+    <string name="developer_summary">About and contact</string>
 </resources>

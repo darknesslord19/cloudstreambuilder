@@ -247,7 +247,8 @@ class SettingsUpdates : BasePreferenceFragmentCompat() {
         }
         
         getPref(R.string.install_prerelease_key)?.let { pref ->
-            pref.isVisible = BuildConfig.FLAVOR == "stable"
+            // This build updates from its own address, the official pre-release is not offered
+            pref.isVisible = false
             pref.setOnPreferenceClickListener {
                 activity?.installPreReleaseIfNeeded()
                 return@setOnPreferenceClickListener true

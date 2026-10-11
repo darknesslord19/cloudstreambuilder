@@ -1,19 +1,23 @@
 name: Build APK
 
-# Builds an installable debug APK without needing any secrets, so it also works in a fork.
-# It runs on every push to the "eklentili" branch and can be started from the "Actions" tab,
-# the APK is attached to the finished run.
+# Builds the installable APK without needing any secrets, so it also works in a fork.
+# It runs on every push to the "eklentili" branch and can be started from the "Actions" tab.
+# The APK is published as a release ("Releases" page of the repository) and is also attached
+# to the finished run.
 on:
   push:
     branches: [ eklentili ]
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # The build number of the app, the update check compares it with "version_code"
+      FORK_BUILD_NUMBER: ${{ github.run_number }}
     steps:
     - uses: actions/checkout@v6
 
@@ -30,10 +34,46 @@ jobs:
       uses: gradle/actions/setup-gradle@v5
 
     - name: Build
-      run: ./gradlew assemblePrereleaseDebug
+      run: ./gradlew assembleStableRelease
+
+    - name: Name the APK
+      run: |
+        mkdir -p out
+        cp app/build/outputs/apk/stable/release/*.apk "out/CloudStream-${FORK_BUILD_NUMBER}.apk"
+        ls -la out
 
     - name: Upload APK
       uses: actions/upload-artifact@v7
       with:
         name: cloudstream-apk
-        path: "app/build/outputs/apk/prerelease/debug/*.apk"
+        path: out/*.apk
+
+    - name: Publish release
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        APK_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/v${FORK_BUILD_NUMBER}/CloudStream-${FORK_BUILD_NUMBER}.apk"
+        VERSION_NAME="$(grep -E '^versionName' gradle/libs.versions.toml | cut -d'"' -f2)"
+        {
+          echo "Sürüm ${FORK_BUILD_NUMBER} (${GITHUB_SHA::7})"
+          echo
+          echo "Uygulama içi güncellemeyi duyurmak için güncelleme adresine yazılacak içerik:"
+          echo
+          echo '```json'
+          echo '{'
+          echo "  \"version_code\": ${FORK_BUILD_NUMBER},"
+          echo "  \"version_name\": \"${VERSION_NAME}\","
+          echo '  "title": "Yeni Güncelleme Mevcut!",'
+          echo '  "message": "Yeni özellikler ekledik ve hataları düzelttik.",'
+          echo '  "changelog": ["Hata düzeltmeleri", "Performans iyileştirmeleri"],'
+          echo "  \"update_url\": \"${APK_URL}\","
+          echo '  "force": false,'
+          echo '  "show": true'
+          echo '}'
+          echo '```'
+        } > notes.md
+        gh release create "v${FORK_BUILD_NUMBER}" "out/CloudStream-${FORK_BUILD_NUMBER}.apk" \
+          --repo "${GITHUB_REPOSITORY}" \
+          --target "${GITHUB_SHA}" \
+          --title "Sürüm ${FORK_BUILD_NUMBER}" \
+          --notes-file notes.md

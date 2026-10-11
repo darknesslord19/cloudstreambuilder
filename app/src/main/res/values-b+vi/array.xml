@@ -230,6 +230,16 @@
         <item>Dracula</item>
         <item>Giấc Mơ Oải Hương</item>
         <item>Xanh Lam Tĩnh Lặng</item>
+        <item>Gece Mavisi</item>
+        <item>Okyanus</item>
+        <item>Orman</item>
+        <item>Bordo</item>
+        <item>Mor Gece</item>
+        <item>Nord</item>
+        <item>Gün Batımı</item>
+        <item>Kahve</item>
+        <item>Zümrüt (AMOLED)</item>
+        <item>Gül Kurusu</item>
     </string-array>
     <string-array name="themes_names_values">
         <item>AmoledLight</item>
@@ -241,6 +251,16 @@
         <item>Dracula</item>
         <item>Lavender</item>
         <item>SilentBlue</item>
+        <item>MidnightBlue</item>
+        <item>Ocean</item>
+        <item>Forest</item>
+        <item>Wine</item>
+        <item>PurpleNight</item>
+        <item>Nord</item>
+        <item>Sunset</item>
+        <item>Coffee</item>
+        <item>Emerald</item>
+        <item>Rose</item>
     </string-array>
 
     <!--https://github.com/videolan/vlc-android/blob/72ccfb93db027b49855760001d1a930fa657c5a8/application/resources/src/main/res/values/arrays.xml#L266-->

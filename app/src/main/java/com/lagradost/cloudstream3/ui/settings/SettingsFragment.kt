@@ -241,6 +241,55 @@ class SettingsFragment : BaseFragment<MainSettingsBinding>(
                 }
             }
 
+            // The developer page is a bundled web page instead of a settings screen
+            settingsAbout.apply {
+                setOnClickListener {
+                    activity?.let { AboutPage.show(it) }
+                }
+                if (isLayout(TV)) {
+                    isFocusable = true
+                    isFocusableInTouchMode = true
+                }
+            }
+
+            // Every row says what is found inside it
+            fun summaryOf(vararg parts: Int): String = parts.joinToString(", ") { getString(it) }
+            settingsGeneralSummary.text = summaryOf(
+                R.string.extension_language,
+                R.string.title_downloads,
+                R.string.pref_category_bypass,
+                R.string.pref_category_links
+            )
+            settingsPlayerSummary.text = summaryOf(
+                R.string.pref_category_subtitles,
+                R.string.pref_category_player_features,
+                R.string.pref_category_gestures,
+                R.string.pref_category_player_layout,
+                R.string.pref_category_cache
+            )
+            settingsProvidersSummary.text = summaryOf(
+                R.string.provider_lang_settings,
+                R.string.preferred_media_settings
+            )
+            settingsUiSummary.text = summaryOf(
+                R.string.pref_category_looks,
+                R.string.pref_category_ui_features,
+                R.string.search_poster_img_des,
+                R.string.poster_ui_settings
+            )
+            settingsUpdatesSummary.text = summaryOf(
+                R.string.pref_category_app_updates,
+                R.string.pref_category_backup,
+                R.string.pref_category_extensions,
+                R.string.pref_category_actions
+            )
+            settingsCreditsSummary.text = summaryOf(
+                R.string.pref_category_accounts,
+                R.string.pref_category_security
+            )
+            settingsExtensionsSummary.text = summaryOf(R.string.add_repository)
+            settingsAboutSummary.text = summaryOf(R.string.developer_summary)
+
             // Default focus on TV
             if (isLayout(TV)) {
                 settingsGeneral.requestFocus()
@@ -254,7 +303,9 @@ class SettingsFragment : BaseFragment<MainSettingsBinding>(
         ).apply { timeZone = TimeZone.getTimeZone("UTC")
         }.format(Date(BuildConfig.BUILD_DATE)).replace("UTC", "")
 
-        binding.appVersion.text = appVersion
+        // The build number is what the update check compares, so it is shown next to the version
+        binding.appVersion.text =
+            if (BuildConfig.FORK_BUILD > 0) "$appVersion (${BuildConfig.FORK_BUILD})" else appVersion
         binding.buildDate.text = buildTimestamp
         binding.commitHash.text = commitHash
         binding.appVersionInfo.setOnLongClickListener {

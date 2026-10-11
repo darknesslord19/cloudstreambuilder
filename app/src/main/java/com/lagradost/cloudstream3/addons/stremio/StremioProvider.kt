@@ -55,6 +55,7 @@ class StremioProvider(
     val addon: StremioAddon,
     providerName: String,
     language: String,
+    private val uiLanguage: String = "en",
 ) : MainAPI() {
     override var name = providerName
     override var mainUrl = addon.baseUrl
@@ -105,6 +106,7 @@ class StremioProvider(
     private fun catalogKey(catalog: StremioAddon.Catalog) = catalog.type + "|" + catalog.id
 
     private fun catalogTitle(catalog: StremioAddon.Catalog): String {
+        CatalogNames.localized(catalog.name, catalog.type, uiLanguage)?.let { return it }
         val type = catalog.type.replaceFirstChar { it.uppercase() }
         return if (catalog.name.contains(type, ignoreCase = true)) catalog.name else catalog.name + " - " + type
     }

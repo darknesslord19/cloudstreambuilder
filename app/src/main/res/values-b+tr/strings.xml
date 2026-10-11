@@ -765,4 +765,6 @@
     <string name="addon_offers_subtitles">altyazılar</string>
     <string name="addon_no_catalog_note">Bu eklentinin kendi kataloğu yok. Bağlantıları, Cinemeta gibi bir katalog eklentisinden bir içerik açtığınızda görünür.</string>
     <string name="addon_configure">Yapılandır</string>
+    <string name="developer">Geliştirici</string>
+    <string name="developer_summary">Hakkında ve iletişim</string>
 </resources>

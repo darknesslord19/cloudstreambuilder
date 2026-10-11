@@ -2,10 +2,12 @@ package com.lagradost.cloudstream3.addons.android
 
 import android.content.Context
 import android.widget.Toast
+import androidx.preference.PreferenceManager
 import com.lagradost.cloudstream3.AllLanguagesName
 import com.lagradost.cloudstream3.CloudStreamApp
 import com.lagradost.cloudstream3.CommonActivity
 import com.lagradost.cloudstream3.MainActivity
+import com.lagradost.cloudstream3.R
 import com.lagradost.cloudstream3.addons.AddonManager
 import com.lagradost.cloudstream3.addons.AddonPlatform
 import com.lagradost.cloudstream3.addons.js.AddonHostBridge
@@ -14,6 +16,7 @@ import com.lagradost.cloudstream3.mvvm.logError
 import com.lagradost.cloudstream3.plugins.RepositoryManager
 import com.lagradost.cloudstream3.utils.AppContextUtils.getApiProviderLangSettings
 import java.io.File
+import java.util.Locale
 
 /** What the add-on code needs from the app, see [AddonPlatform]. */
 class AndroidAddonPlatform(context: Context) : AddonPlatform {
@@ -62,6 +65,18 @@ class AndroidAddonPlatform(context: Context) : AddonPlatform {
         }
         if (active.contains(AllLanguagesName) || active.contains("en")) return "en"
         return active.firstOrNull() ?: "en"
+    }
+
+    override fun uiLanguage(): String {
+        val chosen = try {
+            PreferenceManager.getDefaultSharedPreferences(appContext)
+                .getString(appContext.getString(R.string.locale_key), null)
+        } catch (t: Throwable) {
+            null
+        }
+        // Without a language chosen in the app, the app follows the device
+        val tag = chosen?.takeIf { it.isNotBlank() } ?: Locale.getDefault().language
+        return tag.substringBefore('-').substringBefore('_').lowercase(Locale.ROOT)
     }
 
     override fun notifyUser(message: String) {

@@ -33,6 +33,9 @@ interface AddonPlatform {
      */
     fun defaultProviderLanguage(): String = "en"
 
+    /** Two letter code of the language the app is shown in, "tr" for Turkish. */
+    fun uiLanguage(): String = "en"
+
     /** Shows a short message to the user, may be called from any thread. */
     fun notifyUser(message: String) {}
 

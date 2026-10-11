@@ -59,6 +59,10 @@ val generateGitHash = tasks.register<GenerateGitHashTask>("generateGitHash") {
     outputDir.set(layout.buildDirectory.dir("generated/git"))
 }
 
+// Number of this build of the fork. It is counted up by the build workflow and is what the
+// update check compares, a build made by hand has the number 0.
+val forkBuildNumber = (System.getenv("FORK_BUILD_NUMBER") ?: "0").toIntOrNull() ?: 0
+
 android {
     @Suppress("UnstableApiUsage")
     testOptions {
@@ -96,16 +100,30 @@ android {
                 keyPassword = System.getenv("SIGNING_KEY_PASSWORD")
             }
         }
+
+        // Every build of the fork is signed with the same key, otherwise a new version could
+        // not be installed over an older one. The key is kept in the repository, so it only
+        // says "built from this repository", it is not a secret.
+        create("fork") {
+            storeFile = file("fork.keystore")
+            storePassword = "cloudstream-fork"
+            keyAlias = "fork"
+            keyPassword = "cloudstream-fork"
+        }
     }
 
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
         applicationId = "com.lagradost.cloudstream3"
+        // Lets the fork be installed next to the official app
+        applicationIdSuffix = ".addons"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = libs.versions.versionCode.get().toInt()
+        versionCode = libs.versions.versionCode.get().toInt() * 1000 + forkBuildNumber
         versionName = libs.versions.versionName.get()
+
+        buildConfigField("int", "FORK_BUILD", "$forkBuildNumber")
 
         manifestPlaceholders["target_sdk_version"] = libs.versions.targetSdk.get()
 
@@ -142,6 +160,7 @@ android {
 
     buildTypes {
         release {
+            signingConfig = signingConfigs.getByName("fork")
             isDebuggable = false
             isMinifyEnabled = false
             isShrinkResources = false
@@ -151,6 +170,7 @@ android {
             )
         }
         debug {
+            signingConfig = signingConfigs.getByName("fork")
             isDebuggable = true
             applicationIdSuffix = ".debug"
             proguardFiles(

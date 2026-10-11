@@ -18,6 +18,7 @@ import com.lagradost.cloudstream3.CommonActivity.showToast
 import com.lagradost.cloudstream3.MainActivity.Companion.deleteFileOnExit
 import com.lagradost.cloudstream3.R
 import com.lagradost.cloudstream3.app
+import com.lagradost.cloudstream3.mapper
 import com.lagradost.cloudstream3.mvvm.logError
 import com.lagradost.cloudstream3.mvvm.safe
 import com.lagradost.cloudstream3.services.PackageInstallerService
@@ -40,6 +41,26 @@ import java.io.InputStreamReader
 object InAppUpdater {
     private const val GITHUB_USER_NAME = "recloudstream"
     private const val GITHUB_REPO = "cloudstream"
+
+    /**
+     * Where this build looks for its updates. The address answers with a JSON object:
+     *
+     * {
+     *   "version_code": 3,                    build number of the newest version (required)
+     *   "version_name": "4.8.0",              shown to the user
+     *   "title": "...", "message": "...",     texts of the dialog
+     *   "changelog": ["...", "..."],          a list or a single text
+     *   "update_url": "https://.../app.apk",  an .apk is installed by the app, any other
+     *                                         address is opened in the browser
+     *   "force": false,                       true: the dialog cannot be dismissed
+     *   "show": true                          false: nothing is shown
+     * }
+     *
+     * "versionCode", "versionName", "downloadUrl" and "pageUrl" are understood as well.
+     * An update is offered when version_code is higher than [BuildConfig.FORK_BUILD].
+     */
+    private const val UPDATE_INFO_URL =
+        "https://darknes-lord-paste-default-rtdb.firebaseio.com/pastes/Cloudstream.json"
 
     private const val PRERELEASE_PACKAGE_NAME = "com.lagradost.cloudstream3.prerelease"
     private const val LOG_TAG = "InAppUpdater"
@@ -81,20 +102,89 @@ object InAppUpdater {
         @JsonProperty("updateVersion") @SerialName("updateVersion") val updateVersion: String?,
         @JsonProperty("changelog") @SerialName("changelog") val changelog: String?,
         @JsonProperty("updateNodeId") @SerialName("updateNodeId") val updateNodeId: String?,
+        /** Title of the dialog, null for the usual "old -> new" title */
+        @JsonProperty("title") @SerialName("title") val title: String? = null,
+        /** If the dialog can not be dismissed */
+        @JsonProperty("force") @SerialName("force") val force: Boolean = false,
+        /** If [updateURL] is an apk the app can install, otherwise it is a page to open */
+        @JsonProperty("directApk") @SerialName("directApk") val directApk: Boolean = true,
     )
 
+    @Suppress("UNUSED_PARAMETER")
     private suspend fun Activity.getAppUpdate(installPrerelease: Boolean): Update {
         return try {
             when {
                 // No updates on debug version
                 BuildConfig.DEBUG -> Update(false, null, null, null, null)
-                BuildConfig.FLAVOR == "prerelease" || installPrerelease -> getPreReleaseUpdate()
-                else -> getReleaseUpdate()
+                // This build has its own update address, see [UPDATE_INFO_URL]
+                else -> getForkUpdate()
             }
         } catch (e: Exception) {
             Log.e(LOG_TAG, Log.getStackTraceString(e))
             Update(false, null, null, null, null)
         }
+    }
+
+    private suspend fun getForkUpdate(): Update {
+        val none = Update(false, null, null, null, null)
+        val json = try {
+            mapper.readTree(app.get(UPDATE_INFO_URL).text)
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, Log.getStackTraceString(e))
+            null
+        }
+        // Anything but an object means that no update was published
+        if (json == null || !json.isObject) return none
+
+        fun text(vararg names: String): String? = names.firstNotNullOfOrNull { name ->
+            json.get(name)?.takeIf { it.isValueNode && !it.isNull }?.asText()?.trim()
+                ?.takeIf { it.isNotEmpty() }
+        }
+
+        fun flag(name: String, default: Boolean): Boolean {
+            val node = json.get(name) ?: return default
+            return when {
+                node.isBoolean -> node.asBoolean()
+                node.isNumber -> node.asInt() != 0
+                node.isTextual -> node.asText().trim().equals("true", ignoreCase = true)
+                else -> default
+            }
+        }
+
+        if (!flag("show", true)) return none
+
+        val newBuild = text("version_code", "versionCode", "build")?.toDoubleOrNull()?.toInt()
+            ?: return none
+        Log.d(LOG_TAG, "Published build: $newBuild, this build: ${BuildConfig.FORK_BUILD}")
+        if (newBuild <= BuildConfig.FORK_BUILD) return none
+
+        fun isWebAddress(url: String) = url.startsWith("https://") || url.startsWith("http://")
+        fun isApk(url: String) =
+            url.substringBefore('#').substringBefore('?').endsWith(".apk", ignoreCase = true)
+
+        val download = text("downloadUrl", "download_url", "apkUrl", "apk_url")?.takeIf { isWebAddress(it) }
+        val page = text("update_url", "updateUrl", "pageUrl", "page_url", "url")?.takeIf { isWebAddress(it) }
+        val url = download ?: page ?: return none
+
+        val changelogNode = json.get("changelog")
+        val changelog = when {
+            changelogNode == null || changelogNode.isNull -> null
+            changelogNode.isArray -> changelogNode.mapNotNull { line ->
+                line.asText()?.trim()?.takeIf { it.isNotEmpty() }
+            }.joinToString("\n")
+            else -> changelogNode.asText()?.trim()
+        }?.takeIf { it.isNotEmpty() }
+
+        return Update(
+            shouldUpdate = true,
+            updateURL = url,
+            updateVersion = text("version_name", "versionName") ?: newBuild.toString(),
+            changelog = listOfNotNull(text("message"), changelog).joinToString("\n\n"),
+            updateNodeId = "fork-$newBuild",
+            title = text("title"),
+            force = flag("force", false),
+            directApk = download != null || isApk(url),
+        )
     }
 
     private suspend fun Activity.getReleaseUpdate(): Update {
@@ -268,8 +358,8 @@ object InAppUpdater {
         )
 
         // Skips the update if its an automatic update and the update is skipped
-        // This allows updating manually
-        if (update.updateNodeId.equals(updateNodeId) && checkAutoUpdate) {
+        // This allows updating manually. A forced update can not be skipped.
+        if (update.updateNodeId.equals(updateNodeId) && checkAutoUpdate && !update.force) {
             return false
         }
 
@@ -281,10 +371,12 @@ object InAppUpdater {
 
                 val builder = AlertDialog.Builder(this, R.style.AlertDialogCustom)
                 builder.setTitle(
-                    getString(R.string.new_update_format).format(
-                        currentVersion?.versionName, update.updateVersion
-                    )
+                    update.title?.let { title -> "$title (${update.updateVersion})" }
+                        ?: getString(R.string.new_update_format).format(
+                            currentVersion?.versionName, update.updateVersion
+                        )
                 )
+                builder.setCancelable(!update.force)
 
                 val logRegex = Regex("\\[(.*?)]\\((.*?)\\)")
                 val sanitizedChangelog = update.changelog?.replace(logRegex) { matchResult ->
@@ -294,6 +386,20 @@ object InAppUpdater {
                 builder.setMessage(sanitizedChangelog)
                 builder.apply {
                     setPositiveButton(R.string.update) { _, _ ->
+                        if (!update.directApk) {
+                            // Not a file the app can install, the page it is offered on is opened
+                            try {
+                                startActivity(
+                                    Intent(Intent.ACTION_VIEW, Uri.parse(update.updateURL))
+                                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                )
+                            } catch (e: Exception) {
+                                logError(e)
+                                showToast(R.string.error, Toast.LENGTH_SHORT)
+                            }
+                            return@setPositiveButton
+                        }
+
                         // Forcefully start any delayed installations
                         if (ApkInstaller.delayedInstaller?.startInstallation() == true) return@setPositiveButton
 
@@ -341,9 +447,11 @@ object InAppUpdater {
                         }
                     }
 
-                    setNegativeButton(R.string.cancel) { _, _ -> }
+                    if (!update.force) {
+                        setNegativeButton(R.string.cancel) { _, _ -> }
+                    }
 
-                    if (checkAutoUpdate) {
+                    if (checkAutoUpdate && !update.force) {
                         setNeutralButton(R.string.skip_update) { _, _ ->
                             settingsManager.edit {
                                 putString(

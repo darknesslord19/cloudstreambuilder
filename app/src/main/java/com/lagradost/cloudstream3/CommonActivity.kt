@@ -336,12 +336,31 @@ object CommonActivity {
         }
     }
 
+    /**
+     * Extra themes, by the name saved in the settings: the theme itself and the accent colour
+     * that goes with it. The accent is used until the user picks a primary colour.
+     */
+    private val extraThemes: Map<String, Pair<Int, Int>> = mapOf(
+        "MidnightBlue" to (R.style.MidnightBlueMode to R.style.OverlayPrimaryColorThemeMidnightBlue),
+        "Ocean" to (R.style.OceanMode to R.style.OverlayPrimaryColorThemeOcean),
+        "Forest" to (R.style.ForestMode to R.style.OverlayPrimaryColorThemeForest),
+        "Wine" to (R.style.WineMode to R.style.OverlayPrimaryColorThemeWine),
+        "PurpleNight" to (R.style.PurpleNightMode to R.style.OverlayPrimaryColorThemePurpleNight),
+        "Nord" to (R.style.NordMode to R.style.OverlayPrimaryColorThemeNord),
+        "Sunset" to (R.style.SunsetMode to R.style.OverlayPrimaryColorThemeSunset),
+        "Coffee" to (R.style.CoffeeMode to R.style.OverlayPrimaryColorThemeCoffee),
+        "Emerald" to (R.style.EmeraldMode to R.style.OverlayPrimaryColorThemeEmerald),
+        "Rose" to (R.style.RoseMode to R.style.OverlayPrimaryColorThemeRose),
+    )
+
     fun loadThemes(act: Activity?) {
         if (act == null) return
         val settingsManager = PreferenceManager.getDefaultSharedPreferences(act)
 
+        val themeName = settingsManager.getString(act.getString(R.string.app_theme_key), "AmoledLight")
+            ?: "AmoledLight"
         val currentTheme =
-            when (settingsManager.getString(act.getString(R.string.app_theme_key), "AmoledLight")) {
+            when (themeName) {
                 "System" -> mapSystemTheme(act)
                 "Black" -> R.style.AppTheme
                 "Light" -> R.style.LightMode
@@ -354,12 +373,12 @@ object CommonActivity {
                 "Lavender" -> R.style.LavenderMode
                 "SilentBlue" -> R.style.SilentBlueMode
 
-                else -> R.style.AppTheme
+                else -> extraThemes[themeName]?.first ?: R.style.AppTheme
             }
 
         val currentOverlayTheme =
             when (settingsManager.getString(act.getString(R.string.primary_color_key), "Normal")) {
-                "Normal" -> R.style.OverlayPrimaryColorNormal
+                "Normal" -> extraThemes[themeName]?.second ?: R.style.OverlayPrimaryColorNormal
                 "DandelionYellow" -> R.style.OverlayPrimaryColorDandelionYellow
                 "CarnationPink" -> R.style.OverlayPrimaryColorCarnationPink
                 "Orange" -> R.style.OverlayPrimaryColorOrange
