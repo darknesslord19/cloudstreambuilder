@@ -11,7 +11,13 @@ import com.lagradost.cloudstream3.utils.ExtractorLinkType
 import com.lagradost.cloudstream3.utils.Qualities
 import com.lagradost.cloudstream3.utils.loadExtractor
 import com.lagradost.cloudstream3.utils.newExtractorLink
+import com.lagradost.cloudstream3.USER_AGENT
+import com.lagradost.cloudstream3.app
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
+import okhttp3.Request
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -42,6 +48,7 @@ object StreamHub {
     const val TMDB_API_KEY = "e6333b32409e02a4a6eba6fb7ff866bb"
 
     private const val NUVIO_TIMEOUT_MS = 60_000L
+    private const val PROBE_TIMEOUT_MS = 6_000L
 
     @Volatile
     internal var tmdbApiUrl: String = "https://api.themoviedb.org/3"
@@ -162,7 +169,7 @@ object StreamHub {
         val youtubeId = stream.text("ytId")
         val externalUrl = stream.text("externalUrl")
         when {
-            url != null -> callback(buildLink(addonName, label, url, quality, headers, null))
+            url != null -> callback(buildLink(addonName, label, url, quality, headers, detectType(url, headers, null)))
 
             infoHash != null -> {
                 val magnet = buildMagnet(
@@ -225,8 +232,12 @@ object StreamHub {
         }
 
         when {
-            url != null && !url.contains("[object") ->
-                callback(buildLink(scraperName, label, url, quality, result.stringMap("headers"), null))
+            url != null && !url.contains("[object") -> {
+                val headers = result.stringMap("headers") +
+                        result.obj("behaviorHints").obj("proxyHeaders").stringMap("request")
+                val hint = result.text("format", "type", "container", "mimeType")
+                callback(buildLink(scraperName, label, url, quality, headers, detectType(url, headers, hint)))
+            }
 
             infoHash != null -> callback(
                 buildLink(
@@ -275,6 +286,70 @@ object StreamHub {
             } else {
                 this.headers = headers
             }
+        }
+    }
+
+    private val videoExtensions = setOf("mp4", "mkv", "webm", "avi", "mov", "m4v", "ts", "flv", "wmv", "mpg", "mpeg", "3gp")
+
+    /**
+     * What kind of stream [url] is. A source's [hint] and the address decide when they can; an
+     * address that says nothing (like ".../playlist/123?token=...") is asked, as the Nuvio player
+     * does, because a playlist opened as a plain video file is refused by many servers.
+     */
+    internal suspend fun detectType(url: String, headers: Map<String, String>, hint: String?): ExtractorLinkType {
+        when (hint?.trim()?.lowercase()) {
+            "m3u8", "hls", "application/x-mpegurl", "application/vnd.apple.mpegurl" -> return ExtractorLinkType.M3U8
+            "dash", "mpd", "application/dash+xml" -> return ExtractorLinkType.DASH
+        }
+        val byAddress = linkTypeOf(url)
+        if (byAddress != ExtractorLinkType.VIDEO) return byAddress
+        if (!url.startsWith("http")) return byAddress
+        val extension = url.substringBefore('#').substringBefore('?').substringAfterLast('/').substringAfterLast('.', "").lowercase()
+        if (extension in videoExtensions) return byAddress
+        if (hint?.trim()?.lowercase() in videoExtensions) return byAddress
+        return probeType(url, headers) ?: byAddress
+    }
+
+    /** Asks the server what [url] is, reading only the start of the answer. */
+    private suspend fun probeType(url: String, headers: Map<String, String>): ExtractorLinkType? {
+        return try {
+            withTimeoutOrNull(PROBE_TIMEOUT_MS) {
+                withContext(Dispatchers.IO) {
+                    val builder = Request.Builder().url(url).get()
+                    var hasUserAgent = false
+                    for ((key, value) in headers) {
+                        if (key.equals("user-agent", ignoreCase = true)) hasUserAgent = true
+                        builder.header(key, value)
+                    }
+                    if (!hasUserAgent) builder.header("User-Agent", USER_AGENT)
+                    app.baseClient.newCall(builder.build()).execute().use { response ->
+                        if (!response.isSuccessful) return@use null
+                        val type = response.header("Content-Type")?.substringBefore(';')?.trim()?.lowercase()
+                        when {
+                            type == null -> null
+                            type.contains("mpegurl") || type == "application/m3u8" -> ExtractorLinkType.M3U8
+                            type.contains("dash+xml") -> ExtractorLinkType.DASH
+                            type.startsWith("video/") || type.startsWith("audio/") -> ExtractorLinkType.VIDEO
+                            else -> {
+                                // Playlists are often sent as plain text, their first line tells
+                                val source = response.body?.source() ?: return@use null
+                                source.request(64)
+                                val start = source.buffer.snapshot().utf8().take(64)
+                                when {
+                                    start.trimStart().startsWith("#EXTM3U") -> ExtractorLinkType.M3U8
+                                    start.contains("<MPD") -> ExtractorLinkType.DASH
+                                    else -> null
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (t: Throwable) {
+            Log.w(TAG, "Probe of $url failed: ${t.message}")
+            null
         }
     }
 
