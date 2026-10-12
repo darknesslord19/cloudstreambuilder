@@ -42,6 +42,9 @@ interface AddonPlatform {
     /** The language the built-in catalog is filed under, null for [defaultProviderLanguage]. */
     fun catalogLanguage(): String? = null
 
+    /** If sources of [kind] may be added and used, this build can switch kinds off. */
+    fun isKindEnabled(kind: AddonKind): Boolean = true
+
     /** Two letter code of the language the app is shown in, "tr" for Turkish. */
     fun uiLanguage(): String = "en"
 

@@ -808,4 +808,9 @@
     <string name="icon_purple">Mor</string>
     <string name="icon_pink">Pembe</string>
     <string name="icon_silver">Gümüş</string>
+    <string name="addon_address_hint_format">%s adresi</string>
+    <string name="addon_kind_cloudstream">CloudStream deposu</string>
+    <string name="addon_kind_stremio">Stremio eklentisi</string>
+    <string name="addon_kind_nuvio">Nuvio deposu</string>
+    <string name="addon_kind_skystream">SkyStream deposu</string>
 </resources>

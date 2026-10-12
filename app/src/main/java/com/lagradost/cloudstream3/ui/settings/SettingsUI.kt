@@ -11,7 +11,9 @@ import androidx.preference.SeekBarPreference
 import com.lagradost.cloudstream3.CloudStreamApp.Companion.getActivity
 import com.lagradost.cloudstream3.CommonActivity
 import com.lagradost.cloudstream3.MainActivity
+import com.lagradost.cloudstream3.fork.ForkFeatures
 import com.lagradost.cloudstream3.fork.Looks
+import com.lagradost.cloudstream3.fork.RemoteRules
 import com.lagradost.cloudstream3.R
 import com.lagradost.cloudstream3.SearchQuality
 import com.lagradost.cloudstream3.mvvm.logError
@@ -145,9 +147,39 @@ class SettingsUI : BasePreferenceFragmentCompat() {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) { // Remove system on android 9 and less
                 removeIncompatible("System")
             }
+            val extrasOn = ForkFeatures.isOn(RemoteRules.Feature.THEMES, requireContext())
+            if (!extrasOn) {
+                // The added themes are switched off, the list is the usual one
+                for (index in prefValues.indices.reversed()) {
+                    if (CommonActivity.extraThemeNames.contains(prefValues[index])) {
+                        prefValues.removeAt(index)
+                        prefNames.removeAt(index)
+                    }
+                }
+            }
 
             val currentLayout =
                 settingsManager.getString(getString(R.string.app_theme_key), prefValues.first())
+
+            if (!extrasOn) {
+                activity?.showBottomDialog(
+                    prefNames.toList(),
+                    prefValues.indexOf(currentLayout),
+                    getString(R.string.app_theme_settings),
+                    true,
+                    {}
+                ) {
+                    try {
+                        settingsManager.edit {
+                            putString(getString(R.string.app_theme_key), prefValues[it])
+                        }
+                        activity?.recreate()
+                    } catch (e: Exception) {
+                        logError(e)
+                    }
+                }
+                return@setOnPreferenceClickListener true
+            }
 
             // Every theme is listed with a small picture of its colours
             val act = activity ?: return@setOnPreferenceClickListener true
@@ -175,6 +207,12 @@ class SettingsUI : BasePreferenceFragmentCompat() {
             }
             return@setOnPreferenceClickListener true
         }
+
+        // The font and icon choices are only there while they are switched on
+        findPreference<Preference>(Looks.FONT_KEY)?.isVisible =
+            ForkFeatures.isOn(RemoteRules.Feature.FONTS, requireContext())
+        findPreference<Preference>(Looks.ICON_KEY)?.isVisible =
+            ForkFeatures.isOn(RemoteRules.Feature.ICONS, requireContext())
 
         findPreference<Preference>(Looks.FONT_KEY)?.let { pref ->
             pref.summary = context?.let { Looks.currentFont(it).label }

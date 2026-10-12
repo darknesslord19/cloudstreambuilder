@@ -842,4 +842,9 @@
     <string name="icon_purple">Purple</string>
     <string name="icon_pink">Pink</string>
     <string name="icon_silver">Silver</string>
+    <string name="addon_address_hint_format">The address of a %s</string>
+    <string name="addon_kind_cloudstream">CloudStream repository</string>
+    <string name="addon_kind_stremio">Stremio add-on</string>
+    <string name="addon_kind_nuvio">Nuvio repository</string>
+    <string name="addon_kind_skystream">SkyStream repository</string>
 </resources>

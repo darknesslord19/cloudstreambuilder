@@ -67,7 +67,11 @@ object Looks {
     }
 
     /** The style that makes the chosen font the font of [context]'s theme. */
-    fun fontOverlay(context: Context): Int = currentFont(context).style
+    fun fontOverlay(context: Context): Int {
+        // Switched off, the app has its usual font
+        if (!ForkFeatures.isOn(RemoteRules.Feature.FONTS, context)) return fonts.first().style
+        return currentFont(context).style
+    }
 
     private fun typefaceOf(context: Context, font: Font): Typeface? {
         return try {
@@ -108,18 +112,48 @@ object Looks {
      * Makes [chosen] the icon of the app and closes the app. Launchers only pick a new icon up
      * reliably while the app is not running, and the system would stop the app anyway.
      */
+    private fun enableOnly(context: Context, chosen: AppIcon) {
+        val manager = context.packageManager
+        // The new entry first, so there is never a moment without any launcher entry
+        for (icon in listOf(chosen) + icons.filter { it.key != chosen.key }) {
+            manager.setComponentEnabledSetting(
+                ComponentName(context.packageName, "$ALIAS_PACKAGE.${icon.alias}"),
+                if (icon.key == chosen.key) PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+                else PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                PackageManager.DONT_KILL_APP,
+            )
+        }
+    }
+
+    /** The icon the launcher should show: the chosen one, or the usual one while the choice is switched off. */
+    private fun iconInEffect(context: Context): AppIcon =
+        if (ForkFeatures.isOn(RemoteRules.Feature.ICONS, context)) currentIcon(context) else icons.first()
+
+    /**
+     * Makes the launcher show [iconInEffect], used when the icon choice was switched on or off.
+     * The saved choice is kept, so it comes back when the choice is switched on again.
+     */
+    fun syncIcon(context: Context) {
+        try {
+            val wanted = iconInEffect(context)
+            val manager = context.packageManager
+            val isEnabled = { icon: AppIcon ->
+                when (manager.getComponentEnabledSetting(ComponentName(context.packageName, "$ALIAS_PACKAGE.${icon.alias}"))) {
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED -> true
+                    PackageManager.COMPONENT_ENABLED_STATE_DEFAULT -> icon.key == icons.first().key
+                    else -> false
+                }
+            }
+            if (icons.all { isEnabled(it) == (it.key == wanted.key) }) return
+            enableOnly(context, wanted)
+        } catch (t: Throwable) {
+            logError(t)
+        }
+    }
+
     fun applyIcon(activity: Activity, chosen: AppIcon) {
         try {
-            val manager = activity.packageManager
-            // The new entry first, so there is never a moment without any launcher entry
-            for (icon in listOf(chosen) + icons.filter { it.key != chosen.key }) {
-                manager.setComponentEnabledSetting(
-                    ComponentName(activity.packageName, "$ALIAS_PACKAGE.${icon.alias}"),
-                    if (icon.key == chosen.key) PackageManager.COMPONENT_ENABLED_STATE_ENABLED
-                    else PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                    PackageManager.DONT_KILL_APP,
-                )
-            }
+            enableOnly(activity, chosen)
             PreferenceManager.getDefaultSharedPreferences(activity).edit().putString(ICON_KEY, chosen.key).commit()
         } catch (t: Throwable) {
             logError(t)

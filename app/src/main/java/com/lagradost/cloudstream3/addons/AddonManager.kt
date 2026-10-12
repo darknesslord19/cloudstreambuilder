@@ -132,7 +132,22 @@ object AddonManager {
     fun displayNameOf(source: AddonSource): String = source.name
 
     /** Sources that find links: Nuvio repositories and Stremio add-ons with streams. */
-    fun streamSources(): List<AddonSource> = getSources().filter { source ->
+    /** If sources of [kind] are switched on in this build. */
+    fun isKindEnabled(kind: AddonKind?): Boolean {
+        if (kind == null || !isInitialised) return true
+        return platform.isKindEnabled(kind)
+    }
+
+    /** The sources whose kind is switched on, the ones the user gets to see. */
+    fun visibleSources(): List<AddonSource> = getSources().filter { isKindEnabled(it.addonKind) }
+
+    /** Registers every source again, after kinds were switched on or off. */
+    suspend fun reapply() {
+        loadAll()
+        platform.providersChanged()
+    }
+
+    fun streamSources(): List<AddonSource> = visibleSources().filter { source ->
         when (source.addonKind) {
             AddonKind.NUVIO -> true
             AddonKind.STREMIO -> stremioBySource[source.url]?.hasResource("stream") == true
@@ -283,6 +298,7 @@ object AddonManager {
      * @param enabledIds the scrapers or plugins to switch on, ignored for Stremio add-ons.
      */
     suspend fun add(detected: Detected, customName: String?, enabledIds: List<String>): Result {
+        if (!isKindEnabled(detected.kind)) throw AddonException("${detected.kind.label} is switched off")
         val source: AddonSource
         val failed: List<String>
         mutex.withLock {
@@ -531,6 +547,20 @@ object AddonManager {
         unregister(tag)
         stremioBySource.remove(url)
         nuvioBySource.remove(url)
+
+        // A switched-off kind stays saved but offers nothing until it is switched on again
+        if (!isKindEnabled(source.addonKind)) {
+            publishRegistry()
+            for (key in previousKeys) {
+                try {
+                    platform.jsEngine.unload(key)
+                } catch (t: Throwable) {
+                    Log.w(TAG, "Unload failed: ${t.message}")
+                }
+            }
+            scriptKeysBySource.remove(url)
+            return
+        }
 
         when (source.addonKind) {
             AddonKind.STREMIO -> {

@@ -60,7 +60,19 @@ object AssetPage {
         private val onClose: () -> Unit,
         private val onAddRepository: ((url: String, name: String?) -> Unit)?,
         private val addedUrls: () -> List<String>,
+        private val allowedTypes: () -> List<String>,
     ) {
+        /** The kinds of repositories the app takes at the moment, as a JSON list. */
+        @JavascriptInterface
+        fun allowedTypes(): String {
+            return try {
+                JSONArray(allowedTypes.invoke()).toString()
+            } catch (t: Throwable) {
+                logError(t)
+                "[]"
+            }
+        }
+
         @JavascriptInterface
         fun version(): String = BuildConfig.VERSION_NAME
 
@@ -160,6 +172,7 @@ object AssetPage {
         page: String,
         onAddRepository: ((url: String, name: String?) -> Unit)? = null,
         addedUrls: () -> List<String> = { emptyList() },
+        allowedTypes: () -> List<String> = { listOf("cloudstream", "stremio", "nuvio", "skystream") },
         cancelable: Boolean = true,
         bridges: Map<String, Any> = emptyMap(),
         quiet: Boolean = false,
@@ -203,7 +216,7 @@ object AssetPage {
         }
 
         webView.addJavascriptInterface(
-            PageBridge(activity, { if (cancelable) dialog.dismiss() }, onAddRepository, addedUrls),
+            PageBridge(activity, { if (cancelable) dialog.dismiss() }, onAddRepository, addedUrls, allowedTypes),
             "CloudStream"
         )
         for ((name, bridge) in bridges) {

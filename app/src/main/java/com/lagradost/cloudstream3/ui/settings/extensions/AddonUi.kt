@@ -46,9 +46,25 @@ object AddonUi {
         return RepositoryData(source.iconUrl, "${AddonManager.displayNameOf(source)} ($kind)", source.url)
     }
 
+    /** The line under the address field: which kinds of addresses are understood. */
+    fun addressHint(context: Context): String {
+        val kinds = listOfNotNull(
+            context.getString(R.string.addon_kind_cloudstream),
+            context.getString(R.string.addon_kind_stremio).takeIf { AddonManager.isKindEnabled(AddonKind.STREMIO) },
+            context.getString(R.string.addon_kind_nuvio).takeIf { AddonManager.isKindEnabled(AddonKind.NUVIO) },
+            context.getString(R.string.addon_kind_skystream).takeIf { AddonManager.isKindEnabled(AddonKind.SKYSTREAM) },
+        )
+        return context.getString(R.string.addon_address_hint_format, kinds.joinToString(", "))
+    }
+
+    /** The kinds the repository list page may offer, as its "type" values. */
+    fun allowedTypes(): List<String> = listOf("cloudstream") + AddonKind.values()
+        .filter { AddonManager.isKindEnabled(it) }
+        .map { it.id }
+
     fun listedSources(): List<RepositoryData> {
         return try {
-            AddonManager.getSources().map { toRepositoryData(it) }
+            AddonManager.visibleSources().map { toRepositoryData(it) }
         } catch (t: Throwable) {
             logError(t)
             emptyList()
@@ -71,6 +87,9 @@ object AddonUi {
             logError(t)
             null
         } ?: return Outcome.NOT_AN_ADDON
+
+        // A switched-off kind is treated as if this build did not know it
+        if (!AddonManager.isKindEnabled(detected.kind)) return Outcome.NOT_AN_ADDON
 
         val enabled: List<String> = if (detected.entries.isEmpty()) {
             emptyList()

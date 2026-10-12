@@ -162,6 +162,9 @@
   var canAdd = false, added = [];
   try { canAdd = !!(app && app.canAddRepository && app.canAddRepository()); } catch (e) {}
   try { if (app && app.addedRepositories) added = JSON.parse(app.addedRepositories()) || []; } catch (e) {}
+  // Kinds the app has switched off are not offered
+  var allowed = null;
+  try { if (app && app.allowedTypes) allowed = JSON.parse(app.allowedTypes()); } catch (e) {}
 
   var listEl = document.getElementById('list');
   var chipsEl = document.getElementById('chips');
@@ -265,7 +268,10 @@
     });
   }
 
-  function show(list) { repos = clean(list); renderChips(); renderList(); }
+  function show(list) {
+    repos = clean(list).filter(function (r) { return !allowed || allowed.indexOf(r.type) !== -1; });
+    renderChips(); renderList();
+  }
 
   show(REPOS);
   if (REMOTE_LIST) {

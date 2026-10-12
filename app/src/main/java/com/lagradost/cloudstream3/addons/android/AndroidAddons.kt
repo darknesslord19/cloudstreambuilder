@@ -8,7 +8,10 @@ import com.lagradost.cloudstream3.CloudStreamApp
 import com.lagradost.cloudstream3.CommonActivity
 import com.lagradost.cloudstream3.MainActivity
 import com.lagradost.cloudstream3.R
+import com.lagradost.cloudstream3.addons.AddonKind
 import com.lagradost.cloudstream3.addons.AddonManager
+import com.lagradost.cloudstream3.fork.ForkFeatures
+import com.lagradost.cloudstream3.fork.RemoteRules
 import com.lagradost.cloudstream3.addons.AddonPlatform
 import com.lagradost.cloudstream3.addons.js.AddonHostBridge
 import com.lagradost.cloudstream3.addons.js.AddonJsEngine
@@ -84,6 +87,15 @@ class AndroidAddonPlatform(context: Context) : AddonPlatform {
         // Only when Turkish providers are shown, the catalog would be hidden otherwise
         return if (active.contains(AllLanguagesName) || active.contains(CATALOG_LANGUAGE)) CATALOG_LANGUAGE else null
     }
+
+    override fun isKindEnabled(kind: AddonKind): Boolean = ForkFeatures.isOn(
+        when (kind) {
+            AddonKind.STREMIO -> RemoteRules.Feature.STREMIO
+            AddonKind.NUVIO -> RemoteRules.Feature.NUVIO
+            AddonKind.SKYSTREAM -> RemoteRules.Feature.SKYSTREAM
+        },
+        appContext,
+    )
 
     override fun uiLanguage(): String {
         val chosen = try {

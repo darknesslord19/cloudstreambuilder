@@ -32,7 +32,9 @@ import androidx.preference.PreferenceManager
 import com.google.android.gms.cast.framework.CastSession
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.navigationrail.NavigationRailView
+import com.lagradost.cloudstream3.fork.ForkFeatures
 import com.lagradost.cloudstream3.fork.Looks
+import com.lagradost.cloudstream3.fork.RemoteRules
 import com.lagradost.cloudstream3.CloudStreamApp.Companion.getKey
 import com.lagradost.cloudstream3.CloudStreamApp.Companion.removeKey
 import com.lagradost.cloudstream3.actions.OpenInAppAction
@@ -341,7 +343,13 @@ object CommonActivity {
      * Extra themes, by the name saved in the settings: the theme itself and the accent colour
      * that goes with it. The accent is used until the user picks a primary colour.
      */
-    private val extraThemes: Map<String, Pair<Int, Int>> = mapOf(
+    private val extraThemes: Map<String, Pair<Int, Int>>
+        get() = if (ForkFeatures.isOn(RemoteRules.Feature.THEMES)) allExtraThemes else emptyMap()
+
+    /** The saved names of the themes this build adds. */
+    val extraThemeNames: Set<String> get() = allExtraThemes.keys
+
+    private val allExtraThemes: Map<String, Pair<Int, Int>> = mapOf(
         "MidnightBlue" to (R.style.MidnightBlueMode to R.style.OverlayPrimaryColorThemeMidnightBlue),
         "Ocean" to (R.style.OceanMode to R.style.OverlayPrimaryColorThemeOcean),
         "Forest" to (R.style.ForestMode to R.style.OverlayPrimaryColorThemeForest),

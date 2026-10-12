@@ -95,6 +95,31 @@ object RemoteRules {
         )
     }
 
+    // ---------------------------------------------------------------- features
+
+    /** The additions of this build that can be switched off, with their names in the documents. */
+    enum class Feature(val key: String) {
+        STREMIO("stremio"),
+        NUVIO("nuvio"),
+        SKYSTREAM("skystream"),
+        THEMES("themes"),
+        FONTS("fonts"),
+        ICONS("icons"),
+    }
+
+    /**
+     * What is switched on: the general document, e.g. { "stremio": true, "nuvio": false, ... },
+     * with the "features" object of this device's entry in the access list on top of it.
+     * Anything not named in either stays on.
+     */
+    fun features(general: JsonNode?, user: JsonNode?): Map<Feature, Boolean> {
+        val own = user?.takeIf { it.isObject }?.get("features")
+        return Feature.values().associateWith { feature ->
+            val base = general.flag(true, feature.key)
+            own.flag(base, feature.key)
+        }
+    }
+
     // ---------------------------------------------------------------- access list
 
     /** The "settings" part of the access document. */

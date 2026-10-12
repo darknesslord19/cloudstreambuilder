@@ -76,7 +76,11 @@ import com.lagradost.cloudstream3.CommonActivity.setActivityInstance
 import com.lagradost.cloudstream3.CommonActivity.showToast
 import com.lagradost.cloudstream3.CommonActivity.updateLocale
 import com.lagradost.cloudstream3.addons.android.AndroidAddons
+import com.lagradost.cloudstream3.addons.AddonManager
 import com.lagradost.cloudstream3.fork.AccessGate
+import com.lagradost.cloudstream3.fork.ForkFeatures
+import com.lagradost.cloudstream3.fork.Looks
+import com.lagradost.cloudstream3.fork.RemoteRules
 import com.lagradost.cloudstream3.fork.Announcements
 import com.lagradost.cloudstream3.CommonActivity.updateTheme
 import com.lagradost.cloudstream3.actions.temp.fcast.FcastManager
@@ -1999,6 +2003,19 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
         // The optional access list of this build, and what the developer has to announce
         AccessGate.onAppStart(this)
         Announcements.check(this)
+
+        // What is switched on in this build: the icon follows at once, the add-on kinds as
+        // soon as the switches are read, themes and fonts at the next start
+        Looks.syncIcon(this)
+        ioSafe {
+            val changed = ForkFeatures.refresh(this@MainActivity)
+            val kinds = setOf(RemoteRules.Feature.STREMIO, RemoteRules.Feature.NUVIO, RemoteRules.Feature.SKYSTREAM)
+            if (changed.any { it in kinds }) {
+                AndroidAddons.ensureInitialised(this@MainActivity)
+                AddonManager.reapply()
+            }
+            if (changed.contains(RemoteRules.Feature.ICONS)) Looks.syncIcon(this@MainActivity)
+        }
 
         FcastManager().init(this, false)
 

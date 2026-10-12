@@ -286,7 +286,7 @@ class ExtensionsFragment : BaseFragment<FragmentExtensionsBinding>(
 
             val dialog = builder.create()
             dialog.show()
-            binding.text2.setText(R.string.addon_address_hint)
+            binding.text2.text = AddonUi.addressHint(ctx)
             binding.text2.isVisible = true
             (activity?.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager)?.primaryClip?.getItemAt(
                 0
@@ -319,6 +319,7 @@ class ExtensionsFragment : BaseFragment<FragmentExtensionsBinding>(
                     addedUrls = {
                         RepositoryManager.getRepositories().map { it.url } + AddonManager.sourceUrls()
                     },
+                    allowedTypes = { AddonUi.allowedTypes() },
                 )
             }
             // A slow pulse draws the eye to the list, it stops with the dialog
