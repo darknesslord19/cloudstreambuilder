@@ -5,129 +5,194 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Bilgilerim</title>
 <!--
-  Ayarlar > Bilgilerim. Yalnızca erişim listesi açıkken görünür.
-  Uygulamaya: Access.info() -> { deviceId, name, expires, remaining, hasPassword }, Access.logout()
+  Ayarlar > Bilgilerim. Yalnızca erişim listesi açıkken görünür. Renkler uygulamanın temasından gelir.
+  Uygulamaya: Access.info() -> { deviceId, name, plan, active, expires, unlimited, years, days, hours,
+              minutes, progress, hasPassword }, Access.theme(), Access.logout()
 -->
 <style>
   :root {
-    --bg: #0b0709; --ink: #fbeef3; --muted: #b79aa6; --line: rgba(255, 190, 215, .16);
-    --rose: #f27ba5; --card: rgba(26, 15, 20, .82); --danger: #ff5a4d;
+    --bg: #111114;
+    --card: #1c1c20;
+    --field: #26262b;
+    --line: rgba(255, 255, 255, .08);
+    --ink: #f4f4f6;
+    --muted: #9c9ca6;
+    --accent: #e8365d;
+    --accent-2: #ff7a93;
+    --accent-a12: rgba(232, 54, 93, .12);
+    --accent-a16: rgba(232, 54, 93, .16);
+    --accent-a45: rgba(232, 54, 93, .45);
+    --ok: #34d399;
+    --bad: #f87171;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { min-height: 100%; }
   body {
-    margin: 0; min-height: 100vh; background: var(--bg); color: var(--ink);
+    margin: 0; color: var(--ink);
+    background: radial-gradient(120% 55% at 50% 0%, var(--accent-a16), transparent 70%), var(--bg);
     font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   }
-  .glow {
-    position: fixed; inset: -25% -30% auto -30%; height: 55vh; pointer-events: none;
-    background: radial-gradient(42% 46% at 50% 40%, rgba(242, 123, 165, .26), transparent 70%);
-    filter: blur(30px);
-  }
-  .bar {
-    position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 8px; padding: 12px 12px;
-    background: linear-gradient(rgba(11, 7, 9, .94), rgba(11, 7, 9, .7));
-    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
-  }
-  .bar h1 { margin: 0; font-size: 22px; font-weight: 700; }
-  .icon-btn {
-    width: 44px; height: 44px; border: 0; border-radius: 50%; background: none; color: var(--ink);
-    display: grid; place-items: center;
-  }
-  .icon-btn:active { background: rgba(255, 255, 255, .08); }
-  .icon-btn svg { width: 24px; height: 24px; fill: currentColor; }
+  main { min-height: 100vh; display: grid; place-items: center; grid-template-columns: minmax(0, 1fr); padding: 28px 16px; }
 
-  main { position: relative; z-index: 1; max-width: 520px; margin: 0 auto; padding: 8px 16px 40px; }
   .card {
-    border: 1px solid var(--line); border-radius: 22px; background: var(--card);
-    opacity: 0; transform: translateY(16px); animation: rise .6s cubic-bezier(.2, .7, .2, 1) forwards;
+    width: 100%; min-width: 0; justify-self: center; max-width: 440px; padding: 28px 22px;
+    border-radius: 28px; background: var(--card); border: 1px solid var(--line);
+    box-shadow: 0 30px 70px rgba(0, 0, 0, .45);
+    opacity: 0; transform: translateY(18px);
+    animation: rise .6s cubic-bezier(.2, .7, .2, 1) .05s forwards;
   }
   @keyframes rise { to { opacity: 1; transform: none; } }
-  .row { display: flex; align-items: center; gap: 16px; padding: 16px 18px; }
-  .row + .row { border-top: 1px solid var(--line); }
-  .badge {
-    flex: none; width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center;
-    background: rgba(242, 123, 165, .14); color: var(--rose);
+
+  .head { display: flex; align-items: center; gap: 18px; margin-bottom: 26px; }
+  .avatar {
+    flex: none; width: 64px; height: 64px; border-radius: 20px; display: grid; place-items: center;
+    background: var(--field); border: 1px solid var(--line); color: var(--ink);
   }
-  .badge svg { width: 24px; height: 24px; fill: currentColor; }
-  .row div { flex: 1; min-width: 0; }
-  .row small { display: block; color: var(--muted); font-size: 14px; }
-  .row b { display: block; font-size: 18px; font-weight: 700; overflow-wrap: anywhere; }
+  .avatar svg { width: 30px; height: 30px; }
+  .who { flex: 1; min-width: 0; }
+  .who h1 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -.3px; overflow-wrap: anywhere; }
+  .who p { margin: 2px 0 0; color: var(--muted); font-size: 16px; }
+  .badge {
+    flex: none; align-self: flex-start; display: inline-flex; align-items: center; gap: 8px;
+    padding: 5px 10px; border-radius: 999px; font-size: 12px; font-weight: 800; letter-spacing: .06em;
+    color: var(--ok); background: rgba(52, 211, 153, .10); border: 1px solid rgba(52, 211, 153, .35);
+  }
+  .badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .badge.off { color: var(--bad); background: rgba(248, 113, 113, .10); border-color: rgba(248, 113, 113, .35); }
+
+  .row {
+    display: flex; align-items: center; gap: 14px; min-height: 64px; margin-top: 14px; padding: 12px 16px 12px 18px;
+    border-radius: 20px; border: 1px solid var(--line); background: var(--card);
+  }
+  .row > svg { flex: none; width: 22px; height: 22px; color: var(--muted); }
+  .row .label { color: var(--muted); font-size: 16px; }
+  .row .value { margin-left: auto; text-align: right; font-weight: 700; font-size: 17px; overflow-wrap: anywhere; }
+  .row .stack { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .row .stack .label { font-size: 14px; }
+  .row .stack .value { margin: 2px 0 0; text-align: left; font-size: clamp(14px, 4.2vw, 17px); overflow-wrap: anywhere; }
+  .row .value.mono { font-family: ui-monospace, "Roboto Mono", monospace; font-weight: 500; letter-spacing: .04em; }
+  .copy {
+    flex: none; width: 40px; height: 40px; border: 0; border-radius: 12px; background: none; color: var(--muted);
+    display: grid; place-items: center;
+  }
+  .copy:active { background: var(--accent-a12); color: var(--accent); }
+  .copy svg { width: 20px; height: 20px; }
+
+  .left { margin-top: 14px; padding: 20px 20px 22px; border-radius: 20px; border: 1px solid var(--line); background: var(--field); }
+  .left .line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+  .left .label { color: var(--muted); }
+  .left .value { margin-left: auto; font-size: clamp(17px, 5vw, 20px); font-weight: 800; white-space: nowrap; }
+  .left small { color: var(--muted); font-size: 14px; }
+  .bar { height: 8px; margin-top: 16px; border-radius: 999px; background: rgba(255, 255, 255, .10); overflow: hidden; }
+  .bar span {
+    display: block; height: 100%; width: 0; border-radius: inherit;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    transition: width 1.1s cubic-bezier(.2, .7, .2, 1) .3s;
+  }
 
   .logout {
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-    width: 100%; min-height: 54px; margin-top: 18px; border: 0; border-radius: 16px;
-    font: inherit; font-size: 17px; font-weight: 750; color: #fff; background: var(--danger);
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    width: 100%; min-height: 58px; margin-top: 26px; border-radius: 18px;
+    font: inherit; font-size: 18px; font-weight: 700; color: var(--ink);
+    background: var(--accent-a12); border: 1.5px solid var(--accent);
     transition: transform .12s ease;
   }
   .logout:active { transform: scale(.98); }
-  .logout svg { width: 22px; height: 22px; fill: currentColor; }
+  .logout svg { width: 22px; height: 22px; }
+  @media (max-width: 380px) {
+    .card { padding: 22px 16px; }
+    .head { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 4px 16px; }
+    .avatar { grid-row: 1 / span 2; }
+    .badge { grid-column: 2; justify-self: start; }
+  }
   [hidden] { display: none !important; }
 
   .toast {
     position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 20px); opacity: 0;
-    padding: 10px 16px; border-radius: 999px; font-size: 14px; background: var(--ink); color: #2a0f1a;
+    padding: 10px 16px; border-radius: 999px; font-size: 14px; background: var(--ink); color: var(--bg);
     transition: opacity .2s ease, transform .2s ease; pointer-events: none;
   }
   .toast.show { opacity: 1; transform: translate(-50%, 0); }
-  @media (prefers-reduced-motion: reduce) { .card { animation: none; opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .card { animation: none; opacity: 1; transform: none; } .bar span { transition: none; } }
 </style>
 </head>
 <body>
-<div class="glow" aria-hidden="true"></div>
-<div class="bar">
-  <button class="icon-btn" id="back" aria-label="Geri">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11H7.800l5.600-5.600L12 4l-8 8 8 8 1.400-1.400L7.800 13H20v-2z"/></svg>
-  </button>
-  <h1>Bilgilerim</h1>
-</div>
-
 <main>
   <section class="card">
-    <div class="row">
-      <span class="badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-3.300 0-8 1.700-8 5v1h16v-1c0-3.300-4.700-5-8-5z"/></svg></span>
-      <div><small>Ad</small><b id="name">—</b></div>
+    <div class="head">
+      <div class="avatar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.2 3.6-7 8-7s8 2.8 8 7"/></svg>
+      </div>
+      <div class="who"><h1 id="name">—</h1><p id="plan"></p></div>
+      <span class="badge" id="badge">AKTİF</span>
     </div>
+
     <div class="row">
-      <span class="badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 1H7a2 2 0 0 0-2 2v18a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zm0 18H7V5h10v14zm-5 3a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/></svg></span>
-      <div><small>Cihaz Kimliği</small><b id="device">—</b></div>
-      <button class="icon-btn" id="copy" aria-label="Kimliği kopyala">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 1H4a2 2 0 0 0-2 2v14h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg>
+      <span class="stack"><span class="label">Cihaz Kimliği</span><span class="value mono" id="device">—</span></span>
+      <button class="copy" id="copy" aria-label="Kimliği kopyala">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M5 15a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2"/></svg>
       </button>
     </div>
-    <div class="row">
-      <span class="badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16H5V9h14v11zm-3-8h-4v4h4v-4z"/></svg></span>
-      <div><small>Bitiş Tarihi</small><b id="expires">—</b></div>
-    </div>
-    <div class="row">
-      <span class="badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2v6l4 4-4 4v6h12v-6l-4-4 4-4V2H6zm10 14.500V20H8v-3.500l4-4 4 4zM12 11.500l-4-4V4h8v3.500l-4 4z"/></svg></span>
-      <div><small>Kalan Süre</small><b id="remaining">—</b></div>
-    </div>
-  </section>
 
-  <button class="logout" id="logout" hidden>
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l1.400-1.400L8.800 13H20v-2H8.800l2.600-2.600L10 7l-5 5 5 5zM4 5h8V3H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8v-2H4V5z"/></svg>
-    Çıkış yap
-  </button>
+    <div class="row">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+      <span class="label">Bitiş Tarihi</span>
+      <span class="value" id="expires">—</span>
+    </div>
+
+    <div class="left">
+      <div class="line"><span class="label">Kalan Süre</span><span class="value" id="remaining">—</span><small id="leftWord">kaldı</small></div>
+      <div class="bar"><span id="bar"></span></div>
+    </div>
+
+    <button class="logout" id="logout" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3"/><path d="M15 17l5-5-5-5"/><path d="M20 12H9"/></svg>
+      Güvenli Çıkış Yap
+    </button>
+  </section>
 </main>
 <div class="toast" id="toast" role="status"></div>
 
+<script src="theme.js"></script>
 <script>
 (function () {
   var access = window.Access || {
     info: function () {
-      return JSON.stringify({ deviceId: "1e256221b241974e", name: "Örnek Kullanıcı", expires: "30.12.2080",
-        remaining: "54 yıl 94 gün kaldı", hasPassword: true });
+      return JSON.stringify({ deviceId: "14147d0155f3a4b5", name: "Darknes Lord", plan: "Premium Üyelik", active: true,
+        expires: "31.01.2028", years: 1, days: 111, hours: 3, minutes: 0, progress: .68, hasPassword: true });
     },
-    logout: function () {}
+    theme: function () { return "{}"; }, logout: function () {}
   };
   var app = window.CloudStream;
+  applyTheme(access);
+
   var info = {};
   try { info = JSON.parse(access.info()) || {}; } catch (e) {}
+  function set(id, text) { document.getElementById(id).textContent = text; }
 
-  document.getElementById('name').textContent = info.name || "—";
-  document.getElementById('device').textContent = info.deviceId || "—";
-  document.getElementById('expires').textContent = info.expires || "Süresiz";
-  document.getElementById('remaining').textContent = info.remaining || "—";
+  set('name', info.name || "—");
+  set('plan', info.plan || "");
+  set('device', info.deviceId || "—");
+  set('expires', info.unlimited ? "Süresiz" : (info.expires || "—"));
+  var badge = document.getElementById('badge');
+  badge.textContent = info.active === false ? "SÜRESİ DOLDU" : "AKTİF";
+  badge.className = 'badge' + (info.active === false ? ' off' : '');
+
+  var parts = [];
+  if (info.unlimited) {
+    set('remaining', "Süresiz"); document.getElementById('leftWord').hidden = true;
+  } else {
+    if (info.years > 0) parts.push(info.years + " Yıl");
+    if (info.days > 0) parts.push(info.days + " Gün");
+    if (!parts.length && info.hours > 0) parts.push(info.hours + " Saat");
+    if (!parts.length && info.minutes > 0) parts.push(info.minutes + " Dakika");
+    if (parts.length) set('remaining', parts.join(" "));
+    else { set('remaining', "Süre doldu"); document.getElementById('leftWord').hidden = true; }
+  }
+  var progress = typeof info.progress === 'number' ? Math.max(0, Math.min(1, info.progress)) : 1;
+  requestAnimationFrame(function () { document.getElementById('bar').style.width = (progress * 100).toFixed(1) + '%'; });
+
   // Without a password there is nothing to log out of, the device itself is the key
   document.getElementById('logout').hidden = !info.hasPassword;
 
@@ -140,9 +205,6 @@
       clearTimeout(toastTimer);
       toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 1600);
     } catch (e) {}
-  });
-  document.getElementById('back').addEventListener('click', function () {
-    if (app && app.close) app.close(); else window.close();
   });
   document.getElementById('logout').addEventListener('click', function () { try { access.logout(); } catch (e) {} });
 })();

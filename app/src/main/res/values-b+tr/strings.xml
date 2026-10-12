@@ -813,4 +813,5 @@
     <string name="addon_kind_stremio">Stremio eklentisi</string>
     <string name="addon_kind_nuvio">Nuvio deposu</string>
     <string name="addon_kind_skystream">SkyStream deposu</string>
+    <string name="access_default_plan">Premium Üyelik</string>
 </resources>

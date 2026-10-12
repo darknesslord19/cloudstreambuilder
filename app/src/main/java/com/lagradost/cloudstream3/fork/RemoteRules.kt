@@ -147,7 +147,11 @@ object RemoteRules {
         EXPIRED,
     }
 
-    class User(val name: String?, val expiresAt: Long?)
+    /**
+     * @property plan what the account is called on the account page, e.g. "Premium Üyelik".
+     * @property startsAt when the access began, used to show how much of it is left.
+     */
+    class User(val name: String?, val expiresAt: Long?, val plan: String? = null, val startsAt: Long? = null)
 
     sealed class Decision {
         class Granted(val user: User) : Decision()
@@ -163,7 +167,11 @@ object RemoteRules {
         if (user == null || !user.isObject) return Decision.Denied(Denial.NOT_REGISTERED, null)
         val expiresText = user.string("expires", "expire", "end", "bitis", "until")
         val expiresAt = endOfDay(expiresText)
-        val info = User(user.string("name", "ad"), expiresAt)
+        val info = User(
+            user.string("name", "ad"), expiresAt,
+            plan = user.string("plan", "uyelik", "membership"),
+            startsAt = endOfDay(user.string("start", "starts", "baslangic"))?.let { it - 86_399_999L },
+        )
 
         if (!user.flag(true, "active", "enabled", "aktif")) return Decision.Denied(Denial.SUSPENDED, info)
         // A date that cannot be read must not open the door for good
@@ -232,6 +240,17 @@ object RemoteRules {
             }
         }
         return true
+    }
+
+    /**
+     * The part of the access that is left, from 1 (all of it) to 0. Without a start the
+     * access is measured against a year.
+     */
+    fun leftFraction(startsAt: Long?, expiresAt: Long?, now: Long): Double {
+        if (expiresAt == null) return 1.0
+        if (expiresAt <= now) return 0.0
+        val total = if (startsAt != null && startsAt < expiresAt) expiresAt - startsAt else 365L * 86_400_000L
+        return ((expiresAt - now).toDouble() / total).coerceIn(0.0, 1.0)
     }
 
     /** How much time is left until [expiresAt], as whole years, days, hours and minutes. */

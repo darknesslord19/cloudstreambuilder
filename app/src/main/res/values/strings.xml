@@ -849,4 +849,5 @@
     <string name="addon_kind_stremio">Stremio add-on</string>
     <string name="addon_kind_nuvio">Nuvio repository</string>
     <string name="addon_kind_skystream">SkyStream repository</string>
+    <string name="access_default_plan">Premium membership</string>
 </resources>

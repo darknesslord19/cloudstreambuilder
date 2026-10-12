@@ -7,6 +7,7 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
 import android.text.InputType
+import android.util.TypedValue
 import android.webkit.JavascriptInterface
 import android.widget.EditText
 import android.widget.Toast
@@ -98,6 +99,8 @@ object AccessGate {
         val granted: Boolean,
         val name: String?,
         val expiresAt: Long?,
+        val plan: String?,
+        val startsAt: Long?,
         val hasPassword: Boolean,
         val telegram: String,
         val reason: String?,
@@ -118,6 +121,8 @@ object AccessGate {
             granted = !enabled || (prefs.getBoolean(KEY_GRANTED, false) && decision is Decision.Granted),
             name = info?.name,
             expiresAt = info?.expiresAt,
+            plan = info?.plan,
+            startsAt = info?.startsAt,
             hasPassword = !prefs.getString(KEY_PASSWORD, null).isNullOrEmpty(),
             telegram = prefs.getString(KEY_TELEGRAM, null) ?: DEFAULT_TELEGRAM,
             reason = prefs.getString(KEY_REASON, null),
@@ -287,6 +292,16 @@ object AccessGate {
                     .put("expires", dateText(state.expiresAt) ?: JSONObject.NULL)
                     .put("remaining", remainingText(activity, state.expiresAt))
                     .put("hasPassword", state.hasPassword)
+                    .put("plan", state.plan ?: activity.getString(R.string.access_default_plan))
+                    .put("active", state.granted)
+                    .put("unlimited", state.expiresAt == null)
+                    .put("progress", RemoteRules.leftFraction(state.startsAt, state.expiresAt, System.currentTimeMillis()))
+                    .apply {
+                        state.expiresAt?.let { end ->
+                            val left = RemoteRules.remaining(end, System.currentTimeMillis())
+                            put("years", left.years).put("days", left.days).put("hours", left.hours).put("minutes", left.minutes)
+                        }
+                    }
                     .toString()
             } catch (t: Throwable) {
                 logError(t)
@@ -307,6 +322,29 @@ object AccessGate {
 
         @JavascriptInterface
         fun retry() = login(null)
+
+        /** The colours of the app theme, so the page looks like the rest of the app. */
+        @JavascriptInterface
+        fun theme(): String {
+            return try {
+                fun color(attr: Int): String? {
+                    val value = TypedValue()
+                    if (!activity.theme.resolveAttribute(attr, value, true)) return null
+                    val argb = if (value.resourceId != 0) activity.resources.getColor(value.resourceId, activity.theme) else value.data
+                    return String.format(Locale.ROOT, "#%06X", argb and 0xFFFFFF)
+                }
+                JSONObject()
+                    .put("background", color(R.attr.primaryBlackBackground) ?: JSONObject.NULL)
+                    .put("surface", color(R.attr.primaryGrayBackground) ?: JSONObject.NULL)
+                    .put("text", color(R.attr.textColor) ?: JSONObject.NULL)
+                    .put("muted", color(R.attr.grayTextColor) ?: JSONObject.NULL)
+                    .put("accent", color(android.R.attr.colorPrimary) ?: JSONObject.NULL)
+                    .toString()
+            } catch (t: Throwable) {
+                logError(t)
+                "{}"
+            }
+        }
 
         @JavascriptInterface
         fun openTelegram() = open(state(activity).telegram)
