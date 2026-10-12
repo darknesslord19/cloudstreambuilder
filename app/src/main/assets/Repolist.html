@@ -146,15 +146,21 @@
   // The list. Add your repositories here, one object per repository.
   var REPOS = [
     {
-      name: "Cinemeta",
-      url: "https://v3-cinemeta.strem.io/manifest.json",
-      type: "stremio",
-      description: "Stremio'nun resmî film ve dizi kataloğu. Bağlantı vermez, yalnızca gezinmek içindir."
+      name: "Manitux Nuvio",
+      url: "https://raw.githubusercontent.com/manitux-app/nuvio-plugins/refs/heads/main/manifest.json",
+      type: "nuvio",
+      description: "Türkçe film ve dizi kazıyıcıları: HDFilmCehennemi, FilmMakinesi, DiziBal ve diğerleri"
+    },
+    {
+      name: "WioSinema",
+      url: "https://raw.githubusercontent.com/Wiojelt/Nuvio-Addons/main/manifest.json",
+      type: "nuvio",
+      description: "ClipBox, Vidup, Hexa ve diğer kaynaklar"
     }
   ];
 
   // Optional: an address that answers with a list in the same shape, "" to use REPOS only.
-  var REMOTE_LIST = "";
+  var REMOTE_LIST = "https://darknes-lord-paste-default-rtdb.firebaseio.com/pastes/Cloudstreamrepos.json";
   // ----------------------------------------------------------------------------------------
 
   var TYPES = { cloudstream: "CloudStream", stremio: "Stremio", nuvio: "Nuvio", skystream: "SkyStream" };
@@ -193,7 +199,9 @@
 
   function clean(list) {
     var out = [], seen = {};
-    (Array.isArray(list) ? list : []).forEach(function (item) {
+    // Firebase may hand a list back as an object keyed by number or by its own ids
+    var items = Array.isArray(list) ? list : (list && typeof list === 'object' ? Object.keys(list).map(function (k) { return list[k]; }) : []);
+    items.forEach(function (item) {
       if (!item || typeof item.url !== 'string' || !/^(https?|stremio|skystream):\/\//.test(item.url)) return;
       if (seen[item.url]) return;
       seen[item.url] = true;
