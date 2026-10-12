@@ -624,7 +624,9 @@ class PlayerView @JvmOverloads constructor(
     fun playerError(exception: Throwable) {
         fun showErrorToast(message: String) {
             if (callbacks?.hasNextMirror() == true) {
-                showToast(message, Toast.LENGTH_SHORT)
+                // Another link is tried right away, so a link that does not open says nothing.
+                // Only when none is left the user hears what went wrong.
+                Log.w("PlayerView", "Link failed, trying the next one: $message")
                 callbacks?.nextMirror()
             } else {
                 showToast(
