@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
+import android.util.TypedValue
 import android.view.KeyEvent
 import android.view.ViewGroup
 import android.webkit.JavascriptInterface
@@ -28,6 +29,8 @@ import com.lagradost.cloudstream3.mvvm.logError
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import org.json.JSONArray
+import org.json.JSONObject
+import java.util.Locale
 
 /** The "Developer" page of the settings, the bundled web page assets/about.html. */
 object AboutPage {
@@ -113,6 +116,29 @@ object AssetPage {
             } catch (t: Throwable) {
                 logError(t)
                 "[]"
+            }
+        }
+
+        /** The colours of the app theme, so the page looks like the rest of the app. */
+        @JavascriptInterface
+        fun theme(): String {
+            return try {
+                fun color(attr: Int): String? {
+                    val value = TypedValue()
+                    if (!activity.theme.resolveAttribute(attr, value, true)) return null
+                    val argb = if (value.resourceId != 0) activity.resources.getColor(value.resourceId, activity.theme) else value.data
+                    return String.format(Locale.ROOT, "#%06X", argb and 0xFFFFFF)
+                }
+                JSONObject()
+                    .put("background", color(R.attr.primaryBlackBackground) ?: JSONObject.NULL)
+                    .put("surface", color(R.attr.primaryGrayBackground) ?: JSONObject.NULL)
+                    .put("text", color(R.attr.textColor) ?: JSONObject.NULL)
+                    .put("muted", color(R.attr.grayTextColor) ?: JSONObject.NULL)
+                    .put("accent", color(android.R.attr.colorPrimary) ?: JSONObject.NULL)
+                    .toString()
+            } catch (t: Throwable) {
+                logError(t)
+                "{}"
             }
         }
 
