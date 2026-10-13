@@ -59,6 +59,21 @@ object Looks {
         Font("CutiveMono", "Cutive Mono", R.style.FontOverlayCutiveMono, null, "serif-monospace"),
         Font("ComingSoon", "Coming Soon", R.style.FontOverlayComingSoon, null, "casual"),
         Font("DancingScript", "Dancing Script", R.style.FontOverlayDancingScript, null, "cursive"),
+        Font("Inter", "Inter", R.style.FontOverlayInter, R.font.inter_regular, null),
+        Font("InterLight", "Inter Light", R.style.FontOverlayInterLight, R.font.inter_light, null),
+        Font("InterMedium", "Inter Medium", R.style.FontOverlayInterMedium, R.font.inter_medium, null),
+        Font("InterSemiBold", "Inter SemiBold", R.style.FontOverlayInterSemiBold, R.font.inter_semibold, null),
+        Font("PoppinsLight", "Poppins Light", R.style.FontOverlayPoppinsLight, R.font.poppins_light, null),
+        Font("PoppinsMedium", "Poppins Medium", R.style.FontOverlayPoppinsMedium, R.font.poppins_medium, null),
+        Font("Lora", "Lora", R.style.FontOverlayLora, R.font.lora, null),
+        Font("Carlito", "Carlito", R.style.FontOverlayCarlito, R.font.carlito, null),
+        Font("Caladea", "Caladea", R.style.FontOverlayCaladea, R.font.caladea, null),
+        Font("LiberationSans", "Liberation Sans", R.style.FontOverlayLiberationSans, R.font.liberation_sans, null),
+        Font("LiberationSerif", "Liberation Serif", R.style.FontOverlayLiberationSerif, R.font.liberation_serif, null),
+        Font("LiberationMono", "Liberation Mono", R.style.FontOverlayLiberationMono, R.font.liberation_mono, null),
+        Font("DejaVuSans", "DejaVu Sans", R.style.FontOverlayDejaVuSans, R.font.dejavu_sans, null),
+        Font("DejaVuSansCondensed", "DejaVu Sans Condensed", R.style.FontOverlayDejaVuSansCondensed, R.font.dejavu_sans_condensed, null),
+        Font("DejaVuSerif", "DejaVu Serif", R.style.FontOverlayDejaVuSerif, R.font.dejavu_serif, null),
     )
 
     fun currentFont(context: Context): Font {

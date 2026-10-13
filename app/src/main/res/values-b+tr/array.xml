@@ -212,6 +212,26 @@
         <item>Parti</item>
         <item>Pembe</item>
         <item>Lavanta</item>
+        <item>Mercan</item>
+        <item>Turkuaz</item>
+        <item>Gök Mavisi</item>
+        <item>Safir</item>
+        <item>Menekşe</item>
+        <item>Fuşya</item>
+        <item>Gül</item>
+        <item>Kiraz</item>
+        <item>Mandalina</item>
+        <item>Kehribar</item>
+        <item>Bal</item>
+        <item>Nane</item>
+        <item>Zümrüt</item>
+        <item>Zeytin Yeşili</item>
+        <item>Petrol Mavisi</item>
+        <item>Buz</item>
+        <item>Leylak</item>
+        <item>Şeftali</item>
+        <item>Bakır</item>
+        <item>Gümüş</item>
         <item>Material You</item>
         <item>Material You (İkincil)</item>
     </string-array>
@@ -236,6 +256,26 @@
         <item>Party</item>
         <item>Pink</item>
         <item>Lavender</item>
+        <item>ForkCoral</item>
+        <item>ForkTurquoise</item>
+        <item>ForkSkyBlue</item>
+        <item>ForkSapphire</item>
+        <item>ForkViolet</item>
+        <item>ForkFuchsia</item>
+        <item>ForkRose</item>
+        <item>ForkCherry</item>
+        <item>ForkTangerine</item>
+        <item>ForkAmber</item>
+        <item>ForkHoney</item>
+        <item>ForkMint</item>
+        <item>ForkEmerald</item>
+        <item>ForkOlive</item>
+        <item>ForkPetrol</item>
+        <item>ForkIce</item>
+        <item>ForkLilac</item>
+        <item>ForkPeach</item>
+        <item>ForkCopper</item>
+        <item>ForkSilver</item>
         <item>Monet</item>
         <item>Monet2</item>
     </string-array>
@@ -270,6 +310,26 @@
         <item>Kraliyet</item>
         <item>Mürdüm</item>
         <item>Krem (Açık)</item>
+        <item>Arduvaz</item>
+        <item>Fırtına</item>
+        <item>Yosun</item>
+        <item>Leylak Gecesi</item>
+        <item>Moka</item>
+        <item>Lagün</item>
+        <item>Alacakaranlık</item>
+        <item>Kül</item>
+        <item>Kot Mavisi</item>
+        <item>Zeytin</item>
+        <item>İnci (Açık)</item>
+        <item>Gökyüzü (Açık)</item>
+        <item>Nane (Açık)</item>
+        <item>Şeftali (Açık)</item>
+        <item>Lavanta Bahçesi (Açık)</item>
+        <item>Kiraz Çiçeği (Açık)</item>
+        <item>Kum (Açık)</item>
+        <item>Limon (Açık)</item>
+        <item>Bulut (Açık)</item>
+        <item>Su Yeşili (Açık)</item>
     </string-array>
     <string-array name="themes_names_values">
         <item>AmoledLight</item>
@@ -301,6 +361,26 @@
         <item>Royal</item>
         <item>Plum</item>
         <item>Cream</item>
+        <item>Slate</item>
+        <item>Storm</item>
+        <item>Moss</item>
+        <item>Mauve</item>
+        <item>Mocha</item>
+        <item>Lagoon</item>
+        <item>Dusk</item>
+        <item>Ash</item>
+        <item>Denim</item>
+        <item>Olive</item>
+        <item>Pearl</item>
+        <item>Sky</item>
+        <item>Mint</item>
+        <item>Peach</item>
+        <item>Lilac</item>
+        <item>Blossom</item>
+        <item>Sand</item>
+        <item>Lemon</item>
+        <item>Cloud</item>
+        <item>Aqua</item>
     </string-array>
 
     <string-array name="extension_statuses">

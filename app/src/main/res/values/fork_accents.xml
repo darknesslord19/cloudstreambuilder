@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Twenty extra primary colours -->
+
+    <color name="forkAccentCoral">#FF6F61</color>
+    <style name="OverlayPrimaryColorForkCoral">
+        <item name="colorPrimary">@color/forkAccentCoral</item>
+        <item name="android:colorPrimary">@color/forkAccentCoral</item>
+        <item name="colorPrimaryDark">#D9483B</item>
+        <item name="colorAccent">@color/forkAccentCoral</item>
+        <item name="colorOnPrimary">#111111</item>
+        <item name="android:colorAccent">@color/forkAccentCoral</item>
+    </style>
+
+    <color name="forkAccentTurquoise">#1ED6C6</color>
+    <style name="OverlayPrimaryColorForkTurquoise">
+        <item name="colorPrimary">@color/forkAccentTurquoise</item>
+        <item name="android:colorPrimary">@color/forkAccentTurquoise</item>
+        <item name="colorPrimaryDark">#12A396</item>
+        <item name="colorAccent">@color/forkAccentTurquoise</item>
+        <item name="colorOnPrimary">#111111</item>
+        <item name="android:colorAccent">@color/forkAccentTurquoise</item>
+    </style>
+
+    <color name="forkAccentSkyBlue">#4FB3FF</color>
+    <style name="OverlayPrimaryColorForkSkyBlue">
+        <item name="colorPrimary">@color/forkAccentSkyBlue</item>
+        <item name="android:colorPrimary">@color/forkAccentSkyBlue</item>
+        <item name="colorPrimaryDark">#1F86D6</item>
+        <item name="colorAccent">@color/forkAccentSkyBlue</item>
+        <item name="colorOnPrimary">#111111</item>
+        <item name="android:colorAccent">@color/forkAccentSkyBlue</item>
+    </style>
+
+    <color name="forkAccentSapphire">#3D5AFE</color>
+    <style name="OverlayPrimaryColorForkSapphire">
+        <item name="colorPrimary">@color/forkAccentSapphire</item>
+        <item name="android:colorPrimary">@color/forkAccentSapphire</item>
+        <item name="colorPrimaryDark">#2A3FCC</item>
+        <item name="colorAccent">@color/forkAccentSapphire</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">@color/forkAccentSapphire</item>
+    </style>
+
+    <color name="forkAccentViolet">#8E5CF7</color>
+    <style name="OverlayPrimaryColorForkViolet">
+        <item name="colorPrimary">@color/forkAccentViolet</item>
+        <item name="android:colorPrimary">@color/forkAccentViolet</item>
+        <item name="colorPrimaryDark">#6537D1</item>
+        <item name="colorAccent">@color/forkAccentViolet</item>
+        <item name="colorOnPrimary">#111111</item>
+        <item name="android:colorAccent">@color/forkAccentViolet</item>
+    </style>
+
+    <color name="forkAccentFuchsia">#E040FB</color>
+    <style name="OverlayPrimaryColorForkFuchsia">
+        <item name="colorPrimary">@color/forkAccentFuchsia</item>
+        <item name="android:colorPrimary">@color/forkAccentFuchsia</item>
+        <item name="colorPrimaryDark">#AA1FC4</item>
+        <item name="colorAccent">@color/forkAccentFuchsia</item>
+        <item name="colorOnPrimary">#111111</item>
+        <item name="android:colorAccent">@color/forkAccentFuchsia</item>
+    </style>
+
+    <color name="forkAccentRose">#FF5C8A</color>
+    <style name="OverlayPrimaryColorForkRose">
+        <item name="colorPrimary">@color/forkAccentRose</item>
+        <item name="android:colorPrimary">@color/forkAccentRose</item>
+        <item name="colorPrimaryDark">#D1386A</item>
+        <item name="colorAccent">@color/forkAccentRose</item>
+        <item name="colorOnPrimary">#111111</item>
+        <item name="android:colorAccent">@color/forkAccentRose</item>
+    </style>
+
+    <color name="forkAccentCherry">#E5383B</color>
+    <style name="OverlayPrimaryColorForkCherry">
+        <item name="colorPrimary">@color/forkAccentCherry</item>
+        <item name="android:colorPrimary">@color/forkAccentCherry</item>
+        <item name="colorPrimaryDark">#B0242A</item>
+        <item name="colorAccent">@color/forkAccentCherry</item>
+        <item name="colorOnPrimary">#111111</item>
+        <item name="android:colorAccent">@color/forkAccentCherry</item>
+    </style>
+
+    <color name="forkAccentTangerine">#FF8C1A</color>
+    <style name="OverlayPrimaryColorForkTangerine">
+        <item name="colorPrimary">@color/forkAccentTangerine</item>
+        <item name="android:colorPrimary">@color/forkAccentTangerine</item>
+        <item name="colorPrimaryDark">#D06A00</item>
+        <item name="colorAccent">@color/forkAccentTangerine</item>
+        <item name="colorOnPrimary">#111111</item>
+        <item name="android:colorAccent">@color/forkAccentTangerine</item>
+    </style>
+
+    <color name="forkAccentAmber">#FFB300</color>
+    <style name="OverlayPrimaryColorForkAmber">
+        <item name="colorPrimary">@color/forkAccentAmber</item>
+        <item name="android:colorPrimary">@color/forkAccentAmber</item>
+        <item name="colorPrimaryDark">#C88A00</item>
+        <item name="colorAccent">@color/forkAccentAmber</item>
+        <item name="colorOnPrimary">#111111</item>
+        <item name="android:colorAccent">@color/forkAccentAmber</item>
+    </style>
+
+    <color name="forkAccentHoney">#E8B04B</color>
+    <style name="OverlayPrimaryColorForkHoney">
+        <item name="colorPrimary">@color/forkAccentHoney</item>
+        <item name="android:colorPrimary">@color/forkAccentHoney</item>
+        <item name="colorPrimaryDark">#B98523</item>
+        <item name="colorAccent">@color/forkAccentHoney</item>
+        <item name="colorOnPrimary">#111111</item>
+        <item name="android:colorAccent">@color/forkAccentHoney</item>
+    </style>
+
+    <color name="forkAccentMint">#3DDC97</color>
+    <style name="OverlayPrimaryColorForkMint">
+        <item name="colorPrimary">@color/forkAccentMint</item>
+        <item name="android:colorPrimary">@color/forkAccentMint</item>
+        <item name="colorPrimaryDark">#22A872</item>
+        <item name="colorAccent">@color/forkAccentMint</item>
+        <item name="colorOnPrimary">#111111</item>
+        <item name="android:colorAccent">@color/forkAccentMint</item>
+    </style>
+
+    <color name="forkAccentEmerald">#10B981</color>
+    <style name="OverlayPrimaryColorForkEmerald">
+        <item name="colorPrimary">@color/forkAccentEmerald</item>
+        <item name="android:colorPrimary">@color/forkAccentEmerald</item>
+        <item name="colorPrimaryDark">#0B8A60</item>
+        <item name="colorAccent">@color/forkAccentEmerald</item>
+        <item name="colorOnPrimary">#111111</item>
+        <item name="android:colorAccent">@color/forkAccentEmerald</item>
+    </style>
+
+    <color name="forkAccentOlive">#9BAA3A</color>
+    <style name="OverlayPrimaryColorForkOlive">
+        <item name="colorPrimary">@color/forkAccentOlive</item>
+        <item name="android:colorPrimary">@color/forkAccentOlive</item>
+        <item name="colorPrimaryDark">#74801F</item>
+        <item name="colorAccent">@color/forkAccentOlive</item>
+        <item name="colorOnPrimary">#111111</item>
+        <item name="android:colorAccent">@color/forkAccentOlive</item>
+    </style>
+
+    <color name="forkAccentPetrol">#14A3A3</color>
+    <style name="OverlayPrimaryColorForkPetrol">
+        <item name="colorPrimary">@color/forkAccentPetrol</item>
+        <item name="android:colorPrimary">@color/forkAccentPetrol</item>
+        <item name="colorPrimaryDark">#0C7A7A</item>
+        <item name="colorAccent">@color/forkAccentPetrol</item>
+        <item name="colorOnPrimary">#111111</item>
+        <item name="android:colorAccent">@color/forkAccentPetrol</item>
+    </style>
+
+    <color name="forkAccentIce">#8FD8FF</color>
+    <style name="OverlayPrimaryColorForkIce">
+        <item name="colorPrimary">@color/forkAccentIce</item>
+        <item name="android:colorPrimary">@color/forkAccentIce</item>
+        <item name="colorPrimaryDark">#58AFDB</item>
+        <item name="colorAccent">@color/forkAccentIce</item>
+        <item name="colorOnPrimary">#111111</item>
+        <item name="android:colorAccent">@color/forkAccentIce</item>
+    </style>
+
+    <color name="forkAccentLilac">#C8A2F0</color>
+    <style name="OverlayPrimaryColorForkLilac">
+        <item name="colorPrimary">@color/forkAccentLilac</item>
+        <item name="android:colorPrimary">@color/forkAccentLilac</item>
+        <item name="colorPrimaryDark">#9C74C8</item>
+        <item name="colorAccent">@color/forkAccentLilac</item>
+        <item name="colorOnPrimary">#111111</item>
+        <item name="android:colorAccent">@color/forkAccentLilac</item>
+    </style>
+
+    <color name="forkAccentPeach">#FFA987</color>
+    <style name="OverlayPrimaryColorForkPeach">
+        <item name="colorPrimary">@color/forkAccentPeach</item>
+        <item name="android:colorPrimary">@color/forkAccentPeach</item>
+        <item name="colorPrimaryDark">#D9805E</item>
+        <item name="colorAccent">@color/forkAccentPeach</item>
+        <item name="colorOnPrimary">#111111</item>
+        <item name="android:colorAccent">@color/forkAccentPeach</item>
+    </style>
+
+    <color name="forkAccentCopper">#C8733A</color>
+    <style name="OverlayPrimaryColorForkCopper">
+        <item name="colorPrimary">@color/forkAccentCopper</item>
+        <item name="android:colorPrimary">@color/forkAccentCopper</item>
+        <item name="colorPrimaryDark">#9A5222</item>
+        <item name="colorAccent">@color/forkAccentCopper</item>
+        <item name="colorOnPrimary">#111111</item>
+        <item name="android:colorAccent">@color/forkAccentCopper</item>
+    </style>
+
+    <color name="forkAccentSilver">#B8C2CC</color>
+    <style name="OverlayPrimaryColorForkSilver">
+        <item name="colorPrimary">@color/forkAccentSilver</item>
+        <item name="android:colorPrimary">@color/forkAccentSilver</item>
+        <item name="colorPrimaryDark">#8792A0</item>
+        <item name="colorAccent">@color/forkAccentSilver</item>
+        <item name="colorOnPrimary">#111111</item>
+        <item name="android:colorAccent">@color/forkAccentSilver</item>
+    </style>
+
+</resources>

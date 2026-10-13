@@ -309,8 +309,46 @@ class SettingsUI : BasePreferenceFragmentCompat() {
                 }
             }
 
+            val extrasOn = ForkFeatures.isOn(RemoteRules.Feature.THEMES, requireContext())
+            if (!extrasOn) {
+                // The added colours are switched off, the list is the usual one
+                for (index in prefValues.indices.reversed()) {
+                    if (CommonActivity.extraAccentNames.contains(prefValues[index])) {
+                        prefValues.removeAt(index)
+                        prefNames.removeAt(index)
+                    }
+                }
+            }
+
             val currentLayout =
                 settingsManager.getString(getString(R.string.primary_color_key), prefValues.first())
+
+            if (extrasOn) {
+                // Every colour is shown on the theme that is in use
+                val act = activity ?: return@setOnPreferenceClickListener true
+                val themeName = settingsManager.getString(getString(R.string.app_theme_key), "AmoledLight")
+                val options = prefNames.mapIndexed { index, name ->
+                    Looks.Option(
+                        name,
+                        palette = Looks.paletteOf(
+                            act,
+                            CommonActivity.themeStyleOf(act, themeName),
+                            CommonActivity.accentStyleOf(themeName, prefValues[index]),
+                        )
+                    )
+                }
+                Looks.pick(act, getString(R.string.primary_color_settings), options, prefValues.indexOf(currentLayout)) {
+                    try {
+                        settingsManager.edit {
+                            putString(getString(R.string.primary_color_key), prefValues[it])
+                        }
+                        activity?.recreate()
+                    } catch (e: Exception) {
+                        logError(e)
+                    }
+                }
+                return@setOnPreferenceClickListener true
+            }
 
             activity?.showDialog(
                 prefNames.toList(),

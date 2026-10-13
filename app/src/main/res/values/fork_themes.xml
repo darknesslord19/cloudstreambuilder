@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Twenty extra app themes. Each one has a matching accent colour, used while the
+    <!-- Forty extra app themes. Each one has a matching accent colour, used while the
          "primary colour" setting is left on its default. -->
 
     <!-- Gece Mavisi -->
@@ -663,6 +663,686 @@
         <item name="colorAccent">@color/CreamAccent</item>
         <item name="colorOnPrimary">@color/CreamOnAccent</item>
         <item name="android:colorAccent">@color/CreamAccent</item>
+    </style>
+
+    <!-- Arduvaz -->
+    <color name="SlatePrimaryGrayBackground">#313640</color>
+    <color name="SlateBitDarkerGrayBackground">#23272E</color>
+    <color name="SlateGrayBackground">#2A2F37</color>
+    <color name="SlateItemBackground">#2D323B</color>
+    <color name="SlateTextColor">#E7EAF0</color>
+    <color name="SlateIconColor">#9AA3B2</color>
+    <color name="SlateAccent">#7AA2F7</color>
+    <color name="SlateAccentDark">#4E74C9</color>
+    <color name="SlateOnAccent">#14181F</color>
+
+    <style name="SlateMode">
+        <item name="primaryGrayBackground">@color/SlatePrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/SlateBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/SlateGrayBackground</item>
+        <item name="boxItemBackground">@color/SlateItemBackground</item>
+        <item name="textColor">@color/SlateTextColor</item>
+        <item name="grayTextColor">@color/SlateIconColor</item>
+        <item name="iconColor">@color/SlateIconColor</item>
+        <item name="white">@color/SlateTextColor</item>
+        <item name="black">@color/SlateBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/SlateTextColor</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeSlate">
+        <item name="colorPrimary">@color/SlateAccent</item>
+        <item name="android:colorPrimary">@color/SlateAccent</item>
+        <item name="colorPrimaryDark">@color/SlateAccentDark</item>
+        <item name="colorAccent">@color/SlateAccent</item>
+        <item name="colorOnPrimary">@color/SlateOnAccent</item>
+        <item name="android:colorAccent">@color/SlateAccent</item>
+    </style>
+
+    <!-- Fırtına -->
+    <color name="StormPrimaryGrayBackground">#343C47</color>
+    <color name="StormBitDarkerGrayBackground">#252B33</color>
+    <color name="StormGrayBackground">#2C333C</color>
+    <color name="StormItemBackground">#303843</color>
+    <color name="StormTextColor">#E6EDF5</color>
+    <color name="StormIconColor">#98A6B7</color>
+    <color name="StormAccent">#5FB3E8</color>
+    <color name="StormAccentDark">#2F84BB</color>
+    <color name="StormOnAccent">#0F1A22</color>
+
+    <style name="StormMode">
+        <item name="primaryGrayBackground">@color/StormPrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/StormBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/StormGrayBackground</item>
+        <item name="boxItemBackground">@color/StormItemBackground</item>
+        <item name="textColor">@color/StormTextColor</item>
+        <item name="grayTextColor">@color/StormIconColor</item>
+        <item name="iconColor">@color/StormIconColor</item>
+        <item name="white">@color/StormTextColor</item>
+        <item name="black">@color/StormBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/StormTextColor</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeStorm">
+        <item name="colorPrimary">@color/StormAccent</item>
+        <item name="android:colorPrimary">@color/StormAccent</item>
+        <item name="colorPrimaryDark">@color/StormAccentDark</item>
+        <item name="colorAccent">@color/StormAccent</item>
+        <item name="colorOnPrimary">@color/StormOnAccent</item>
+        <item name="android:colorAccent">@color/StormAccent</item>
+    </style>
+
+    <!-- Yosun -->
+    <color name="MossPrimaryGrayBackground">#333B33</color>
+    <color name="MossBitDarkerGrayBackground">#242A24</color>
+    <color name="MossGrayBackground">#2B322B</color>
+    <color name="MossItemBackground">#2F372F</color>
+    <color name="MossTextColor">#E8EFE6</color>
+    <color name="MossIconColor">#9DAE9A</color>
+    <color name="MossAccent">#8FC77E</color>
+    <color name="MossAccentDark">#5E9A4D</color>
+    <color name="MossOnAccent">#121A10</color>
+
+    <style name="MossMode">
+        <item name="primaryGrayBackground">@color/MossPrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/MossBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/MossGrayBackground</item>
+        <item name="boxItemBackground">@color/MossItemBackground</item>
+        <item name="textColor">@color/MossTextColor</item>
+        <item name="grayTextColor">@color/MossIconColor</item>
+        <item name="iconColor">@color/MossIconColor</item>
+        <item name="white">@color/MossTextColor</item>
+        <item name="black">@color/MossBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/MossTextColor</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeMoss">
+        <item name="colorPrimary">@color/MossAccent</item>
+        <item name="android:colorPrimary">@color/MossAccent</item>
+        <item name="colorPrimaryDark">@color/MossAccentDark</item>
+        <item name="colorAccent">@color/MossAccent</item>
+        <item name="colorOnPrimary">@color/MossOnAccent</item>
+        <item name="android:colorAccent">@color/MossAccent</item>
+    </style>
+
+    <!-- Leylak Gecesi -->
+    <color name="MauvePrimaryGrayBackground">#3A3342</color>
+    <color name="MauveBitDarkerGrayBackground">#2A2530</color>
+    <color name="MauveGrayBackground">#312B38</color>
+    <color name="MauveItemBackground">#352F3D</color>
+    <color name="MauveTextColor">#F0E9F5</color>
+    <color name="MauveIconColor">#AE9FBC</color>
+    <color name="MauveAccent">#C49BE8</color>
+    <color name="MauveAccentDark">#9468BE</color>
+    <color name="MauveOnAccent">#1D1424</color>
+
+    <style name="MauveMode">
+        <item name="primaryGrayBackground">@color/MauvePrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/MauveBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/MauveGrayBackground</item>
+        <item name="boxItemBackground">@color/MauveItemBackground</item>
+        <item name="textColor">@color/MauveTextColor</item>
+        <item name="grayTextColor">@color/MauveIconColor</item>
+        <item name="iconColor">@color/MauveIconColor</item>
+        <item name="white">@color/MauveTextColor</item>
+        <item name="black">@color/MauveBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/MauveTextColor</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeMauve">
+        <item name="colorPrimary">@color/MauveAccent</item>
+        <item name="android:colorPrimary">@color/MauveAccent</item>
+        <item name="colorPrimaryDark">@color/MauveAccentDark</item>
+        <item name="colorAccent">@color/MauveAccent</item>
+        <item name="colorOnPrimary">@color/MauveOnAccent</item>
+        <item name="android:colorAccent">@color/MauveAccent</item>
+    </style>
+
+    <!-- Moka -->
+    <color name="MochaPrimaryGrayBackground">#3B342F</color>
+    <color name="MochaBitDarkerGrayBackground">#2B2622</color>
+    <color name="MochaGrayBackground">#322C28</color>
+    <color name="MochaItemBackground">#36302B</color>
+    <color name="MochaTextColor">#F2EAE3</color>
+    <color name="MochaIconColor">#B3A396</color>
+    <color name="MochaAccent">#D9A273</color>
+    <color name="MochaAccentDark">#A87346</color>
+    <color name="MochaOnAccent">#20160E</color>
+
+    <style name="MochaMode">
+        <item name="primaryGrayBackground">@color/MochaPrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/MochaBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/MochaGrayBackground</item>
+        <item name="boxItemBackground">@color/MochaItemBackground</item>
+        <item name="textColor">@color/MochaTextColor</item>
+        <item name="grayTextColor">@color/MochaIconColor</item>
+        <item name="iconColor">@color/MochaIconColor</item>
+        <item name="white">@color/MochaTextColor</item>
+        <item name="black">@color/MochaBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/MochaTextColor</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeMocha">
+        <item name="colorPrimary">@color/MochaAccent</item>
+        <item name="android:colorPrimary">@color/MochaAccent</item>
+        <item name="colorPrimaryDark">@color/MochaAccentDark</item>
+        <item name="colorAccent">@color/MochaAccent</item>
+        <item name="colorOnPrimary">@color/MochaOnAccent</item>
+        <item name="android:colorAccent">@color/MochaAccent</item>
+    </style>
+
+    <!-- Lagün -->
+    <color name="LagoonPrimaryGrayBackground">#2F3C3C</color>
+    <color name="LagoonBitDarkerGrayBackground">#212B2B</color>
+    <color name="LagoonGrayBackground">#283333</color>
+    <color name="LagoonItemBackground">#2B3838</color>
+    <color name="LagoonTextColor">#E4F2F1</color>
+    <color name="LagoonIconColor">#93ADAB</color>
+    <color name="LagoonAccent">#5CCFC2</color>
+    <color name="LagoonAccentDark">#2E9C90</color>
+    <color name="LagoonOnAccent">#0D1F1D</color>
+
+    <style name="LagoonMode">
+        <item name="primaryGrayBackground">@color/LagoonPrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/LagoonBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/LagoonGrayBackground</item>
+        <item name="boxItemBackground">@color/LagoonItemBackground</item>
+        <item name="textColor">@color/LagoonTextColor</item>
+        <item name="grayTextColor">@color/LagoonIconColor</item>
+        <item name="iconColor">@color/LagoonIconColor</item>
+        <item name="white">@color/LagoonTextColor</item>
+        <item name="black">@color/LagoonBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/LagoonTextColor</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeLagoon">
+        <item name="colorPrimary">@color/LagoonAccent</item>
+        <item name="android:colorPrimary">@color/LagoonAccent</item>
+        <item name="colorPrimaryDark">@color/LagoonAccentDark</item>
+        <item name="colorAccent">@color/LagoonAccent</item>
+        <item name="colorOnPrimary">@color/LagoonOnAccent</item>
+        <item name="android:colorAccent">@color/LagoonAccent</item>
+    </style>
+
+    <!-- Alacakaranlık -->
+    <color name="DuskPrimaryGrayBackground">#3D3238</color>
+    <color name="DuskBitDarkerGrayBackground">#2C2428</color>
+    <color name="DuskGrayBackground">#342A2F</color>
+    <color name="DuskItemBackground">#382E34</color>
+    <color name="DuskTextColor">#F5E8EE</color>
+    <color name="DuskIconColor">#B9A0AB</color>
+    <color name="DuskAccent">#EE8FB0</color>
+    <color name="DuskAccentDark">#BD5F82</color>
+    <color name="DuskOnAccent">#24121A</color>
+
+    <style name="DuskMode">
+        <item name="primaryGrayBackground">@color/DuskPrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/DuskBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/DuskGrayBackground</item>
+        <item name="boxItemBackground">@color/DuskItemBackground</item>
+        <item name="textColor">@color/DuskTextColor</item>
+        <item name="grayTextColor">@color/DuskIconColor</item>
+        <item name="iconColor">@color/DuskIconColor</item>
+        <item name="white">@color/DuskTextColor</item>
+        <item name="black">@color/DuskBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/DuskTextColor</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeDusk">
+        <item name="colorPrimary">@color/DuskAccent</item>
+        <item name="android:colorPrimary">@color/DuskAccent</item>
+        <item name="colorPrimaryDark">@color/DuskAccentDark</item>
+        <item name="colorAccent">@color/DuskAccent</item>
+        <item name="colorOnPrimary">@color/DuskOnAccent</item>
+        <item name="android:colorAccent">@color/DuskAccent</item>
+    </style>
+
+    <!-- Kül -->
+    <color name="AshPrimaryGrayBackground">#363636</color>
+    <color name="AshBitDarkerGrayBackground">#282828</color>
+    <color name="AshGrayBackground">#2F2F2F</color>
+    <color name="AshItemBackground">#333333</color>
+    <color name="AshTextColor">#ECECEC</color>
+    <color name="AshIconColor">#A6A6A6</color>
+    <color name="AshAccent">#F0B45A</color>
+    <color name="AshAccentDark">#BD8530</color>
+    <color name="AshOnAccent">#1E1608</color>
+
+    <style name="AshMode">
+        <item name="primaryGrayBackground">@color/AshPrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/AshBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/AshGrayBackground</item>
+        <item name="boxItemBackground">@color/AshItemBackground</item>
+        <item name="textColor">@color/AshTextColor</item>
+        <item name="grayTextColor">@color/AshIconColor</item>
+        <item name="iconColor">@color/AshIconColor</item>
+        <item name="white">@color/AshTextColor</item>
+        <item name="black">@color/AshBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/AshTextColor</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeAsh">
+        <item name="colorPrimary">@color/AshAccent</item>
+        <item name="android:colorPrimary">@color/AshAccent</item>
+        <item name="colorPrimaryDark">@color/AshAccentDark</item>
+        <item name="colorAccent">@color/AshAccent</item>
+        <item name="colorOnPrimary">@color/AshOnAccent</item>
+        <item name="android:colorAccent">@color/AshAccent</item>
+    </style>
+
+    <!-- Kot Mavisi -->
+    <color name="DenimPrimaryGrayBackground">#303850</color>
+    <color name="DenimBitDarkerGrayBackground">#222838</color>
+    <color name="DenimGrayBackground">#283046</color>
+    <color name="DenimItemBackground">#2C344B</color>
+    <color name="DenimTextColor">#E8ECF8</color>
+    <color name="DenimIconColor">#9AA4C4</color>
+    <color name="DenimAccent">#8EA8FF</color>
+    <color name="DenimAccentDark">#5C76D1</color>
+    <color name="DenimOnAccent">#121726</color>
+
+    <style name="DenimMode">
+        <item name="primaryGrayBackground">@color/DenimPrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/DenimBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/DenimGrayBackground</item>
+        <item name="boxItemBackground">@color/DenimItemBackground</item>
+        <item name="textColor">@color/DenimTextColor</item>
+        <item name="grayTextColor">@color/DenimIconColor</item>
+        <item name="iconColor">@color/DenimIconColor</item>
+        <item name="white">@color/DenimTextColor</item>
+        <item name="black">@color/DenimBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/DenimTextColor</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeDenim">
+        <item name="colorPrimary">@color/DenimAccent</item>
+        <item name="android:colorPrimary">@color/DenimAccent</item>
+        <item name="colorPrimaryDark">@color/DenimAccentDark</item>
+        <item name="colorAccent">@color/DenimAccent</item>
+        <item name="colorOnPrimary">@color/DenimOnAccent</item>
+        <item name="android:colorAccent">@color/DenimAccent</item>
+    </style>
+
+    <!-- Zeytin -->
+    <color name="OlivePrimaryGrayBackground">#38382B</color>
+    <color name="OliveBitDarkerGrayBackground">#29291F</color>
+    <color name="OliveGrayBackground">#303025</color>
+    <color name="OliveItemBackground">#343428</color>
+    <color name="OliveTextColor">#EFEFE0</color>
+    <color name="OliveIconColor">#B0AF92</color>
+    <color name="OliveAccent">#C9C25E</color>
+    <color name="OliveAccentDark">#9A9433</color>
+    <color name="OliveOnAccent">#1C1B08</color>
+
+    <style name="OliveMode">
+        <item name="primaryGrayBackground">@color/OlivePrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/OliveBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/OliveGrayBackground</item>
+        <item name="boxItemBackground">@color/OliveItemBackground</item>
+        <item name="textColor">@color/OliveTextColor</item>
+        <item name="grayTextColor">@color/OliveIconColor</item>
+        <item name="iconColor">@color/OliveIconColor</item>
+        <item name="white">@color/OliveTextColor</item>
+        <item name="black">@color/OliveBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/OliveTextColor</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeOlive">
+        <item name="colorPrimary">@color/OliveAccent</item>
+        <item name="android:colorPrimary">@color/OliveAccent</item>
+        <item name="colorPrimaryDark">@color/OliveAccentDark</item>
+        <item name="colorAccent">@color/OliveAccent</item>
+        <item name="colorOnPrimary">@color/OliveOnAccent</item>
+        <item name="android:colorAccent">@color/OliveAccent</item>
+    </style>
+
+    <!-- İnci (Açık) -->
+    <color name="PearlPrimaryGrayBackground">#F0F2F5</color>
+    <color name="PearlBitDarkerGrayBackground">#FFFFFF</color>
+    <color name="PearlGrayBackground">#E8EBF0</color>
+    <color name="PearlItemBackground">#ECEFF3</color>
+    <color name="PearlTextColor">#1E2128</color>
+    <color name="PearlIconColor">#5C6370</color>
+    <color name="PearlAccent">#3A6FF2</color>
+    <color name="PearlAccentDark">#2A55C4</color>
+    <color name="PearlOnAccent">#FFFFFF</color>
+
+    <style name="PearlMode">
+        <item name="primaryGrayBackground">@color/PearlPrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/PearlBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/PearlGrayBackground</item>
+        <item name="boxItemBackground">@color/PearlItemBackground</item>
+        <item name="textColor">@color/PearlTextColor</item>
+        <item name="grayTextColor">@color/PearlIconColor</item>
+        <item name="iconColor">@color/PearlIconColor</item>
+        <item name="white">@color/PearlTextColor</item>
+        <item name="black">@color/PearlBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/PearlTextColor</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemePearl">
+        <item name="colorPrimary">@color/PearlAccent</item>
+        <item name="android:colorPrimary">@color/PearlAccent</item>
+        <item name="colorPrimaryDark">@color/PearlAccentDark</item>
+        <item name="colorAccent">@color/PearlAccent</item>
+        <item name="colorOnPrimary">@color/PearlOnAccent</item>
+        <item name="android:colorAccent">@color/PearlAccent</item>
+    </style>
+
+    <!-- Gökyüzü (Açık) -->
+    <color name="SkyPrimaryGrayBackground">#E3EEF9</color>
+    <color name="SkyBitDarkerGrayBackground">#F5FAFF</color>
+    <color name="SkyGrayBackground">#D9E7F5</color>
+    <color name="SkyItemBackground">#DEEAF7</color>
+    <color name="SkyTextColor">#13233A</color>
+    <color name="SkyIconColor">#4A607A</color>
+    <color name="SkyAccent">#1976D2</color>
+    <color name="SkyAccentDark">#1257A3</color>
+    <color name="SkyOnAccent">#FFFFFF</color>
+
+    <style name="SkyMode">
+        <item name="primaryGrayBackground">@color/SkyPrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/SkyBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/SkyGrayBackground</item>
+        <item name="boxItemBackground">@color/SkyItemBackground</item>
+        <item name="textColor">@color/SkyTextColor</item>
+        <item name="grayTextColor">@color/SkyIconColor</item>
+        <item name="iconColor">@color/SkyIconColor</item>
+        <item name="white">@color/SkyTextColor</item>
+        <item name="black">@color/SkyBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/SkyTextColor</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeSky">
+        <item name="colorPrimary">@color/SkyAccent</item>
+        <item name="android:colorPrimary">@color/SkyAccent</item>
+        <item name="colorPrimaryDark">@color/SkyAccentDark</item>
+        <item name="colorAccent">@color/SkyAccent</item>
+        <item name="colorOnPrimary">@color/SkyOnAccent</item>
+        <item name="android:colorAccent">@color/SkyAccent</item>
+    </style>
+
+    <!-- Nane (Açık) -->
+    <color name="MintPrimaryGrayBackground">#E0F2E8</color>
+    <color name="MintBitDarkerGrayBackground">#F4FBF7</color>
+    <color name="MintGrayBackground">#D5EDE0</color>
+    <color name="MintItemBackground">#DAF0E4</color>
+    <color name="MintTextColor">#10261A</color>
+    <color name="MintIconColor">#466454</color>
+    <color name="MintAccent">#18875A</color>
+    <color name="MintAccentDark">#116845</color>
+    <color name="MintOnAccent">#FFFFFF</color>
+
+    <style name="MintMode">
+        <item name="primaryGrayBackground">@color/MintPrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/MintBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/MintGrayBackground</item>
+        <item name="boxItemBackground">@color/MintItemBackground</item>
+        <item name="textColor">@color/MintTextColor</item>
+        <item name="grayTextColor">@color/MintIconColor</item>
+        <item name="iconColor">@color/MintIconColor</item>
+        <item name="white">@color/MintTextColor</item>
+        <item name="black">@color/MintBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/MintTextColor</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeMint">
+        <item name="colorPrimary">@color/MintAccent</item>
+        <item name="android:colorPrimary">@color/MintAccent</item>
+        <item name="colorPrimaryDark">@color/MintAccentDark</item>
+        <item name="colorAccent">@color/MintAccent</item>
+        <item name="colorOnPrimary">@color/MintOnAccent</item>
+        <item name="android:colorAccent">@color/MintAccent</item>
+    </style>
+
+    <!-- Şeftali (Açık) -->
+    <color name="PeachPrimaryGrayBackground">#FBE8DC</color>
+    <color name="PeachBitDarkerGrayBackground">#FFF8F3</color>
+    <color name="PeachGrayBackground">#F7DFCF</color>
+    <color name="PeachItemBackground">#F9E3D5</color>
+    <color name="PeachTextColor">#2E1A10</color>
+    <color name="PeachIconColor">#735546</color>
+    <color name="PeachAccent">#C95A25</color>
+    <color name="PeachAccentDark">#9E4318</color>
+    <color name="PeachOnAccent">#FFFFFF</color>
+
+    <style name="PeachMode">
+        <item name="primaryGrayBackground">@color/PeachPrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/PeachBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/PeachGrayBackground</item>
+        <item name="boxItemBackground">@color/PeachItemBackground</item>
+        <item name="textColor">@color/PeachTextColor</item>
+        <item name="grayTextColor">@color/PeachIconColor</item>
+        <item name="iconColor">@color/PeachIconColor</item>
+        <item name="white">@color/PeachTextColor</item>
+        <item name="black">@color/PeachBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/PeachTextColor</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemePeach">
+        <item name="colorPrimary">@color/PeachAccent</item>
+        <item name="android:colorPrimary">@color/PeachAccent</item>
+        <item name="colorPrimaryDark">@color/PeachAccentDark</item>
+        <item name="colorAccent">@color/PeachAccent</item>
+        <item name="colorOnPrimary">@color/PeachOnAccent</item>
+        <item name="android:colorAccent">@color/PeachAccent</item>
+    </style>
+
+    <!-- Lavanta Bahçesi (Açık) -->
+    <color name="LilacPrimaryGrayBackground">#ECE6F8</color>
+    <color name="LilacBitDarkerGrayBackground">#FAF7FF</color>
+    <color name="LilacGrayBackground">#E4DCF4</color>
+    <color name="LilacItemBackground">#E8E1F6</color>
+    <color name="LilacTextColor">#221A33</color>
+    <color name="LilacIconColor">#615478</color>
+    <color name="LilacAccent">#7246D0</color>
+    <color name="LilacAccentDark">#5531A8</color>
+    <color name="LilacOnAccent">#FFFFFF</color>
+
+    <style name="LilacMode">
+        <item name="primaryGrayBackground">@color/LilacPrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/LilacBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/LilacGrayBackground</item>
+        <item name="boxItemBackground">@color/LilacItemBackground</item>
+        <item name="textColor">@color/LilacTextColor</item>
+        <item name="grayTextColor">@color/LilacIconColor</item>
+        <item name="iconColor">@color/LilacIconColor</item>
+        <item name="white">@color/LilacTextColor</item>
+        <item name="black">@color/LilacBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/LilacTextColor</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeLilac">
+        <item name="colorPrimary">@color/LilacAccent</item>
+        <item name="android:colorPrimary">@color/LilacAccent</item>
+        <item name="colorPrimaryDark">@color/LilacAccentDark</item>
+        <item name="colorAccent">@color/LilacAccent</item>
+        <item name="colorOnPrimary">@color/LilacOnAccent</item>
+        <item name="android:colorAccent">@color/LilacAccent</item>
+    </style>
+
+    <!-- Kiraz Çiçeği (Açık) -->
+    <color name="BlossomPrimaryGrayBackground">#F9E3EC</color>
+    <color name="BlossomBitDarkerGrayBackground">#FFF7FA</color>
+    <color name="BlossomGrayBackground">#F5D9E4</color>
+    <color name="BlossomItemBackground">#F7DEE8</color>
+    <color name="BlossomTextColor">#2E1520</color>
+    <color name="BlossomIconColor">#77505F</color>
+    <color name="BlossomAccent">#C93370</color>
+    <color name="BlossomAccentDark">#A0245A</color>
+    <color name="BlossomOnAccent">#FFFFFF</color>
+
+    <style name="BlossomMode">
+        <item name="primaryGrayBackground">@color/BlossomPrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/BlossomBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/BlossomGrayBackground</item>
+        <item name="boxItemBackground">@color/BlossomItemBackground</item>
+        <item name="textColor">@color/BlossomTextColor</item>
+        <item name="grayTextColor">@color/BlossomIconColor</item>
+        <item name="iconColor">@color/BlossomIconColor</item>
+        <item name="white">@color/BlossomTextColor</item>
+        <item name="black">@color/BlossomBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/BlossomTextColor</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeBlossom">
+        <item name="colorPrimary">@color/BlossomAccent</item>
+        <item name="android:colorPrimary">@color/BlossomAccent</item>
+        <item name="colorPrimaryDark">@color/BlossomAccentDark</item>
+        <item name="colorAccent">@color/BlossomAccent</item>
+        <item name="colorOnPrimary">@color/BlossomOnAccent</item>
+        <item name="android:colorAccent">@color/BlossomAccent</item>
+    </style>
+
+    <!-- Kum (Açık) -->
+    <color name="SandPrimaryGrayBackground">#EFE8D8</color>
+    <color name="SandBitDarkerGrayBackground">#FBF8F1</color>
+    <color name="SandGrayBackground">#E8DFCB</color>
+    <color name="SandItemBackground">#ECE4D2</color>
+    <color name="SandTextColor">#2A241A</color>
+    <color name="SandIconColor">#695F4A</color>
+    <color name="SandAccent">#996616</color>
+    <color name="SandAccentDark">#7A500F</color>
+    <color name="SandOnAccent">#FFFFFF</color>
+
+    <style name="SandMode">
+        <item name="primaryGrayBackground">@color/SandPrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/SandBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/SandGrayBackground</item>
+        <item name="boxItemBackground">@color/SandItemBackground</item>
+        <item name="textColor">@color/SandTextColor</item>
+        <item name="grayTextColor">@color/SandIconColor</item>
+        <item name="iconColor">@color/SandIconColor</item>
+        <item name="white">@color/SandTextColor</item>
+        <item name="black">@color/SandBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/SandTextColor</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeSand">
+        <item name="colorPrimary">@color/SandAccent</item>
+        <item name="android:colorPrimary">@color/SandAccent</item>
+        <item name="colorPrimaryDark">@color/SandAccentDark</item>
+        <item name="colorAccent">@color/SandAccent</item>
+        <item name="colorOnPrimary">@color/SandOnAccent</item>
+        <item name="android:colorAccent">@color/SandAccent</item>
+    </style>
+
+    <!-- Limon (Açık) -->
+    <color name="LemonPrimaryGrayBackground">#F5F0D5</color>
+    <color name="LemonBitDarkerGrayBackground">#FFFDF2</color>
+    <color name="LemonGrayBackground">#EFE8C4</color>
+    <color name="LemonItemBackground">#F2ECCC</color>
+    <color name="LemonTextColor">#26230F</color>
+    <color name="LemonIconColor">#656040</color>
+    <color name="LemonAccent">#7D6B00</color>
+    <color name="LemonAccentDark">#5E5000</color>
+    <color name="LemonOnAccent">#FFFFFF</color>
+
+    <style name="LemonMode">
+        <item name="primaryGrayBackground">@color/LemonPrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/LemonBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/LemonGrayBackground</item>
+        <item name="boxItemBackground">@color/LemonItemBackground</item>
+        <item name="textColor">@color/LemonTextColor</item>
+        <item name="grayTextColor">@color/LemonIconColor</item>
+        <item name="iconColor">@color/LemonIconColor</item>
+        <item name="white">@color/LemonTextColor</item>
+        <item name="black">@color/LemonBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/LemonTextColor</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeLemon">
+        <item name="colorPrimary">@color/LemonAccent</item>
+        <item name="android:colorPrimary">@color/LemonAccent</item>
+        <item name="colorPrimaryDark">@color/LemonAccentDark</item>
+        <item name="colorAccent">@color/LemonAccent</item>
+        <item name="colorOnPrimary">@color/LemonOnAccent</item>
+        <item name="android:colorAccent">@color/LemonAccent</item>
+    </style>
+
+    <!-- Bulut (Açık) -->
+    <color name="CloudPrimaryGrayBackground">#E9E9EC</color>
+    <color name="CloudBitDarkerGrayBackground">#F7F7F8</color>
+    <color name="CloudGrayBackground">#E1E1E5</color>
+    <color name="CloudItemBackground">#E5E5E9</color>
+    <color name="CloudTextColor">#1C1C1F</color>
+    <color name="CloudIconColor">#5E5E66</color>
+    <color name="CloudAccent">#4A4A55</color>
+    <color name="CloudAccentDark">#2E2E36</color>
+    <color name="CloudOnAccent">#FFFFFF</color>
+
+    <style name="CloudMode">
+        <item name="primaryGrayBackground">@color/CloudPrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/CloudBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/CloudGrayBackground</item>
+        <item name="boxItemBackground">@color/CloudItemBackground</item>
+        <item name="textColor">@color/CloudTextColor</item>
+        <item name="grayTextColor">@color/CloudIconColor</item>
+        <item name="iconColor">@color/CloudIconColor</item>
+        <item name="white">@color/CloudTextColor</item>
+        <item name="black">@color/CloudBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/CloudTextColor</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeCloud">
+        <item name="colorPrimary">@color/CloudAccent</item>
+        <item name="android:colorPrimary">@color/CloudAccent</item>
+        <item name="colorPrimaryDark">@color/CloudAccentDark</item>
+        <item name="colorAccent">@color/CloudAccent</item>
+        <item name="colorOnPrimary">@color/CloudOnAccent</item>
+        <item name="android:colorAccent">@color/CloudAccent</item>
+    </style>
+
+    <!-- Su Yeşili (Açık) -->
+    <color name="AquaPrimaryGrayBackground">#DDF1F1</color>
+    <color name="AquaBitDarkerGrayBackground">#F2FBFB</color>
+    <color name="AquaGrayBackground">#D1EBEB</color>
+    <color name="AquaItemBackground">#D7EEEE</color>
+    <color name="AquaTextColor">#0F2626</color>
+    <color name="AquaIconColor">#466666</color>
+    <color name="AquaAccent">#0B8585</color>
+    <color name="AquaAccentDark">#086565</color>
+    <color name="AquaOnAccent">#FFFFFF</color>
+
+    <style name="AquaMode">
+        <item name="primaryGrayBackground">@color/AquaPrimaryGrayBackground</item>
+        <item name="primaryBlackBackground">@color/AquaBitDarkerGrayBackground</item>
+        <item name="iconGrayBackground">@color/AquaGrayBackground</item>
+        <item name="boxItemBackground">@color/AquaItemBackground</item>
+        <item name="textColor">@color/AquaTextColor</item>
+        <item name="grayTextColor">@color/AquaIconColor</item>
+        <item name="iconColor">@color/AquaIconColor</item>
+        <item name="white">@color/AquaTextColor</item>
+        <item name="black">@color/AquaBitDarkerGrayBackground</item>
+        <item name="colorOnPrimary">@color/AquaTextColor</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+
+    <style name="OverlayPrimaryColorThemeAqua">
+        <item name="colorPrimary">@color/AquaAccent</item>
+        <item name="android:colorPrimary">@color/AquaAccent</item>
+        <item name="colorPrimaryDark">@color/AquaAccentDark</item>
+        <item name="colorAccent">@color/AquaAccent</item>
+        <item name="colorOnPrimary">@color/AquaOnAccent</item>
+        <item name="android:colorAccent">@color/AquaAccent</item>
     </style>
 
 </resources>

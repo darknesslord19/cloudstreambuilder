@@ -84,5 +84,65 @@
         <item name="appFont">cursive</item>
     </style>
 
+    <style name="FontOverlayInter">
+        <item name="appFont">@font/inter_regular</item>
+    </style>
+
+    <style name="FontOverlayInterLight">
+        <item name="appFont">@font/inter_light</item>
+    </style>
+
+    <style name="FontOverlayInterMedium">
+        <item name="appFont">@font/inter_medium</item>
+    </style>
+
+    <style name="FontOverlayInterSemiBold">
+        <item name="appFont">@font/inter_semibold</item>
+    </style>
+
+    <style name="FontOverlayPoppinsLight">
+        <item name="appFont">@font/poppins_light</item>
+    </style>
+
+    <style name="FontOverlayPoppinsMedium">
+        <item name="appFont">@font/poppins_medium</item>
+    </style>
+
+    <style name="FontOverlayLora">
+        <item name="appFont">@font/lora</item>
+    </style>
+
+    <style name="FontOverlayCarlito">
+        <item name="appFont">@font/carlito</item>
+    </style>
+
+    <style name="FontOverlayCaladea">
+        <item name="appFont">@font/caladea</item>
+    </style>
+
+    <style name="FontOverlayLiberationSans">
+        <item name="appFont">@font/liberation_sans</item>
+    </style>
+
+    <style name="FontOverlayLiberationSerif">
+        <item name="appFont">@font/liberation_serif</item>
+    </style>
+
+    <style name="FontOverlayLiberationMono">
+        <item name="appFont">@font/liberation_mono</item>
+    </style>
+
+    <style name="FontOverlayDejaVuSans">
+        <item name="appFont">@font/dejavu_sans</item>
+    </style>
+
+    <style name="FontOverlayDejaVuSansCondensed">
+        <item name="appFont">@font/dejavu_sans_condensed</item>
+    </style>
+
+    <style name="FontOverlayDejaVuSerif">
+        <item name="appFont">@font/dejavu_serif</item>
+    </style>
+
     <color name="fork_icon_background">#000000</color>
 </resources>

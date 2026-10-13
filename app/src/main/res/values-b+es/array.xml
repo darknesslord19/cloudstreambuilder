@@ -190,6 +190,26 @@
         <item>Fiesta</item>
         <item>Dolor rosa</item>
         <item>Lavanda</item>
+        <item>Coral</item>
+        <item>Turquoise</item>
+        <item>Sky blue</item>
+        <item>Sapphire</item>
+        <item>Violet</item>
+        <item>Fuchsia</item>
+        <item>Rose</item>
+        <item>Cherry</item>
+        <item>Tangerine</item>
+        <item>Amber</item>
+        <item>Honey</item>
+        <item>Mint</item>
+        <item>Emerald</item>
+        <item>Olive</item>
+        <item>Petrol</item>
+        <item>Ice</item>
+        <item>Lilac</item>
+        <item>Peach</item>
+        <item>Copper</item>
+        <item>Silver</item>
         <item>Material You</item>
         <item>Material You (Secondary)</item>
     </string-array>
@@ -214,6 +234,26 @@
         <item>Party</item>
         <item>Pink</item>
         <item>Lavender</item>
+        <item>ForkCoral</item>
+        <item>ForkTurquoise</item>
+        <item>ForkSkyBlue</item>
+        <item>ForkSapphire</item>
+        <item>ForkViolet</item>
+        <item>ForkFuchsia</item>
+        <item>ForkRose</item>
+        <item>ForkCherry</item>
+        <item>ForkTangerine</item>
+        <item>ForkAmber</item>
+        <item>ForkHoney</item>
+        <item>ForkMint</item>
+        <item>ForkEmerald</item>
+        <item>ForkOlive</item>
+        <item>ForkPetrol</item>
+        <item>ForkIce</item>
+        <item>ForkLilac</item>
+        <item>ForkPeach</item>
+        <item>ForkCopper</item>
+        <item>ForkSilver</item>
         <item>Monet</item>
         <item>Monet2</item>
     </string-array>
@@ -249,6 +289,26 @@
         <item>Kraliyet</item>
         <item>Mürdüm</item>
         <item>Krem (Açık)</item>
+        <item>Arduvaz</item>
+        <item>Fırtına</item>
+        <item>Yosun</item>
+        <item>Leylak Gecesi</item>
+        <item>Moka</item>
+        <item>Lagün</item>
+        <item>Alacakaranlık</item>
+        <item>Kül</item>
+        <item>Kot Mavisi</item>
+        <item>Zeytin</item>
+        <item>İnci (Açık)</item>
+        <item>Gökyüzü (Açık)</item>
+        <item>Nane (Açık)</item>
+        <item>Şeftali (Açık)</item>
+        <item>Lavanta Bahçesi (Açık)</item>
+        <item>Kiraz Çiçeği (Açık)</item>
+        <item>Kum (Açık)</item>
+        <item>Limon (Açık)</item>
+        <item>Bulut (Açık)</item>
+        <item>Su Yeşili (Açık)</item>
     </string-array>
     <string-array name="themes_names_values">
         <item>AmoledLight</item>
@@ -280,6 +340,26 @@
         <item>Royal</item>
         <item>Plum</item>
         <item>Cream</item>
+        <item>Slate</item>
+        <item>Storm</item>
+        <item>Moss</item>
+        <item>Mauve</item>
+        <item>Mocha</item>
+        <item>Lagoon</item>
+        <item>Dusk</item>
+        <item>Ash</item>
+        <item>Denim</item>
+        <item>Olive</item>
+        <item>Pearl</item>
+        <item>Sky</item>
+        <item>Mint</item>
+        <item>Peach</item>
+        <item>Lilac</item>
+        <item>Blossom</item>
+        <item>Sand</item>
+        <item>Lemon</item>
+        <item>Cloud</item>
+        <item>Aqua</item>
     </string-array>
 
     <!--https://github.com/videolan/vlc-android/blob/72ccfb93db027b49855760001d1a930fa657c5a8/application/resources/src/main/res/values/arrays.xml#L266-->

@@ -370,6 +370,26 @@ object CommonActivity {
         "Royal" to (R.style.RoyalMode to R.style.OverlayPrimaryColorThemeRoyal),
         "Plum" to (R.style.PlumMode to R.style.OverlayPrimaryColorThemePlum),
         "Cream" to (R.style.CreamMode to R.style.OverlayPrimaryColorThemeCream),
+        "Slate" to (R.style.SlateMode to R.style.OverlayPrimaryColorThemeSlate),
+        "Storm" to (R.style.StormMode to R.style.OverlayPrimaryColorThemeStorm),
+        "Moss" to (R.style.MossMode to R.style.OverlayPrimaryColorThemeMoss),
+        "Mauve" to (R.style.MauveMode to R.style.OverlayPrimaryColorThemeMauve),
+        "Mocha" to (R.style.MochaMode to R.style.OverlayPrimaryColorThemeMocha),
+        "Lagoon" to (R.style.LagoonMode to R.style.OverlayPrimaryColorThemeLagoon),
+        "Dusk" to (R.style.DuskMode to R.style.OverlayPrimaryColorThemeDusk),
+        "Ash" to (R.style.AshMode to R.style.OverlayPrimaryColorThemeAsh),
+        "Denim" to (R.style.DenimMode to R.style.OverlayPrimaryColorThemeDenim),
+        "Olive" to (R.style.OliveMode to R.style.OverlayPrimaryColorThemeOlive),
+        "Pearl" to (R.style.PearlMode to R.style.OverlayPrimaryColorThemePearl),
+        "Sky" to (R.style.SkyMode to R.style.OverlayPrimaryColorThemeSky),
+        "Mint" to (R.style.MintMode to R.style.OverlayPrimaryColorThemeMint),
+        "Peach" to (R.style.PeachMode to R.style.OverlayPrimaryColorThemePeach),
+        "Lilac" to (R.style.LilacMode to R.style.OverlayPrimaryColorThemeLilac),
+        "Blossom" to (R.style.BlossomMode to R.style.OverlayPrimaryColorThemeBlossom),
+        "Sand" to (R.style.SandMode to R.style.OverlayPrimaryColorThemeSand),
+        "Lemon" to (R.style.LemonMode to R.style.OverlayPrimaryColorThemeLemon),
+        "Cloud" to (R.style.CloudMode to R.style.OverlayPrimaryColorThemeCloud),
+        "Aqua" to (R.style.AquaMode to R.style.OverlayPrimaryColorThemeAqua),
     )
 
     /** The style of the app theme saved as [themeName]. */
@@ -419,9 +439,38 @@ object CommonActivity {
             "Monet2" -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
                 R.style.OverlayPrimaryColorMonetTwo else R.style.OverlayPrimaryColorNormal
 
-            else -> R.style.OverlayPrimaryColorNormal
+            else -> extraAccents[colorName] ?: R.style.OverlayPrimaryColorNormal
         }
     }
+
+    /** The primary colours this build adds, by their saved names. Off with the added themes. */
+    val extraAccentNames: Set<String> get() = allExtraAccents.keys
+
+    private val extraAccents: Map<String, Int>
+        get() = if (ForkFeatures.isOn(RemoteRules.Feature.THEMES)) allExtraAccents else emptyMap()
+
+    private val allExtraAccents: Map<String, Int> = mapOf(
+        "ForkCoral" to R.style.OverlayPrimaryColorForkCoral,
+        "ForkTurquoise" to R.style.OverlayPrimaryColorForkTurquoise,
+        "ForkSkyBlue" to R.style.OverlayPrimaryColorForkSkyBlue,
+        "ForkSapphire" to R.style.OverlayPrimaryColorForkSapphire,
+        "ForkViolet" to R.style.OverlayPrimaryColorForkViolet,
+        "ForkFuchsia" to R.style.OverlayPrimaryColorForkFuchsia,
+        "ForkRose" to R.style.OverlayPrimaryColorForkRose,
+        "ForkCherry" to R.style.OverlayPrimaryColorForkCherry,
+        "ForkTangerine" to R.style.OverlayPrimaryColorForkTangerine,
+        "ForkAmber" to R.style.OverlayPrimaryColorForkAmber,
+        "ForkHoney" to R.style.OverlayPrimaryColorForkHoney,
+        "ForkMint" to R.style.OverlayPrimaryColorForkMint,
+        "ForkEmerald" to R.style.OverlayPrimaryColorForkEmerald,
+        "ForkOlive" to R.style.OverlayPrimaryColorForkOlive,
+        "ForkPetrol" to R.style.OverlayPrimaryColorForkPetrol,
+        "ForkIce" to R.style.OverlayPrimaryColorForkIce,
+        "ForkLilac" to R.style.OverlayPrimaryColorForkLilac,
+        "ForkPeach" to R.style.OverlayPrimaryColorForkPeach,
+        "ForkCopper" to R.style.OverlayPrimaryColorForkCopper,
+        "ForkSilver" to R.style.OverlayPrimaryColorForkSilver,
+    )
 
     fun loadThemes(act: Activity?) {
         if (act == null) return
