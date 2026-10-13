@@ -36,6 +36,14 @@ class SettingsPlus : BasePreferenceFragmentCompat() {
         )) {
             findPreference<Preference>(key)?.isVisible = categoriesOn
         }
+        // The effects need the categories, and can be switched off from outside on their own
+        val effectsAllowed = categoriesOn && ForkFeatures.isOn(RemoteRules.Feature.CATEGORY_EFFECTS, context)
+        findPreference<Preference>(Categories.PREF_FX)?.isVisible = effectsAllowed
+        findPreference<Preference>("fork_plus_category_fx_styles")?.isVisible = effectsAllowed
+        findPreference<Preference>("fork_plus_category_fx_styles")?.setOnPreferenceClickListener {
+            activity?.let { Categories.show(it, effects = true) }
+            true
+        }
         findPreference<Preference>(ForkFeatures.PREF_REPOLIST)?.isVisible =
             ForkFeatures.isOn(RemoteRules.Feature.REPOLIST, context)
 

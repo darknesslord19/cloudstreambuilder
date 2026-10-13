@@ -838,6 +838,10 @@
     <string name="plus_remote_on">Açık · %d kategori</string>
     <string name="plus_remote_off">Kapalı</string>
     <string name="plus_remote_none">Şu an yok</string>
+    <string name="categories_fx_settings">Hafif efektler</string>
+    <string name="categories_fx_des">Arka plan ışığı, dokunma, açılış, isim ve diğerleri. Hafiftir, kasmaz</string>
+    <string name="categories_fx_styles">Efekt stilleri</string>
+    <string name="categories_fx_styles_des">11 efekt, her birinde 20 stil. Kategoriler sayfasında ✦ simgesinden de açılır</string>
     <string name="categories_rich_settings">Sinematik mod</string>
     <string name="categories_rich_des">İlk tasarımın bütün efektleri: gezen ışık, film greni, cam simgeler. ⚠ Zayıf telefon ve TV kutularında kasabilir</string>
 </resources>

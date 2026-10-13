@@ -72,6 +72,19 @@ object Categories {
     /** The richer cinematic look with every effect, heavier, off unless switched on */
     const val PREF_RICH = "fork_categories_rich"
 
+    /** The light effects of the categories page (halo, touch, opening and the others) */
+    const val PREF_FX = "fork_categories_fx"
+
+    /**
+     * The effects are on: switched on in Plus and not switched off from outside with
+     * "category_effects". Without the categories there are no effects either.
+     */
+    fun effectsOn(context: Context?): Boolean {
+        context ?: return false
+        if (!available(context) || !ForkFeatures.isOn(Feature.CATEGORY_EFFECTS, context)) return false
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREF_FX, true)
+    }
+
     /** Badges for dubbing and subtitles on the posters */
     const val PREF_BADGES = "fork_categories_badges"
 
@@ -140,9 +153,10 @@ object Categories {
     }
 
     /** Opens the categories screen. */
-    fun show(activity: FragmentActivity) {
+    fun show(activity: FragmentActivity, effects: Boolean = false) {
         if (!available(activity)) return
         val bridge = Bridge(activity)
+        bridge.startWithEffects = effects
         val handle = AssetPage.show(activity, PAGE, bridges = mapOf("Cats" to bridge)) ?: return
         bridge.handle = handle
     }
@@ -211,6 +225,21 @@ object Categories {
 
         @JavascriptInterface
         fun animated(): Boolean = animated(activity)
+
+        /** Opened from Plus to choose the effects: the page opens its effects panel once */
+        @Volatile
+        var startWithEffects = false
+
+        /** The light effects are switched on */
+        @JavascriptInterface
+        fun effects(): Boolean = effectsOn(activity)
+
+        @JavascriptInterface
+        fun startEffects(): Boolean {
+            val start = startWithEffects
+            startWithEffects = false
+            return start
+        }
 
         /** The cinematic mode is switched on in Plus */
         @JavascriptInterface

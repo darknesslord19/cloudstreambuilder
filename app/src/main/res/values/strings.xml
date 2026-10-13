@@ -874,6 +874,10 @@
     <string name="plus_remote_on">On · %d categories</string>
     <string name="plus_remote_off">Off</string>
     <string name="plus_remote_none">None at the moment</string>
+    <string name="categories_fx_settings">Light effects</string>
+    <string name="categories_fx_des">Background light, touch, opening, names and more. Light, it does not stutter</string>
+    <string name="categories_fx_styles">Effect styles</string>
+    <string name="categories_fx_styles_des">11 effects with 20 styles each. Also opens from ✦ on the categories page</string>
     <string name="categories_rich_settings">Cinematic mode</string>
     <string name="categories_rich_des">Every effect of the first design: moving light, grain, glass icons. ⚠ It can stutter on weaker phones and TV boxes</string>
 </resources>
