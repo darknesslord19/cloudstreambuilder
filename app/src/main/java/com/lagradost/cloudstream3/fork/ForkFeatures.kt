@@ -10,7 +10,7 @@ import java.net.URLEncoder
  * Which additions of this build are switched on. Read from [GENERAL_URL] for everyone, and
  * from the "features" of this device in the access list for single users:
  *
- *   Cloudstreamplus.json: { "stremio": true, "nuvio": true, "skystream": true,
+ *   Cloudstreamplus.json: { "stremio": true, "nuvio": true, "skystream": true, "animated_posters": true,
  *                           "themes": true, "fonts": true, "icons": true }
  *   Cloudstreamkey.json, users/<device id>: { ..., "features": { "nuvio": false } }
  *

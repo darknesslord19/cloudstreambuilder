@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tags PosterMotion keeps on the home cards -->
+    <item name="fork_motion_tag" type="id" />
+    <item name="fork_motion_press_tag" type="id" />
+</resources>

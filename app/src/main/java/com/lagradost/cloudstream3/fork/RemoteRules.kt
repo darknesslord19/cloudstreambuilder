@@ -105,6 +105,7 @@ object RemoteRules {
         THEMES("themes"),
         FONTS("fonts"),
         ICONS("icons"),
+        MOTION("animated_posters"),
     }
 
     /**

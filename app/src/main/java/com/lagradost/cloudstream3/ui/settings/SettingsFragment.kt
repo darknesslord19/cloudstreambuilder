@@ -16,6 +16,8 @@ import com.lagradost.cloudstream3.BuildConfig
 import com.lagradost.cloudstream3.R
 import com.lagradost.cloudstream3.databinding.MainSettingsBinding
 import com.lagradost.cloudstream3.fork.AccessGate
+import com.lagradost.cloudstream3.fork.SettingsLook
+import com.lagradost.cloudstream3.ui.account.AccountHelper.showAccountSelectLinear
 import com.lagradost.cloudstream3.mvvm.logError
 import com.lagradost.cloudstream3.mvvm.safe
 import com.lagradost.cloudstream3.syncproviders.AccountManager
@@ -262,7 +264,7 @@ class SettingsFragment : BaseFragment<MainSettingsBinding>(
                     logError(t)
                     false
                 }
-                visibility = if (showAccount) View.VISIBLE else View.GONE
+                settingsAccountCard.visibility = if (showAccount) View.VISIBLE else View.GONE
                 if (showAccount && act != null) {
                     settingsAccountInfoSummary.text = AccessGate.accountSummary(act)
                     setOnClickListener { AccessGate.showAccount(act) }
@@ -310,6 +312,23 @@ class SettingsFragment : BaseFragment<MainSettingsBinding>(
             )
             settingsExtensionsSummary.text = summaryOf(R.string.add_repository)
             settingsAboutSummary.text = summaryOf(R.string.developer_summary)
+
+            // The profile card opens the profile choice, like the picture on the home screen
+            SettingsLook.styleRing(settingsProfileRing)
+            settingsProfile.apply {
+                setOnClickListener { activity?.showAccountSelectLinear() }
+                if (isLayout(TV)) {
+                    isFocusable = true
+                    isFocusableInTouchMode = true
+                }
+            }
+
+            val cards = listOf(
+                settingsProfileCard, settingsAccountCard, settingsCardMain,
+                settingsCardData, settingsCardExtensions, settingsCardAbout
+            )
+            SettingsLook.clipCards(cards)
+            SettingsLook.riseIn(cards + appVersionInfo)
 
             // Default focus on TV
             if (isLayout(TV)) {

@@ -629,6 +629,11 @@
         <item name="preferenceStyle">@style/CustomPreferenceStyle</item>
         <item name="switchPreferenceStyle">@style/CustomSwitchPreferenceStyle</item>
         <item name="seekBarPreferenceStyle">@style/CustomSeekBarPreferenceStyle</item>
+        <item name="preferenceCategoryStyle">@style/ForkPreferenceCategoryStyle</item>
+    </style>
+
+    <style name="ForkPreferenceCategoryStyle" parent="@style/Preference.Category.Material">
+        <item name="android:layout">@layout/fork_preference_category</item>
     </style>
 
     <!--
@@ -665,21 +670,31 @@
     <style name="SettingsRow">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:minHeight">64dp</item>
+        <item name="android:minHeight">74dp</item>
         <item name="android:orientation">horizontal</item>
         <item name="android:gravity">center_vertical</item>
-        <item name="android:paddingStart">20dp</item>
-        <item name="android:paddingEnd">20dp</item>
-        <item name="android:paddingTop">10dp</item>
-        <item name="android:paddingBottom">10dp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">12dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
         <item name="android:background">?attr/focusBackground</item>
     </style>
 
+    <!-- A group of rows of the main settings screen, on a rounded card -->
+    <style name="SettingsCard">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:layout_marginStart">16dp</item>
+        <item name="android:layout_marginEnd">16dp</item>
+        <item name="android:layout_marginTop">12dp</item>
+        <item name="android:background">@drawable/fork_settings_card</item>
+    </style>
+
     <style name="SettingsRowIcon">
-        <item name="android:layout_width">24dp</item>
-        <item name="android:layout_height">24dp</item>
-        <item name="android:layout_marginEnd">24dp</item>
-        <item name="tint">?attr/textColor</item>
+        <item name="android:layout_width">46dp</item>
+        <item name="android:layout_height">46dp</item>
+        <item name="android:layout_marginEnd">16dp</item>
     </style>
 
     <style name="SettingsRowTexts">
@@ -694,6 +709,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">?attr/textColor</item>
         <item name="android:textSize">17sp</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="SettingsRowSummary">
@@ -701,9 +717,26 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginTop">2dp</item>
         <item name="android:textColor">?attr/grayTextColor</item>
-        <item name="android:textSize">13sp</item>
+        <item name="android:textSize">14sp</item>
         <item name="android:maxLines">2</item>
         <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="SettingsRowChevron">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:src">@drawable/ic_baseline_keyboard_arrow_right_24</item>
+        <item name="tint">?attr/grayTextColor</item>
+        <item name="android:importantForAccessibility">no</item>
+    </style>
+
+    <style name="SettingsDivider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_marginStart">78dp</item>
+        <item name="android:layout_marginEnd">20dp</item>
+        <item name="android:background">?attr/primaryBlackBackground</item>
     </style>
 
     <style name="WatchHeaderText">

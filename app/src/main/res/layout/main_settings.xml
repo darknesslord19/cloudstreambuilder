@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- The main settings screen: groups of rows on rounded cards, coloured by the app theme -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -13,278 +14,353 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
+            android:id="@+id/settings_cards"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingBottom="8dp">
 
             <LinearLayout
-                android:id="@+id/settings_profile"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="20dp"
-                tools:visibility="visible">
+                android:id="@+id/settings_profile_card"
+                style="@style/SettingsCard"
+                android:layout_marginTop="16dp">
 
-                <androidx.cardview.widget.CardView
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:foreground="@drawable/outline_big_25_gray"
-                    app:cardCornerRadius="25dp">
+                <LinearLayout
+                    android:id="@+id/settings_profile"
+                    style="@style/SettingsRow"
+                    android:minHeight="96dp"
+                    android:paddingStart="18dp"
+                    android:nextFocusDown="@id/settings_account_info">
 
-                    <ImageView
-                        android:id="@+id/settings_profile_pic"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:contentDescription="@string/account"
-                        android:scaleType="centerCrop"
-                        tools:src="@drawable/profile_bg_orange" />
+                    <FrameLayout
+                        android:id="@+id/settings_profile_ring"
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:layout_marginEnd="18dp"
+                        android:padding="4dp">
 
-                </androidx.cardview.widget.CardView>
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            app:cardBackgroundColor="?attr/primaryBlackBackground"
+                            app:cardCornerRadius="28dp"
+                            app:cardElevation="0dp">
 
-                <TextView
-                    android:id="@+id/settings_profile_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:gravity="center_vertical"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:textColor="?attr/textColor"
-                    android:textSize="18sp"
-                    android:textStyle="normal"
-                    tools:text="Quick Brown Fox" />
+                            <ImageView
+                                android:id="@+id/settings_profile_pic"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:contentDescription="@string/account"
+                                android:scaleType="centerCrop"
+                                tools:src="@drawable/profile_bg_orange" />
+                        </androidx.cardview.widget.CardView>
+                    </FrameLayout>
+
+                    <LinearLayout style="@style/SettingsRowTexts">
+
+                        <TextView
+                            android:id="@+id/settings_profile_text"
+                            style="@style/SettingsRowTitle"
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            android:textSize="20sp"
+                            tools:text="Quick Brown Fox" />
+
+                        <TextView
+                            style="@style/SettingsRowSummary"
+                            android:text="@string/active_profile" />
+                    </LinearLayout>
+
+                    <ImageView style="@style/SettingsRowChevron" />
+                </LinearLayout>
             </LinearLayout>
 
             <!-- Only shown while the access list of this build is switched on -->
             <LinearLayout
-                android:id="@+id/settings_account_info"
-                style="@style/SettingsRow"
-                android:nextFocusDown="@id/settings_general"
+                android:id="@+id/settings_account_card"
+                style="@style/SettingsCard"
                 android:visibility="gone"
                 tools:visibility="visible">
 
-                <ImageView
-                    style="@style/SettingsRowIcon"
-                    android:importantForAccessibility="no"
-                    android:src="@drawable/account_circle_24px" />
+                <LinearLayout
+                    android:id="@+id/settings_account_info"
+                    style="@style/SettingsRow"
+                    android:nextFocusUp="@id/settings_profile"
+                    android:nextFocusDown="@id/settings_general">
 
-                <LinearLayout style="@style/SettingsRowTexts">
+                    <com.lagradost.cloudstream3.fork.IconBox
+                        style="@style/SettingsRowIcon"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/account_circle_24px" />
 
-                    <TextView
-                        style="@style/SettingsRowTitle"
-                        android:text="@string/access_account" />
+                    <LinearLayout style="@style/SettingsRowTexts">
 
-                    <TextView
-                        android:id="@+id/settings_account_info_summary"
-                        style="@style/SettingsRowSummary"
-                        tools:text="Name • 54 years 94 days left" />
+                        <TextView
+                            style="@style/SettingsRowTitle"
+                            android:text="@string/access_account" />
+
+                        <TextView
+                            android:id="@+id/settings_account_info_summary"
+                            style="@style/SettingsRowSummary"
+                            tools:text="Name • 54 years 94 days left" />
+                    </LinearLayout>
+
+                    <ImageView style="@style/SettingsRowChevron" />
                 </LinearLayout>
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/settings_general"
-                style="@style/SettingsRow"
-                android:nextFocusDown="@id/settings_player">
+                android:id="@+id/settings_card_main"
+                style="@style/SettingsCard">
 
-                <ImageView
-                    style="@style/SettingsRowIcon"
-                    android:importantForAccessibility="no"
-                    android:src="@drawable/build_24px" />
+                <LinearLayout
+                    android:id="@+id/settings_general"
+                    style="@style/SettingsRow"
+                    android:nextFocusUp="@id/settings_account_info"
+                    android:nextFocusDown="@id/settings_player">
 
-                <LinearLayout style="@style/SettingsRowTexts">
+                    <com.lagradost.cloudstream3.fork.IconBox
+                        style="@style/SettingsRowIcon"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/build_24px" />
 
-                    <TextView
-                        style="@style/SettingsRowTitle"
-                        android:text="@string/category_general" />
+                    <LinearLayout style="@style/SettingsRowTexts">
 
-                    <TextView
-                        android:id="@+id/settings_general_summary"
-                        style="@style/SettingsRowSummary"
-                        tools:text="First, Second, Third" />
+                        <TextView
+                            style="@style/SettingsRowTitle"
+                            android:text="@string/category_general" />
+
+                        <TextView
+                            android:id="@+id/settings_general_summary"
+                            style="@style/SettingsRowSummary"
+                            tools:text="First, Second, Third" />
+                    </LinearLayout>
+
+                    <ImageView style="@style/SettingsRowChevron" />
+                </LinearLayout>
+
+                <View style="@style/SettingsDivider" />
+
+                <LinearLayout
+                    android:id="@+id/settings_player"
+                    style="@style/SettingsRow"
+                    android:nextFocusUp="@id/settings_general"
+                    android:nextFocusDown="@id/settings_providers">
+
+                    <com.lagradost.cloudstream3.fork.IconBox
+                        style="@style/SettingsRowIcon"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/play_arrow_24px" />
+
+                    <LinearLayout style="@style/SettingsRowTexts">
+
+                        <TextView
+                            style="@style/SettingsRowTitle"
+                            android:text="@string/category_player" />
+
+                        <TextView
+                            android:id="@+id/settings_player_summary"
+                            style="@style/SettingsRowSummary"
+                            tools:text="First, Second, Third" />
+                    </LinearLayout>
+
+                    <ImageView style="@style/SettingsRowChevron" />
+                </LinearLayout>
+
+                <View style="@style/SettingsDivider" />
+
+                <LinearLayout
+                    android:id="@+id/settings_providers"
+                    style="@style/SettingsRow"
+                    android:nextFocusUp="@id/settings_player"
+                    android:nextFocusDown="@id/settings_ui">
+
+                    <com.lagradost.cloudstream3.fork.IconBox
+                        style="@style/SettingsRowIcon"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_baseline_dns_24" />
+
+                    <LinearLayout style="@style/SettingsRowTexts">
+
+                        <TextView
+                            style="@style/SettingsRowTitle"
+                            android:text="@string/category_providers" />
+
+                        <TextView
+                            android:id="@+id/settings_providers_summary"
+                            style="@style/SettingsRowSummary"
+                            tools:text="First, Second, Third" />
+                    </LinearLayout>
+
+                    <ImageView style="@style/SettingsRowChevron" />
+                </LinearLayout>
+
+                <View style="@style/SettingsDivider" />
+
+                <LinearLayout
+                    android:id="@+id/settings_ui"
+                    style="@style/SettingsRow"
+                    android:nextFocusUp="@id/settings_providers"
+                    android:nextFocusDown="@id/settings_updates">
+
+                    <com.lagradost.cloudstream3.fork.IconBox
+                        style="@style/SettingsRowIcon"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/format_paint_24px" />
+
+                    <LinearLayout style="@style/SettingsRowTexts">
+
+                        <TextView
+                            style="@style/SettingsRowTitle"
+                            android:text="@string/category_ui" />
+
+                        <TextView
+                            android:id="@+id/settings_ui_summary"
+                            style="@style/SettingsRowSummary"
+                            tools:text="First, Second, Third" />
+                    </LinearLayout>
+
+                    <ImageView style="@style/SettingsRowChevron" />
                 </LinearLayout>
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/settings_player"
-                style="@style/SettingsRow"
-                android:nextFocusUp="@id/settings_general"
-                android:nextFocusDown="@id/settings_providers">
+                android:id="@+id/settings_card_data"
+                style="@style/SettingsCard">
 
-                <ImageView
-                    style="@style/SettingsRowIcon"
-                    android:importantForAccessibility="no"
-                    android:src="@drawable/play_arrow_24px" />
+                <LinearLayout
+                    android:id="@+id/settings_updates"
+                    style="@style/SettingsRow"
+                    android:nextFocusUp="@id/settings_ui"
+                    android:nextFocusDown="@id/settings_credits">
 
-                <LinearLayout style="@style/SettingsRowTexts">
+                    <com.lagradost.cloudstream3.fork.IconBox
+                        style="@style/SettingsRowIcon"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/mobile_arrow_down_24px" />
 
-                    <TextView
-                        style="@style/SettingsRowTitle"
-                        android:text="@string/category_player" />
+                    <LinearLayout style="@style/SettingsRowTexts">
 
-                    <TextView
-                        android:id="@+id/settings_player_summary"
-                        style="@style/SettingsRowSummary"
-                        tools:text="First, Second, Third" />
+                        <TextView
+                            style="@style/SettingsRowTitle"
+                            android:text="@string/category_updates" />
+
+                        <TextView
+                            android:id="@+id/settings_updates_summary"
+                            style="@style/SettingsRowSummary"
+                            tools:text="First, Second, Third" />
+                    </LinearLayout>
+
+                    <ImageView style="@style/SettingsRowChevron" />
+                </LinearLayout>
+
+                <View style="@style/SettingsDivider" />
+
+                <LinearLayout
+                    android:id="@+id/settings_credits"
+                    style="@style/SettingsRow"
+                    android:nextFocusUp="@id/settings_updates"
+                    android:nextFocusDown="@id/settings_extensions">
+
+                    <com.lagradost.cloudstream3.fork.IconBox
+                        style="@style/SettingsRowIcon"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/encrypted_24px" />
+
+                    <LinearLayout style="@style/SettingsRowTexts">
+
+                        <TextView
+                            style="@style/SettingsRowTitle"
+                            android:text="@string/category_account" />
+
+                        <TextView
+                            android:id="@+id/settings_credits_summary"
+                            style="@style/SettingsRowSummary"
+                            tools:text="First, Second, Third" />
+                    </LinearLayout>
+
+                    <ImageView style="@style/SettingsRowChevron" />
                 </LinearLayout>
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/settings_providers"
-                style="@style/SettingsRow"
-                android:nextFocusUp="@id/settings_player"
-                android:nextFocusDown="@id/settings_ui">
+                android:id="@+id/settings_card_extensions"
+                style="@style/SettingsCard">
 
-                <ImageView
-                    style="@style/SettingsRowIcon"
-                    android:importantForAccessibility="no"
-                    android:src="@drawable/ic_baseline_dns_24" />
+                <LinearLayout
+                    android:id="@+id/settings_extensions"
+                    style="@style/SettingsRow"
+                    android:nextFocusUp="@id/settings_credits"
+                    android:nextFocusDown="@id/settings_about">
 
-                <LinearLayout style="@style/SettingsRowTexts">
+                    <com.lagradost.cloudstream3.fork.IconBox
+                        style="@style/SettingsRowIcon"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/extension_24px" />
 
-                    <TextView
-                        style="@style/SettingsRowTitle"
-                        android:text="@string/category_providers" />
+                    <LinearLayout style="@style/SettingsRowTexts">
 
-                    <TextView
-                        android:id="@+id/settings_providers_summary"
-                        style="@style/SettingsRowSummary"
-                        tools:text="First, Second, Third" />
+                        <TextView
+                            style="@style/SettingsRowTitle"
+                            android:text="@string/extensions" />
+
+                        <TextView
+                            android:id="@+id/settings_extensions_summary"
+                            style="@style/SettingsRowSummary"
+                            tools:text="First, Second, Third" />
+                    </LinearLayout>
+
+                    <ImageView style="@style/SettingsRowChevron" />
                 </LinearLayout>
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/settings_ui"
-                style="@style/SettingsRow"
-                android:nextFocusUp="@id/settings_providers"
-                android:nextFocusDown="@id/settings_updates">
+                android:id="@+id/settings_card_about"
+                style="@style/SettingsCard">
 
-                <ImageView
-                    style="@style/SettingsRowIcon"
-                    android:importantForAccessibility="no"
-                    android:src="@drawable/format_paint_24px" />
+                <LinearLayout
+                    android:id="@+id/settings_about"
+                    style="@style/SettingsRow"
+                    android:nextFocusUp="@id/settings_extensions">
 
-                <LinearLayout style="@style/SettingsRowTexts">
+                    <com.lagradost.cloudstream3.fork.IconBox
+                        style="@style/SettingsRowIcon"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/code_24px" />
 
-                    <TextView
-                        style="@style/SettingsRowTitle"
-                        android:text="@string/category_ui" />
+                    <LinearLayout style="@style/SettingsRowTexts">
 
-                    <TextView
-                        android:id="@+id/settings_ui_summary"
-                        style="@style/SettingsRowSummary"
-                        tools:text="First, Second, Third" />
-                </LinearLayout>
-            </LinearLayout>
+                        <TextView
+                            style="@style/SettingsRowTitle"
+                            android:text="@string/developer" />
 
-            <LinearLayout
-                android:id="@+id/settings_updates"
-                style="@style/SettingsRow"
-                android:nextFocusUp="@id/settings_ui"
-                android:nextFocusDown="@id/settings_credits">
+                        <TextView
+                            android:id="@+id/settings_about_summary"
+                            style="@style/SettingsRowSummary"
+                            tools:text="First, Second, Third" />
+                    </LinearLayout>
 
-                <ImageView
-                    style="@style/SettingsRowIcon"
-                    android:importantForAccessibility="no"
-                    android:src="@drawable/mobile_arrow_down_24px" />
-
-                <LinearLayout style="@style/SettingsRowTexts">
-
-                    <TextView
-                        style="@style/SettingsRowTitle"
-                        android:text="@string/category_updates" />
-
-                    <TextView
-                        android:id="@+id/settings_updates_summary"
-                        style="@style/SettingsRowSummary"
-                        tools:text="First, Second, Third" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/settings_credits"
-                style="@style/SettingsRow"
-                android:nextFocusUp="@id/settings_updates"
-                android:nextFocusDown="@id/settings_extensions">
-
-                <ImageView
-                    style="@style/SettingsRowIcon"
-                    android:importantForAccessibility="no"
-                    android:src="@drawable/encrypted_24px" />
-
-                <LinearLayout style="@style/SettingsRowTexts">
-
-                    <TextView
-                        style="@style/SettingsRowTitle"
-                        android:text="@string/category_account" />
-
-                    <TextView
-                        android:id="@+id/settings_credits_summary"
-                        style="@style/SettingsRowSummary"
-                        tools:text="First, Second, Third" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/settings_extensions"
-                style="@style/SettingsRow"
-                android:nextFocusUp="@id/settings_credits"
-                android:nextFocusDown="@id/settings_about">
-
-                <ImageView
-                    style="@style/SettingsRowIcon"
-                    android:importantForAccessibility="no"
-                    android:src="@drawable/extension_24px" />
-
-                <LinearLayout style="@style/SettingsRowTexts">
-
-                    <TextView
-                        style="@style/SettingsRowTitle"
-                        android:text="@string/extensions" />
-
-                    <TextView
-                        android:id="@+id/settings_extensions_summary"
-                        style="@style/SettingsRowSummary"
-                        tools:text="First, Second, Third" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/settings_about"
-                style="@style/SettingsRow"
-                android:nextFocusUp="@id/settings_extensions">
-
-                <ImageView
-                    style="@style/SettingsRowIcon"
-                    android:importantForAccessibility="no"
-                    android:src="@drawable/code_24px" />
-
-                <LinearLayout style="@style/SettingsRowTexts">
-
-                    <TextView
-                        style="@style/SettingsRowTitle"
-                        android:text="@string/developer" />
-
-                    <TextView
-                        android:id="@+id/settings_about_summary"
-                        style="@style/SettingsRowSummary"
-                        tools:text="First, Second, Third" />
+                    <ImageView style="@style/SettingsRowChevron" />
                 </LinearLayout>
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/app_version_info"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_marginTop="14dp"
+                android:layout_marginBottom="20dp"
+                android:gravity="center"
                 android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/app_version"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:padding="10dp"
-                    android:textColor="?attr/textColor"
+                    android:padding="6dp"
+                    android:textColor="?attr/grayTextColor"
+                    android:textSize="13sp"
                     tools:text="0.0.0" />
 
                 <TextView
@@ -292,14 +368,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="•"
-                    android:textColor="?attr/textColor" />
+                    android:textColor="?attr/grayTextColor" />
 
                 <TextView
                     android:id="@+id/commit_hash"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:padding="10dp"
-                    android:textColor="?attr/textColor"
+                    android:padding="6dp"
+                    android:textColor="?attr/grayTextColor"
+                    android:textSize="13sp"
                     tools:text="1234567" />
 
                 <TextView
@@ -307,14 +384,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="•"
-                    android:textColor="?attr/textColor" />
+                    android:textColor="?attr/grayTextColor" />
 
                 <TextView
                     android:id="@+id/build_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:padding="10dp"
-                    android:textColor="?attr/textColor"
+                    android:padding="6dp"
+                    android:textColor="?attr/grayTextColor"
+                    android:textSize="13sp"
                     tools:text="21/03/2024 09:02 pm" />
             </LinearLayout>
         </LinearLayout>

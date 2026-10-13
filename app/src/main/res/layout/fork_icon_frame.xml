@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The icon of a settings row, on its accent square. The ids are the ones a Preference looks for. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@id/icon_frame"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="16dp">
+
+    <com.lagradost.cloudstream3.fork.IconBox
+        android:id="@android:id/icon"
+        android:layout_width="46dp"
+        android:layout_height="46dp"
+        android:importantForAccessibility="no" />
+</FrameLayout>

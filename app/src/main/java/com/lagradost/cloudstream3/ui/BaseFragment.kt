@@ -269,6 +269,13 @@ abstract class BasePreferenceFragmentCompat() : PreferenceFragmentCompat() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setSystemBarsPadding()
+        // The rows are drawn on cards, the cards bring their own lines
+        try {
+            setDivider(null)
+            com.lagradost.cloudstream3.fork.SettingsLook.decorate(listView)
+        } catch (t: Throwable) {
+            com.lagradost.cloudstream3.mvvm.logError(t)
+        }
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

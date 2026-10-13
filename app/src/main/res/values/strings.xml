@@ -850,4 +850,12 @@
     <string name="addon_kind_nuvio">Nuvio repository</string>
     <string name="addon_kind_skystream">SkyStream repository</string>
     <string name="access_default_plan">Premium membership</string>
+    <string name="active_profile">Active profile</string>
+    <string name="animated_posters">Animated posters</string>
+    <string name="motion_zoom">Slow zoom</string>
+    <string name="motion_auto">Auto advance</string>
+    <string name="motion_shine">Shine</string>
+    <string name="motion_parallax">Scroll depth</string>
+    <string name="motion_press">Grow on touch</string>
+    <string name="motion_off">Off</string>
 </resources>

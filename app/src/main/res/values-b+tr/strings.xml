@@ -814,4 +814,12 @@
     <string name="addon_kind_nuvio">Nuvio deposu</string>
     <string name="addon_kind_skystream">SkyStream deposu</string>
     <string name="access_default_plan">Premium Üyelik</string>
+    <string name="active_profile">Aktif profil</string>
+    <string name="animated_posters">Hareketli Afişler</string>
+    <string name="motion_zoom">Yakınlaşma</string>
+    <string name="motion_auto">Otomatik geçiş</string>
+    <string name="motion_shine">Parlama</string>
+    <string name="motion_parallax">Kaydırma derinliği</string>
+    <string name="motion_press">Dokununca büyüme</string>
+    <string name="motion_off">Kapalı</string>
 </resources>

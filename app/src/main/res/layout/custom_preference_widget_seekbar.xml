@@ -21,16 +21,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="?android:attr/listPreferredItemHeightSmall"
+    android:minHeight="72dp"
     android:gravity="center_vertical"
-    android:paddingStart="?android:attr/listPreferredItemPaddingStart"
-    android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
     android:background="?attr/focusBackground"
     android:clipChildren="false"
     android:clipToPadding="false"
     android:baselineAligned="false">
 
-    <include layout="@layout/image_frame"/>
+    <include layout="@layout/fork_icon_frame" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -52,7 +52,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
-                android:textAppearance="?android:attr/textAppearanceListItem"
+                android:textColor="?attr/textColor"
+                android:textSize="16sp"
+                android:textStyle="bold"
                 android:ellipsize="marquee"
                 tools:ignore="LabelFor" />
 
@@ -64,7 +66,8 @@
                 android:layout_alignStart="@android:id/title"
                 android:layout_gravity="start"
                 android:textAlignment="viewStart"
-                android:textColor="?android:attr/textColorSecondary"
+                android:textColor="?attr/grayTextColor"
+                android:textSize="14sp"
                 android:maxLines="4"
                 style="@style/PreferenceSummaryTextStyle"/>
 

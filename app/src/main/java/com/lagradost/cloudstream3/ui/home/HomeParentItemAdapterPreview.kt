@@ -26,6 +26,7 @@ import com.lagradost.cloudstream3.HomePageList
 import com.lagradost.cloudstream3.LoadResponse
 import com.lagradost.cloudstream3.MainActivity
 import com.lagradost.cloudstream3.R
+import com.lagradost.cloudstream3.fork.PosterMotion
 import com.lagradost.cloudstream3.SearchResponse
 import com.lagradost.cloudstream3.databinding.FragmentHomeHeadBinding
 import com.lagradost.cloudstream3.databinding.FragmentHomeHeadTvBinding
@@ -48,6 +49,7 @@ import com.lagradost.cloudstream3.ui.search.SEARCH_ACTION_LOAD
 import com.lagradost.cloudstream3.ui.search.SEARCH_ACTION_SHOW_METADATA
 import com.lagradost.cloudstream3.ui.search.SearchClickCallback
 import com.lagradost.cloudstream3.ui.settings.Globals.EMULATOR
+import com.lagradost.cloudstream3.ui.settings.Globals.PHONE
 import com.lagradost.cloudstream3.ui.settings.Globals.TV
 import com.lagradost.cloudstream3.ui.settings.Globals.isLayout
 import com.lagradost.cloudstream3.utils.AppContextUtils.html
@@ -479,6 +481,7 @@ class HomeParentItemAdapterPreview(
         private val previewCallback: ViewPager2.OnPageChangeCallback =
             object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
+                    motionPageSelected(position)
                     previewAdapter.apply {
                         if (position >= itemCount - 1 && hasMoreItems) {
                             hasMoreItems = false // don't make two requests
@@ -488,10 +491,53 @@ class HomeParentItemAdapterPreview(
                     val item = previewAdapter.getItemOrNull(position) ?: return
                     onSelect(item, position)
                 }
+
+                override fun onPageScrollStateChanged(state: Int) {
+                    // A poster the user is moving is not moved on by itself
+                    if (state == ViewPager2.SCROLL_STATE_IDLE) scheduleAuto()
+                    else previewViewpager.removeCallbacks(autoAdvance)
+                }
             }
+
+        /** The picture of the big poster that is slowly zooming */
+        private var zoomed: View? = null
+
+        private fun motionPageSelected(position: Int) {
+            previewViewpager.post {
+                val pages = previewViewpager.getChildAt(0) as? RecyclerView
+                val image = pages?.findViewHolderForAdapterPosition(position)
+                    ?.itemView?.findViewById<View>(R.id.home_scroll_preview)
+                if (zoomed !== image) PosterMotion.stopZoom(zoomed)
+                zoomed = image
+                PosterMotion.startZoom(image, position % 2 == 0)
+            }
+            scheduleAuto()
+        }
+
+        private val autoAdvance = Runnable {
+            val count = previewAdapter.itemCount
+            if (count > 1 && previewViewpager.isShown &&
+                previewViewpager.scrollState == ViewPager2.SCROLL_STATE_IDLE
+            ) {
+                val next = previewViewpager.currentItem + 1
+                if (next < count) previewViewpager.setCurrentItem(next, true)
+                else previewViewpager.setCurrentItem(0, false)
+            }
+            scheduleAuto()
+        }
+
+        private fun scheduleAuto() {
+            previewViewpager.removeCallbacks(autoAdvance)
+            if (isLayout(PHONE) && PosterMotion.isOn(previewViewpager.context, PosterMotion.Effect.AUTO)) {
+                previewViewpager.postDelayed(autoAdvance, PosterMotion.AUTO_DELAY_MS)
+            }
+        }
 
         fun onViewDetachedFromWindow() {
             previewViewpager.unregisterOnPageChangeCallback(previewCallback)
+            previewViewpager.removeCallbacks(autoAdvance)
+            PosterMotion.stopZoom(zoomed)
+            zoomed = null
         }
 
         private val toggleList = listOf<Pair<Chip, WatchType>>(
@@ -772,6 +818,7 @@ class HomeParentItemAdapterPreview(
 
         fun onViewAttachedToWindow() {
             previewViewpager.registerOnPageChangeCallback(previewCallback)
+            if (previewAdapter.itemCount > 0) motionPageSelected(previewViewpager.currentItem)
 
             previewViewpager.apply {
                 observe(viewModel.preview) {

@@ -4,13 +4,21 @@
 
     <PreferenceCategory android:title="@string/pref_category_looks">
         <Preference
-            android:icon="@drawable/ic_baseline_color_lens_24"
+            android:icon="@drawable/format_paint_24px"
             android:key="@string/primary_color_key"
             android:title="@string/primary_color_settings" />
         <Preference
             android:icon="@drawable/ic_baseline_color_lens_24"
             android:key="@string/app_theme_key"
             android:title="@string/app_theme_settings" />
+        <Preference
+            android:icon="@drawable/ic_baseline_tv_24"
+            android:key="@string/app_layout_key"
+            android:title="@string/app_layout" />
+        <Preference
+            android:icon="@drawable/animation_24px"
+            android:key="fork_animated_posters"
+            android:title="@string/animated_posters" />
         <Preference
             android:icon="@drawable/title_24px"
             android:key="fork_app_font"
@@ -19,10 +27,9 @@
             android:icon="@drawable/extension_24px"
             android:key="fork_app_icon"
             android:title="@string/app_icon_settings" />
-        <Preference
-            android:icon="@drawable/ic_baseline_tv_24"
-            android:key="@string/app_layout_key"
-            android:title="@string/app_layout" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_category_ui_features">
         <SwitchPreference
             android:defaultValue="true"
             android:icon="@drawable/title_24px"
@@ -53,9 +60,7 @@
             app:min="0"
             app:seekBarIncrement="1"
             app:showSeekBarValue="true" />
-    </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/pref_category_ui_features">
         <Preference
             android:icon="@drawable/ic_baseline_tv_24"
             android:key="@string/poster_ui_key"

@@ -1,5 +1,6 @@
 package com.lagradost.cloudstream3.ui.home
 
+import com.lagradost.cloudstream3.fork.PosterMotion
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
@@ -711,6 +712,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
             homeMasterRecycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     if (isLayout(PHONE)) {
+                        PosterMotion.parallax(recyclerView)
                         // Fab is only relevant to Phone
                         if (dy > 0) { //check for scroll down
                             homeApiFab.shrink() // hide

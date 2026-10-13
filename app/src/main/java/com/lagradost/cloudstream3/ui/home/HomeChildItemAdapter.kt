@@ -1,5 +1,6 @@
 package com.lagradost.cloudstream3.ui.home
 
+import com.lagradost.cloudstream3.fork.PosterMotion
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -209,6 +210,10 @@ open class HomeChildItemAdapter(
         position: Int
     ) {
         applyBinding(holder, position == 0)
+        when (val cardBinding = holder.view) {
+            is HomeResultGridBinding -> PosterMotion.decorateCard(cardBinding.backgroundCard, position)
+            is HomeResultGridExpandedBinding -> PosterMotion.decorateCard(cardBinding.backgroundCard, position)
+        }
 
         SearchResultBuilder.bind(
             clickCallback = { click ->

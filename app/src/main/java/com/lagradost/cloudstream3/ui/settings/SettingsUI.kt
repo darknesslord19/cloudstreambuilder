@@ -13,6 +13,7 @@ import com.lagradost.cloudstream3.CommonActivity
 import com.lagradost.cloudstream3.MainActivity
 import com.lagradost.cloudstream3.fork.ForkFeatures
 import com.lagradost.cloudstream3.fork.Looks
+import com.lagradost.cloudstream3.fork.PosterMotion
 import com.lagradost.cloudstream3.fork.RemoteRules
 import com.lagradost.cloudstream3.R
 import com.lagradost.cloudstream3.SearchQuality
@@ -49,6 +50,47 @@ class SettingsUI : BasePreferenceFragmentCompat() {
         hideKeyboard()
         setPreferencesFromResource(R.xml.settings_ui, rootKey)
         val settingsManager = PreferenceManager.getDefaultSharedPreferences(requireContext())
+
+        // Every choice of the looks says what is chosen
+        fun nameOf(names: Array<String>, values: List<String>, value: String?): String? {
+            val index = values.indexOf(value)
+            return names.getOrNull(if (index >= 0) index else 0)
+        }
+        try {
+            val colorValues = resources.getStringArray(R.array.themes_overlay_names_values).toList()
+            getPref(R.string.primary_color_key)?.summary = nameOf(
+                resources.getStringArray(R.array.themes_overlay_names), colorValues,
+                settingsManager.getString(getString(R.string.primary_color_key), colorValues.firstOrNull())
+            )
+            val themeValues = resources.getStringArray(R.array.themes_names_values).toList()
+            getPref(R.string.app_theme_key)?.summary = nameOf(
+                resources.getStringArray(R.array.themes_names), themeValues,
+                settingsManager.getString(getString(R.string.app_theme_key), themeValues.firstOrNull())
+            )
+            val layoutValues = resources.getIntArray(R.array.app_layout_values).map { it.toString() }
+            getPref(R.string.app_layout_key)?.summary = nameOf(
+                resources.getStringArray(R.array.app_layout), layoutValues,
+                settingsManager.getInt(getString(R.string.app_layout_key), -1).toString()
+            )
+        } catch (t: Throwable) {
+            logError(t)
+        }
+
+        // The moving posters, only there while they are switched on from outside
+        findPreference<Preference>(PosterMotion.PREF_KEY)?.let { pref ->
+            pref.isVisible = PosterMotion.available(requireContext())
+            pref.summary = PosterMotion.summary(requireContext())
+            pref.setOnPreferenceClickListener {
+                val act = activity ?: return@setOnPreferenceClickListener true
+                PosterMotion.pick(act) {
+                    pref.summary = PosterMotion.summary(act)
+                    // The home cards take the change when they are drawn again
+                    HomeChildItemAdapter.sharedPool.clear()
+                    ParentItemAdapter.sharedPool.clear()
+                }
+                return@setOnPreferenceClickListener true
+            }
+        }
 
         (getPref(R.string.overscan_key)?.hideOn(PHONE or EMULATOR) as? SeekBarPreference)?.setOnPreferenceChangeListener { pref, newValue ->
             val padding = (newValue as? Int)?.toPx ?: return@setOnPreferenceChangeListener true
