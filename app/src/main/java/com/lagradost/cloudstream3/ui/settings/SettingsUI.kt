@@ -14,6 +14,7 @@ import com.lagradost.cloudstream3.MainActivity
 import com.lagradost.cloudstream3.fork.ForkFeatures
 import com.lagradost.cloudstream3.fork.Looks
 import com.lagradost.cloudstream3.fork.PosterMotion
+import com.lagradost.cloudstream3.fork.Categories
 import com.lagradost.cloudstream3.fork.RemoteRules
 import com.lagradost.cloudstream3.R
 import com.lagradost.cloudstream3.SearchQuality
@@ -75,6 +76,11 @@ class SettingsUI : BasePreferenceFragmentCompat() {
         } catch (t: Throwable) {
             logError(t)
         }
+
+        // The categories, only there while they are switched on from outside
+        val categoriesOn = Categories.available(requireContext())
+        findPreference<Preference>(Categories.PREF_ICON)?.isVisible = categoriesOn
+        findPreference<Preference>(Categories.PREF_ANIM)?.isVisible = categoriesOn
 
         // The moving posters, only there while they are switched on from outside
         findPreference<Preference>(PosterMotion.PREF_KEY)?.let { pref ->

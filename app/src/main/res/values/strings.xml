@@ -858,4 +858,9 @@
     <string name="motion_parallax">Scroll depth</string>
     <string name="motion_press">Grow on touch</string>
     <string name="motion_off">Off</string>
+    <string name="categories">Categories</string>
+    <string name="categories_icon_settings">Categories icon</string>
+    <string name="categories_icon_des">Show the categories next to the profile picture on the home screen</string>
+    <string name="categories_anim_settings">Moving categories</string>
+    <string name="categories_anim_des">Let the category cards move</string>
 </resources>

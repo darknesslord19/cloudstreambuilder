@@ -27,6 +27,7 @@ import com.lagradost.cloudstream3.LoadResponse
 import com.lagradost.cloudstream3.MainActivity
 import com.lagradost.cloudstream3.R
 import com.lagradost.cloudstream3.fork.PosterMotion
+import com.lagradost.cloudstream3.fork.Categories
 import com.lagradost.cloudstream3.SearchResponse
 import com.lagradost.cloudstream3.databinding.FragmentHomeHeadBinding
 import com.lagradost.cloudstream3.databinding.FragmentHomeHeadTvBinding
@@ -334,6 +335,17 @@ class HomeParentItemAdapterPreview(
 
         private val topPadding: View? = itemView.findViewById(R.id.home_padding)
 
+        private val headCategories: View? = itemView.findViewById(R.id.home_head_categories)
+        private val alternateHeadCategories: View? =
+            itemView.findViewById(R.id.alternate_home_head_categories)
+
+        /** The icon follows the settings and the switch from outside. */
+        private fun updateCategoriesIcon() {
+            val shown = isLayout(PHONE) && Categories.iconShown(itemView.context)
+            headCategories?.isVisible = shown
+            alternateHeadCategories?.isVisible = shown
+        }
+
         private val alternativeAccountPadding: View? =
             itemView.findViewById(R.id.alternative_account_padding)
 
@@ -597,6 +609,14 @@ class HomeParentItemAdapterPreview(
                 activity?.showAccountSelectLinear()
             }
 
+            // The categories, next to the profile picture
+            for (button in listOfNotNull(headCategories, alternateHeadCategories)) {
+                button.setOnClickListener {
+                    (activity as? androidx.fragment.app.FragmentActivity)?.let { Categories.show(it) }
+                }
+            }
+            updateCategoriesIcon()
+
             fun showAccountEditBox(context: Context): Boolean {
                 val currentAccount = DataStoreHelper.getCurrentAccount()
                 return if (currentAccount != null) {
@@ -818,6 +838,7 @@ class HomeParentItemAdapterPreview(
 
         fun onViewAttachedToWindow() {
             previewViewpager.registerOnPageChangeCallback(previewCallback)
+            updateCategoriesIcon()
             if (previewAdapter.itemCount > 0) motionPageSelected(previewViewpager.currentItem)
 
             previewViewpager.apply {

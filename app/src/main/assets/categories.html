@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kategoriler</title>
+<!--
+  Kategoriler: hareketli kategori afişleri; içerikler eklenmiş bütün depolardan toplanır.
+  Uygulamaya: Cats.load(token, spec, page), Cats.open(id), Cats.cancel(), Cats.close(), Cats.animated()
+  Uygulamadan: onCatStart(token, n), onCatResults(token, json), onCatDone(token)
+  Çizgi simgeler: Lucide (ISC lisansı) — https://lucide.dev
+-->
+<style>
+
+  :root {
+    --bg: #0E0B0D; --card: #1A1417; --field: #241B1F; --line: rgba(255, 240, 245, .09);
+    --ink: #FBF1F4; --muted: #A9939C; --accent: #F2A58E; --accent-ink: #2A1410;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); }
+  body { font: 15px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; overflow-x: hidden; }
+  button { font: inherit; color: inherit; }
+  .app { max-width: 520px; margin: 0 auto; min-height: 100vh; position: relative; }
+  .screen { display: none; padding-bottom: 40px; }
+  .screen.on { display: block; animation: in .3s cubic-bezier(.2,.7,.2,1); }
+  @keyframes in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .bar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 8px; padding: 12px; background: linear-gradient(var(--bg) 70%, transparent); }
+  .bar h1 { flex: 1; margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -.3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .icon-btn { flex: none; width: 44px; height: 44px; border-radius: 50%; border: 0; background: transparent; display: grid; place-items: center; color: var(--ink); }
+  .icon-btn:active { background: rgba(255,255,255,.08); }
+  .icon-btn svg { width: 24px; height: 24px; }
+  .hint { margin: 0 16px 14px; color: var(--muted); font-size: 13px; }
+  [hidden] { display: none !important; }
+
+  /* ---------- home mock ---------- */
+  .home { position: relative; height: 380px; overflow: hidden; border-radius: 0 0 22px 22px; }
+  .home .bgimg { position: absolute; inset: 0; background-size: cover; background-position: center; filter: brightness(.6); }
+  .home::after { content: ""; position: absolute; inset: 0; background: linear-gradient(rgba(0,0,0,.4), transparent 30%, transparent 50%, var(--bg)); }
+  .home .top { position: absolute; z-index: 2; top: 0; left: 0; right: 0; display: flex; align-items: center; gap: 4px; padding: 12px; }
+  .home .top .title { flex: 1; text-align: center; font-weight: 700; font-size: 18px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .avatar { flex: none; width: 40px; height: 40px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #6fb2ff, #1b3fa0 70%); border: 2px solid rgba(255,255,255,.25); }
+  .cat-btn { background: rgba(0,0,0,.28); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,.18) !important; }
+  .cat-btn rect { transform-box: fill-box; transform-origin: center; }
+  .anim .cat-btn rect { animation: tile 3.2s ease-in-out infinite; }
+  .anim .cat-btn rect:nth-child(2) { animation-delay: .25s; }
+  .anim .cat-btn rect:nth-child(4) { animation-delay: .5s; }
+  .anim .cat-btn rect:nth-child(3) { animation-delay: .75s; }
+  @keyframes tile { 0%, 30%, 100% { transform: none; fill: transparent; } 12% { transform: scale(.78); fill: var(--accent); } }
+  .home .say { position: absolute; z-index: 2; left: 16px; right: 16px; bottom: 24px; text-align: center; }
+  .home .say b { display: block; font-size: 22px; }
+  .home .say span { color: var(--muted); font-size: 13px; }
+  .tip { position: absolute; z-index: 3; top: 62px; right: 50px; padding: 8px 12px; border-radius: 12px; background: var(--accent); color: var(--accent-ink); font-size: 13px; font-weight: 700; }
+  .tip::after { content: ""; position: absolute; top: -6px; right: 14px; border: 6px solid transparent; border-top: 0; border-bottom-color: var(--accent); }
+
+  /* ---------- cinematic covers ---------- */
+  .grid4 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 4px 16px 6px; perspective: 1000px; }
+  .wide-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 16px; perspective: 1000px; }
+  .cv {
+    position: relative; display: block; width: 100%; overflow: hidden; isolation: isolate; border: 0; padding: 0; cursor: pointer; text-align: left;
+    aspect-ratio: 3 / 4; border-radius: 20px; color: #fff; background: #000;
+    box-shadow: 0 18px 36px -12px rgba(0,0,0,.8), 0 0 0 1px rgba(255,255,255,.07) inset;
+    --tx: 0deg; --ty: 0deg; transform: rotateX(var(--ty)) rotateY(var(--tx)); transition: transform .3s cubic-bezier(.2,.7,.2,1);
+  }
+  .wide-list .cv { aspect-ratio: 16 / 10; border-radius: 16px; }
+  .cv:active { transform: scale(.97); }
+  .anim .grid4 .cv, .anim .wide-list .cv { opacity: 0; animation: rise .7s cubic-bezier(.2,.7,.2,1) forwards; animation-delay: var(--d, 0s); }
+  @keyframes rise { from { opacity: 0; transform: translateY(22px) scale(.96); } to { opacity: 1; transform: none; } }
+  /* the scene, slowly moving like a film camera */
+  .cv .scene { position: absolute; inset: 0; z-index: -6; }
+  .cv .scene i { position: absolute; inset: -6%; background-size: cover; background-position: center; opacity: 0; transition: opacity 1.4s ease; transform: scale(1.08); }
+  .cv .scene i.on { opacity: 1; }
+  .anim .cv .scene i { animation: kb var(--kb, 16s) ease-in-out infinite alternate; }
+  @keyframes kb { from { transform: scale(1.06) translate(var(--fx, -2%), var(--fy, 1%)); } to { transform: scale(1.2) translate(var(--tx2, 2%), var(--ty2, -2%)); } }
+  .cv.noir .scene i { filter: grayscale(1) contrast(1.15) brightness(.9); }
+  /* the colour grade */
+  .cv .grade { position: absolute; inset: 0; z-index: -5; mix-blend-mode: color; opacity: .55; }
+  .cv .tone { position: absolute; inset: 0; z-index: -4; mix-blend-mode: soft-light; opacity: .7; }
+  .cv .shade { position: absolute; inset: 0; z-index: -3;
+    background: linear-gradient(180deg, rgba(0,0,0,.35) 0%, transparent 28%, transparent 42%, rgba(0,0,0,.88) 100%),
+                radial-gradient(120% 90% at 50% 40%, transparent 55%, rgba(0,0,0,.55) 100%); }
+  /* a light leak that drifts */
+  .cv .leak { position: absolute; z-index: -2; width: 120%; aspect-ratio: 1; left: -60%; top: -50%; border-radius: 50%;
+    background: radial-gradient(closest-side, var(--leak, #ffb38a), transparent); mix-blend-mode: screen; opacity: .0; }
+  .anim .cv .leak { animation: leak 11s ease-in-out infinite; animation-delay: calc(var(--d, 0s) * -4); }
+  @keyframes leak { 0%, 100% { transform: translate(0, 0); opacity: .0; } 30% { opacity: .38; } 50% { transform: translate(70%, 40%); opacity: .22; } 75% { opacity: .32; } }
+  /* film grain */
+  .cv .grain { position: absolute; inset: -50%; z-index: -1; opacity: .13; pointer-events: none; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+  .anim .cv .grain { animation: grain .9s steps(5) infinite; }
+  @keyframes grain { 0% { transform: translate(0, 0); } 20% { transform: translate(-8%, 6%); } 40% { transform: translate(6%, -10%); } 60% { transform: translate(-4%, 12%); } 80% { transform: translate(10%, 4%); } 100% { transform: translate(0, 0); } }
+  /* a sheen that passes over now and then */
+  .cv::after { content: ""; position: absolute; inset: -40% -90%; pointer-events: none; opacity: 0; z-index: 3;
+    background: linear-gradient(105deg, transparent 44%, rgba(255,255,255,.16) 50%, transparent 56%); transform: translateX(-60%); }
+  .anim .cv::after { animation: sheen 7s ease-in-out infinite; animation-delay: calc(1.6s + var(--d, 0s) * 2.5); }
+  @keyframes sheen { 0% { transform: translateX(-60%); opacity: 0; } 4% { opacity: 1; } 16%, 100% { transform: translateX(60%); opacity: 0; } }
+  /* glass badge with a line icon */
+  .cv .badge { position: absolute; top: 12px; left: 12px; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
+    background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22); -webkit-backdrop-filter: blur(10px) saturate(1.4); backdrop-filter: blur(10px) saturate(1.4);
+    box-shadow: 0 6px 18px rgba(0,0,0,.35); transform: translateZ(40px); }
+  .wide-list .cv .badge { width: 34px; height: 34px; top: 10px; left: 10px; }
+  .cv .badge svg { width: 20px; height: 20px; stroke: #fff; }
+  .wide-list .cv .badge svg { width: 17px; height: 17px; }
+  .cv .badge svg * { stroke-dasharray: 80; stroke-dashoffset: 0; }
+  .anim .cv .badge svg * { animation: trace 7s ease-in-out infinite; animation-delay: calc(.4s + var(--d, 0s)); }
+  @keyframes trace { 0% { stroke-dashoffset: 80; } 22%, 100% { stroke-dashoffset: 0; } }
+  .anim .cv .badge { animation: badge 7s ease-in-out infinite; animation-delay: calc(.4s + var(--d, 0s)); }
+  @keyframes badge { 0%, 100% { box-shadow: 0 6px 18px rgba(0,0,0,.35); } 20% { box-shadow: 0 0 0 6px rgba(255,255,255,.08), 0 6px 22px var(--leak, #fff); } }
+  .cv .txt { position: absolute; left: 14px; right: 12px; bottom: 14px; transform: translateZ(30px); }
+  .wide-list .cv .txt { left: 12px; bottom: 10px; }
+  .cv .txt small { display: block; font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.72); }
+  .cv .txt b { display: block; margin-top: 2px; font-size: clamp(20px, 6vw, 27px); line-height: 1.02; font-weight: 900; letter-spacing: -.01em; text-transform: uppercase; text-shadow: 0 2px 18px rgba(0,0,0,.6); }
+  .wide-list .cv .txt b { font-size: 16px; letter-spacing: .02em; }
+  .cv .txt .rule { display: block; height: 3px; width: 0; margin-top: 8px; border-radius: 3px; background: linear-gradient(90deg, var(--leak, #fff), transparent); }
+  .anim .cv .txt .rule { animation: rule 1s cubic-bezier(.2,.7,.2,1) forwards; animation-delay: calc(.35s + var(--d, 0s)); }
+  .cv:not(.wide) .txt .rule { width: 0; }
+  body:not(.anim) .cv .txt .rule { width: 46%; }
+  @keyframes rule { to { width: 46%; } }
+  .wide-list .cv .txt .rule { display: none; }
+
+  .section-title { display: flex; align-items: baseline; justify-content: space-between; margin: 24px 16px 10px; }
+  .section-title h2 { margin: 0; font-size: 17px; font-weight: 800; }
+  .section-title small { color: var(--muted); }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 16px; }
+  .chip { min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--field); color: var(--ink); font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; }
+  .chip.on { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+
+  /* ---------- results ---------- */
+  .sources { display: flex; gap: 8px; overflow-x: auto; padding: 0 16px 10px; scrollbar-width: none; }
+  .sources::-webkit-scrollbar { display: none; }
+  .sources .chip { flex: none; }
+  .posters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 4px 16px; }
+  .poster { position: relative; aspect-ratio: 2 / 3; border-radius: 12px; overflow: hidden; background: var(--card); animation: rise .45s cubic-bezier(.2,.7,.2,1); }
+  .poster .p-art { position: absolute; inset: 0; background-size: cover; background-position: center; }
+  .poster::after { content: ""; position: absolute; inset: 0; background: linear-gradient(transparent 55%, rgba(0,0,0,.85)); }
+  .poster .p-name { position: absolute; z-index: 1; left: 6px; right: 6px; bottom: 6px; font-size: 12px; font-weight: 700; }
+  .poster .p-src { position: absolute; z-index: 1; top: 6px; left: 6px; max-width: calc(100% - 12px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 2px 7px; border-radius: 999px; background: rgba(0,0,0,.6); font-size: 10px; }
+  .loading { display: flex; align-items: center; gap: 10px; margin: 6px 16px 12px; color: var(--muted); font-size: 13px; }
+  .bar-p { flex: 1; height: 4px; border-radius: 999px; background: rgba(255,255,255,.1); overflow: hidden; }
+  .bar-p i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .3s ease; }
+
+  /* ---------- editor ---------- */
+  .card { margin: 0 16px 12px; border-radius: 22px; background: var(--card); overflow: hidden; }
+  .row { display: flex; align-items: center; gap: 14px; min-height: 70px; padding: 10px 14px; border-top: 1px solid rgba(0,0,0,.35); }
+  .row:first-child { border-top: 0; }
+  .row .t { flex: 1; min-width: 0; cursor: pointer; }
+  .row .t b { display: block; }
+  .row .t span { color: var(--muted); font-size: 13px; }
+  .row .mini { flex: none; width: 46px; cursor: pointer; }
+  .row .mini .cv { border-radius: 10px; box-shadow: none; }
+  .row .mini .cv .txt, .row .mini .cv .badge { display: none; }
+  .switch { flex: none; width: 50px; height: 30px; border-radius: 999px; border: 0; background: rgba(255,255,255,.18); position: relative; }
+  .switch::after { content: ""; position: absolute; top: 4px; left: 4px; width: 22px; height: 22px; border-radius: 50%; background: #fff; transition: transform .2s; }
+  .switch[aria-checked="true"] { background: var(--accent); }
+  .switch[aria-checked="true"]::after { transform: translateX(20px); }
+  .pin { flex: none; min-height: 34px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--field); font-size: 12px; font-weight: 700; color: var(--muted); }
+  .pin.on { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+  .add { display: flex; align-items: center; justify-content: center; gap: 8px; width: calc(100% - 32px); margin: 4px 16px 16px; min-height: 52px; border-radius: 16px; border: 1.5px dashed var(--accent); background: transparent; color: var(--accent); font-weight: 700; }
+
+  .sheet-back { position: fixed; inset: 0; z-index: 20; background: rgba(0,0,0,.6); display: none; }
+  .sheet-back.on { display: block; }
+  .sheet { position: fixed; z-index: 21; left: 0; right: 0; bottom: 0; max-width: 520px; margin: 0 auto; max-height: 92vh; overflow-y: auto;
+    background: var(--bg); border-radius: 24px 24px 0 0; padding: 8px 16px 24px; transform: translateY(105%); visibility: hidden;
+    transition: transform .3s cubic-bezier(.2,.7,.2,1), visibility 0s .3s; }
+  .sheet.on { transform: none; visibility: visible; transition: transform .3s cubic-bezier(.2,.7,.2,1); }
+  .grab { width: 40px; height: 4px; border-radius: 999px; background: rgba(255,255,255,.2); margin: 6px auto 12px; }
+  .sheet h3 { margin: 0 0 12px; font-size: 18px; }
+  .field { display: block; margin-bottom: 16px; }
+  .field > span { display: block; margin-bottom: 8px; color: var(--muted); font-size: 13px; }
+  .field input { width: 100%; min-height: 48px; padding: 0 14px; border-radius: 14px; border: 1px solid var(--line); background: var(--field); color: var(--ink); font: inherit; }
+  .field input:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+  .scenes { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .scenes button { position: relative; aspect-ratio: 16 / 10; border-radius: 10px; border: 2px solid transparent; background-origin: border-box; padding: 0; overflow: hidden; background-size: cover; background-position: center; }
+  .scenes button.on { border-color: var(--accent); box-shadow: 0 0 0 2px var(--bg) inset; }
+  .scenes button small { position: absolute; left: 0; right: 0; bottom: 0; padding: 8px 4px 3px; font-size: 9px; font-weight: 700; color: #fff; background: linear-gradient(transparent, rgba(0,0,0,.75)); text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .scenes .auto { display: grid; place-items: center; background: var(--field); color: var(--ink); font-size: 11px; font-weight: 700; padding: 4px; text-align: center; }
+  .grades { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+  .grades button { position: relative; display: block; width: 100%; aspect-ratio: 1; border-radius: 50%; border: 2px solid transparent; padding: 0; }
+  .grades button.on { border-color: #fff; box-shadow: 0 0 0 3px var(--accent); }
+  .grades small { display: block; text-align: center; font-size: 10px; color: var(--muted); margin-top: 4px; }
+  .grades div { text-align: center; }
+  .icons { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+  .icons button { aspect-ratio: 1; border-radius: 12px; border: 1px solid var(--line); background: var(--field); padding: 9px; display: grid; place-items: center; }
+  .icons button svg { width: 100%; height: 100%; stroke: var(--ink); }
+  .icons button.on { background: var(--accent); border-color: transparent; }
+  .icons button.on svg { stroke: var(--accent-ink); }
+  .preview { display: flex; justify-content: center; margin: 4px 0 16px; }
+  .preview > div { width: 52%; }
+  .actions { display: flex; gap: 10px; }
+  .btn { flex: 1; min-height: 50px; border-radius: 14px; border: 0; font-weight: 800; }
+  .btn.main { background: var(--accent); color: var(--accent-ink); }
+  .btn.ghost { background: var(--field); color: var(--ink); }
+  .btn.danger { background: rgba(248,113,113,.14); color: #f87171; }
+  .err { color: #f87171; font-size: 13px; margin: -8px 0 12px; }
+  .toast { position: fixed; left: 50%; bottom: 26px; z-index: 30; transform: translate(-50%, 20px); opacity: 0; padding: 10px 16px; border-radius: 999px; background: var(--ink); color: var(--bg); font-size: 14px; transition: .2s; pointer-events: none; }
+  .toast.on { opacity: 1; transform: translate(-50%, 0); }
+
+  .more { display: flex; align-items: center; justify-content: center; gap: 8px; width: calc(100% - 32px); margin: 16px; min-height: 50px; border-radius: 16px; border: 1px solid var(--line); background: var(--field); color: var(--ink); font-weight: 700; }
+  .empty { margin: 30px 24px; text-align: center; color: var(--muted); }
+  .empty b { display: block; color: var(--ink); font-size: 17px; margin-bottom: 6px; }
+  .poster img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .poster .p-q { position: absolute; z-index: 1; top: 6px; right: 6px; padding: 1px 6px; border-radius: 6px; background: var(--accent); color: var(--accent-ink); font-size: 9px; font-weight: 800; }
+  .poster { cursor: pointer; }
+  .poster:active { transform: scale(.97); }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <section class="screen on" id="s-cats">
+    <div class="bar">
+      <button class="icon-btn" id="closePage" aria-label="Kapat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <h1>Kategoriler</h1>
+      <button class="icon-btn" id="openEdit" aria-label="Düzenle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button>
+    </div>
+    <p class="hint">Eklediğin bütün depolardan toplanır.</p>
+    <div class="grid4" id="pinned"></div>
+    <div class="section-title"><h2>Tüm kategoriler</h2><small id="allCount"></small></div>
+    <div class="wide-list" id="others"></div>
+  </section>
+
+  <section class="screen" id="s-list">
+    <div class="bar">
+      <button class="icon-btn" data-back aria-label="Geri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <h1 id="listTitle"></h1>
+    </div>
+    <div class="loading" id="loading"><span id="loadText"></span><span class="bar-p"><i id="loadBar"></i></span></div>
+    <div class="sources" id="sources"></div>
+    <div class="posters" id="posters"></div>
+    <div class="empty" id="empty" hidden><b>Bir şey bulunamadı</b>Depolarında bu kategoriye uyan bölüm yok. Kategoriyi düzenleyip anahtar kelimeleri değiştirmeyi dene.</div>
+    <button class="more" id="more" hidden>Daha fazla yükle</button>
+  </section>
+
+  <section class="screen" id="s-edit">
+    <div class="bar">
+      <button class="icon-btn" data-back aria-label="Geri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <h1>Kategorileri düzenle</h1>
+      <button class="icon-btn" id="resetAll" aria-label="Varsayılana dön"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v5h5"/></svg></button>
+    </div>
+    <p class="hint">"Ana ekran" işaretli 4 kategori büyük afiş olarak üstte durur. Birine dokunup adını, içeriğini, sahnesini, renk tonunu ve simgesini değiştirebilirsin.</p>
+    <div class="card" id="editList"></div>
+    <button class="add" id="addCat"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Kategori ekle</button>
+  </section>
+</div>
+
+<div class="sheet-back" id="sheetBack"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="grab"></div>
+  <h3 id="sheetTitle">Kategori</h3>
+  <div class="preview"><div id="preview"></div></div>
+  <label class="field"><span>Adı</span><input id="fName" maxlength="24" placeholder="Örn. Fantastik"></label>
+  <div class="field"><span>İçerik</span><div class="chips" id="fKind" style="padding:0"></div></div>
+  <label class="field" id="fKeysWrap"><span>Anahtar kelimeler (virgülle) — depolardaki bölüm adlarıyla eşleşir</span><input id="fKeys" placeholder="fantastik, fantasy"></label>
+  <div class="field"><span>Sahne</span><div class="scenes" id="fScenes"></div></div>
+  <label class="field" id="fLinkWrap" hidden><span>Resim bağlantısı (https://…)</span><input id="fLink" inputmode="url" placeholder="https://…/afis.jpg"></label>
+  <div class="field"><span>Renk tonu (10 premium ton)</span><div class="grades" id="fGrades"></div></div>
+  <div class="field"><span>Simge</span><div class="icons" id="fIcons"></div></div>
+  <p class="err" id="fErr" hidden></p>
+  <div class="actions">
+    <button class="btn danger" id="fDelete">Sil</button>
+    <button class="btn ghost" id="fCancel">Vazgeç</button>
+    <button class="btn main" id="fSave">Kaydet</button>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+var SCENES = {"Aksiyon": "categories/scenes/aksiyon.webp", "Macera": "categories/scenes/macera.webp", "Komedi": "categories/scenes/komedi.webp", "Suç": "categories/scenes/suc.webp", "Animasyon": "categories/scenes/animasyon.webp", "Belgesel": "categories/scenes/belgesel.webp", "Dram": "categories/scenes/dram.webp", "Aile": "categories/scenes/aile.webp", "Fantastik": "categories/scenes/fantastik.webp", "Tarih": "categories/scenes/tarih.webp", "Dövüş Sanatları": "categories/scenes/dovus-sanatlari.webp", "Müzikal": "categories/scenes/muzikal.webp", "Gizem": "categories/scenes/gizem.webp", "Bilim Kurgu": "categories/scenes/bilim-kurgu.webp", "Spor": "categories/scenes/spor.webp", "Stand-Up Komedisi": "categories/scenes/stand-up-komedisi.webp", "Süper Kahraman": "categories/scenes/super-kahraman.webp", "Gerilim": "categories/scenes/gerilim.webp", "Savaş": "categories/scenes/savas.webp", "Vahşi Batı": "categories/scenes/vahsi-bati.webp"};
+var LINE = {"film": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"m12.296 3.464 3.02 3.956\" />\n  <path d=\"M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3z\" />\n  <path d=\"M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\" />\n  <path d=\"m6.18 5.276 3.1 3.899\" />\n</svg>", "tv": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"m17 2-5 5-5-5\" />\n  <rect width=\"20\" height=\"15\" x=\"2\" y=\"7\" rx=\"2\" />\n</svg>", "anim": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z\" />\n  <path d=\"M20 2v4\" />\n  <path d=\"M22 4h-4\" />\n  <circle cx=\"4\" cy=\"20\" r=\"2\" />\n</svg>", "new": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"M12 3q1 4 4 6.5t3 5.5a1 1 0 0 1-14 0 5 5 0 0 1 1-3 1 1 0 0 0 5 0c0-2-1.5-3-1.5-5q0-2 2.5-4\" />\n</svg>", "popcorn": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"M18 8a2 2 0 0 0 0-4 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0 0 4\" />\n  <path d=\"M10 22 9 8\" />\n  <path d=\"m14 22 1-14\" />\n  <path d=\"M20 8c.5 0 .9.4.8 1l-2.6 12c-.1.5-.7 1-1.2 1H7c-.6 0-1.1-.4-1.2-1L3.2 9c-.1-.6.3-1 .8-1Z\" />\n</svg>", "action": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z\" />\n</svg>", "war": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"m13 19 6-6\" />\n  <path d=\"M14.5 17.5 3.586 6.586A2 2 0 013 5.172V3h2.172a2 2 0 011.414.586L17.5 14.5\" />\n  <path d=\"m14.828 6.172 2.586-2.586A2 2 0 0118.828 3H21v2.172a2 2 0 01-.586 1.414l-2.586 2.586\" />\n  <path d=\"m16 16 4 4\" />\n  <path d=\"m19 21 2-2\" />\n  <path d=\"m5 14 4 4\" />\n  <path d=\"m5 21-2-2\" />\n  <path d=\"M7.5 16.5 4 20\" />\n</svg>", "adventure": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <circle cx=\"12\" cy=\"12\" r=\"10\" />\n  <path d=\"m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z\" />\n</svg>", "fantasy": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72\" />\n  <path d=\"m14 7 3 3\" />\n  <path d=\"M5 6v4\" />\n  <path d=\"M19 14v4\" />\n  <path d=\"M10 2v2\" />\n  <path d=\"M7 8H3\" />\n  <path d=\"M21 16h-4\" />\n  <path d=\"M11 3H9\" />\n</svg>", "scifi": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5\" />\n  <path d=\"M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09\" />\n  <path d=\"M9 12a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.4 22.4 0 0 1-4 2z\" />\n  <path d=\"M9 12H4s.55-3.03 2-4c1.62-1.08 5 .05 5 .05\" />\n</svg>", "space": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"M20.341 6.484A10 10 0 0 1 10.266 21.85\" />\n  <path d=\"M3.659 17.516A10 10 0 0 1 13.74 2.152\" />\n  <circle cx=\"12\" cy=\"12\" r=\"3\" />\n  <circle cx=\"19\" cy=\"5\" r=\"2\" />\n  <circle cx=\"5\" cy=\"19\" r=\"2\" />\n</svg>", "hero": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\" />\n</svg>", "comedy": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"M15 10V9\" />\n  <path d=\"M7.084 14.302a5.12 5.12 0 009.833 0 .24.24 0 00-.235-.302H7.32a.24.24 0 00-.235.302\" />\n  <path d=\"M9 10V9\" />\n  <circle cx=\"12\" cy=\"12\" r=\"10\" />\n</svg>", "standup": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"m11 7.601-5.994 8.19a1 1 0 0 0 .1 1.298l.817.818a1 1 0 0 0 1.314.087L15.09 12\" />\n  <path d=\"M16.5 21.174C15.5 20.5 14.372 20 13 20c-2.058 0-3.928 2.356-6 2-2.072-.356-2.775-3.369-1.5-4.5\" />\n  <circle cx=\"16\" cy=\"7\" r=\"5\" />\n</svg>", "horror": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"M15 10v1\" />\n  <path d=\"M7.528 20.472a1.6 1.6 0 012.277 0l1.057 1.056a1.6 1.6 0 002.276 0l1.057-1.056a1.6 1.6 0 012.277 0l1.114 1.114a1.4 1.4 0 002.414-1V10a8 8 0 00-16 0v10.586a1.4 1.4 0 002.414 1z\" />\n  <path d=\"M9 10v1\" />\n</svg>", "skull": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"m12.5 17-.5-1-.5 1h1z\" />\n  <path d=\"M15 22a1 1 0 0 0 1-1v-1a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20v1a1 1 0 0 0 1 1z\" />\n  <circle cx=\"15\" cy=\"12\" r=\"1\" />\n  <circle cx=\"9\" cy=\"12\" r=\"1\" />\n</svg>", "thriller": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5\" />\n  <path d=\"M3.22 13H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27\" />\n</svg>", "mystery": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"M5 22h14\" />\n  <path d=\"M5 2h14\" />\n  <path d=\"M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22\" />\n  <path d=\"M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2\" />\n</svg>", "drama": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"M10 11h.01\" />\n  <path d=\"M14 6h.01\" />\n  <path d=\"M18 6h.01\" />\n  <path d=\"M6.5 13.1h.01\" />\n  <path d=\"M22 5c0 9-4 12-6 12s-6-3-6-12c0-2 2-3 6-3s6 1 6 3\" />\n  <path d=\"M17.4 9.9c-.8.8-2 .8-2.8 0\" />\n  <path d=\"M10.1 7.1C9 7.2 7.7 7.7 6 8.6c-3.5 2-4.7 3.9-3.7 5.6 4.5 7.8 9.5 8.4 11.2 7.4.9-.5 1.9-2.1 1.9-4.7\" />\n  <path d=\"M9.1 16.5c.3-1.1 1.4-1.7 2.4-1.4\" />\n</svg>", "crime": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"m21 21-4.34-4.34\" />\n  <circle cx=\"11\" cy=\"11\" r=\"8\" />\n</svg>", "police": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"M7 18v-6a5 5 0 1 1 10 0v6\" />\n  <path d=\"M5 21a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2z\" />\n  <path d=\"M21 12h1\" />\n  <path d=\"M18.5 4.5 18 5\" />\n  <path d=\"M2 12h1\" />\n  <path d=\"M12 2v1\" />\n  <path d=\"m4.929 4.929.707.707\" />\n  <path d=\"M12 12v6\" />\n</svg>", "romance": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5\" />\n</svg>", "doc": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <circle cx=\"12\" cy=\"12\" r=\"10\" />\n  <path d=\"M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20\" />\n  <path d=\"M2 12h20\" />\n</svg>", "history": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"M10 18v-7\" />\n  <path d=\"M11.119 2.205a2 2 0 0 1 1.762 0l7.84 3.846A.5.5 0 0 1 20.5 7h-17a.5.5 0 0 1-.22-.949z\" />\n  <path d=\"M14 18v-7\" />\n  <path d=\"M18 18v-7\" />\n  <path d=\"M3 22h18\" />\n  <path d=\"M6 18v-7\" />\n</svg>", "local": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"M18 5h4\" />\n  <path d=\"M20 3v4\" />\n  <path d=\"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401\" />\n</svg>", "family": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5\" />\n  <path d=\"M15 12h.01\" />\n  <path d=\"M19.38 6.813A9 9 0 0 1 20.8 10.2a2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 2.5c-.8 0-1.5-.4-1.5-1\" />\n  <path d=\"M9 12h.01\" />\n</svg>", "kids": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.72.23 6.5 2.23A9.04 9.04 0 0 1 12 5Z\" />\n  <path d=\"M8 14v.5\" />\n  <path d=\"M16 14v.5\" />\n  <path d=\"M11.25 16.25h1.5L12 17l-.75-.75Z\" />\n</svg>", "sport": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"M11 7a16 16 20 0 1 10.98 4.362\" />\n  <path d=\"M12 12a13 13 0 0 1-8.66 5\" />\n  <path d=\"M16.83 13.634a16 16 0 0 1-9.267 7.328\" />\n  <path d=\"M20.66 17A13 13 0 0 0 12 12a13 13 0 0 1 0-10\" />\n  <path d=\"M8.17 15.366a16 16 0 0 1-1.713-11.69\" />\n  <circle cx=\"12\" cy=\"12\" r=\"10\" />\n</svg>", "martial": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"M17.596 12.768a2 2 0 1 0 2.829-2.829l-1.768-1.767a2 2 0 0 0 2.828-2.829l-2.828-2.828a2 2 0 0 0-2.829 2.828l-1.767-1.768a2 2 0 1 0-2.829 2.829z\" />\n  <path d=\"m2.5 21.5 1.4-1.4\" />\n  <path d=\"m20.1 3.9 1.4-1.4\" />\n  <path d=\"M5.343 21.485a2 2 0 1 0 2.829-2.828l1.767 1.768a2 2 0 1 0 2.829-2.829l-6.364-6.364a2 2 0 1 0-2.829 2.829l1.768 1.767a2 2 0 0 0-2.828 2.829z\" />\n  <path d=\"m9.6 14.4 4.8-4.8\" />\n</svg>", "asia": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"M12 5a3 3 0 1 1 3 3m-3-3a3 3 0 1 0-3 3m3-3v1M9 8a3 3 0 1 0 3 3M9 8h1m5 0a3 3 0 1 1-3 3m3-3h-1m-2 3v-1\" />\n  <circle cx=\"12\" cy=\"8\" r=\"2\" />\n  <path d=\"M12 10v12\" />\n  <path d=\"M12 22c4.2 0 7-1.667 7-5-4.2 0-7 1.667-7 5Z\" />\n  <path d=\"M12 22c-4.2 0-7-1.667-7-5 4.2 0 7 1.667 7 5Z\" />\n</svg>", "music": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"M9 18V5l12-2v13\" />\n  <path d=\"m9 9 12-2\" />\n  <circle cx=\"6\" cy=\"18\" r=\"3\" />\n  <circle cx=\"18\" cy=\"16\" r=\"3\" />\n</svg>", "western": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"m8 3 4 8 5-5 5 15H2L8 3z\" />\n  <path d=\"M4.14 15.08c2.62-1.57 5.24-1.43 7.86.42 2.74 1.94 5.49 2 8.23.19\" />\n</svg>", "award": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"M10 14.66V17a1 1 0 0 1-1 1 2 2 0 0 0-2 2v2\" />\n  <path d=\"M14 14.66V17a1 1 0 0 0 1 1 2 2 0 0 1 2 2v2\" />\n  <path d=\"M17.916 10H19.5A2.5 2.5 0 0 0 22 7.5V5a1 1 0 0 0-1-1h-3\" />\n  <path d=\"M4 22h16\" />\n  <path d=\"M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z\" />\n  <path d=\"M6.084 10H4.5A2.5 2.5 0 0 1 2 7.5V5a1 1 0 0 1 1-1h3\" />\n</svg>", "crown": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z\" />\n  <path d=\"M5 21h14\" />\n</svg>", "castle": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"M10 5V3\" />\n  <path d=\"M14 5V3\" />\n  <path d=\"M15 21v-3a3 3 0 0 0-6 0v3\" />\n  <path d=\"M18 3v8\" />\n  <path d=\"M18 5H6\" />\n  <path d=\"M22 11H2\" />\n  <path d=\"M22 9v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9\" />\n  <path d=\"M6 3v8\" />\n</svg>"};
+(function () {
+  var app = window.CloudStream, native = window.Cats;
+  var STILLS = SCENES;
+  var KINDS = [
+    { id: 'movie', name: 'Filmler' }, { id: 'series', name: 'Diziler' }, { id: 'anime', name: 'Animasyon' },
+    { id: 'new', name: 'Yeni çıkanlar' }, { id: 'genre', name: 'Tür / anahtar kelime' }
+  ];
+  var GRADES = [
+    { name: 'Sinema', color: 'linear-gradient(160deg, #ff3b3b, #5a0010)', tone: 'linear-gradient(180deg, #ff9a6b, #2a0008)', leak: '#ff8a6b' },
+    { name: 'Neon', color: 'linear-gradient(150deg, #ff2e97, #3a0ca3)', tone: 'linear-gradient(200deg, #00e5ff, #ff2e97)', leak: '#7df9ff' },
+    { name: 'Altın', color: 'linear-gradient(160deg, #ffcc66, #6b4400)', tone: 'linear-gradient(180deg, #ffe7a3, #3a2600)', leak: '#ffd27a' },
+    { name: 'Aurora', color: 'linear-gradient(160deg, #20e3b2, #6a3dff)', tone: 'linear-gradient(200deg, #9ff5cf, #3a1d8f)', leak: '#7dffd2' },
+    { name: 'Gece', color: 'linear-gradient(170deg, #3b6bff, #08122e)', tone: 'linear-gradient(180deg, #9ec5ff, #050a1c)', leak: '#8fb6ff' },
+    { name: 'Lav', color: 'linear-gradient(170deg, #ff7a18, #8a0e00)', tone: 'linear-gradient(0deg, #ffb000, #3a0500)', leak: '#ffb347' },
+    { name: 'Okyanus', color: 'linear-gradient(165deg, #00c6ff, #003a52)', tone: 'linear-gradient(180deg, #8fe3ff, #002233)', leak: '#6fd3ff' },
+    { name: 'Mor sis', color: 'linear-gradient(160deg, #b26bff, #2a0a45)', tone: 'linear-gradient(200deg, #e4bfff, #1a0630)', leak: '#d9a6ff' },
+    { name: 'Retro', color: 'linear-gradient(180deg, #ffb347, #ff5e62 50%, #6a1b5f)', tone: 'linear-gradient(180deg, #fff1c1, #6a1b5f)', leak: '#ffc38a' },
+    { name: 'Noir', color: 'none', tone: 'linear-gradient(180deg, #ffffff, #000000)', leak: '#ffffff', noir: true }
+  ];
+  var ICON_NAMES = { film: 'Film', tv: 'Dizi', anim: 'Animasyon', new: 'Yeni', popcorn: 'Popcorn', action: 'Aksiyon', war: 'Savaş', adventure: 'Macera',
+    fantasy: 'Fantastik', scifi: 'Bilim kurgu', space: 'Uzay', hero: 'Süper kahraman', comedy: 'Komedi', standup: 'Stand-up', horror: 'Korku',
+    skull: 'Kafatası', thriller: 'Gerilim', mystery: 'Gizem', drama: 'Dram', crime: 'Suç', police: 'Polisiye', romance: 'Romantik', doc: 'Belgesel',
+    history: 'Tarih', local: 'Yerli', family: 'Aile', kids: 'Çocuk', sport: 'Spor', martial: 'Dövüş', asia: 'Asya', music: 'Müzik',
+    western: 'Vahşi batı', award: 'Ödüllü', crown: 'Kraliyet', castle: 'Kale' };
+  var AUTO_ICON = [
+    [/yeni|new|vizyon/i, 'new'], [/dizi|series/i, 'tv'], [/film|movie|sinema/i, 'film'], [/anim|anime|çizgi/i, 'anim'],
+    [/süper|hero|kahraman/i, 'hero'], [/aksiyon|action/i, 'action'], [/savaş|war/i, 'war'], [/macera|adventure/i, 'adventure'],
+    [/fantastik|fantasy/i, 'fantasy'], [/bilim|sci|uzay/i, 'scifi'], [/stand/i, 'standup'], [/komedi|comedy/i, 'comedy'], [/korku|horror/i, 'horror'],
+    [/gerilim|thriller/i, 'thriller'], [/dram|drama/i, 'drama'], [/suç|crime|polisiye/i, 'crime'], [/roman|aşk|love/i, 'romance'],
+    [/belgesel|doc/i, 'doc'], [/yerli|türk/i, 'local'], [/aile|family/i, 'family'], [/spor|sport/i, 'sport'], [/kore|asya|japon/i, 'asia'],
+    [/müzik|music/i, 'music'], [/tarih|history/i, 'history'], [/gizem|mystery/i, 'mystery'], [/batı|western/i, 'western'], [/dövüş|martial/i, 'martial']
+  ];
+  var AUTO_SCENE = { movie: ['Aksiyon', 'Süper Kahraman', 'Macera'], series: ['Dram', 'Suç', 'Gizem'], anime: ['Animasyon', 'Aile', 'Fantastik'], new: ['Süper Kahraman', 'Bilim Kurgu', 'Fantastik'] };
+  var DEFAULTS = [
+    { name: 'Filmler', kind: 'movie', keys: '', scene: 'auto', grade: 0, pinned: true },
+    { name: 'Diziler', kind: 'series', keys: '', scene: 'auto', grade: 4, pinned: true },
+    { name: 'Animasyon', kind: 'anime', keys: 'animasyon, anime, çizgi', scene: 'auto', grade: 1, pinned: true },
+    { name: 'Yeni Çıkanlar', kind: 'new', keys: '', scene: 'auto', grade: 2, pinned: true },
+    { name: 'Aksiyon', kind: 'genre', keys: 'aksiyon, action', scene: 'Aksiyon', grade: 5 },
+    { name: 'Macera', kind: 'genre', keys: 'macera, adventure', scene: 'Macera', grade: 3 },
+    { name: 'Fantastik', kind: 'genre', keys: 'fantastik, fantasy', scene: 'Fantastik', grade: 7 },
+    { name: 'Bilim Kurgu', kind: 'genre', keys: 'bilim kurgu, bilim-kurgu, sci-fi', scene: 'Bilim Kurgu', grade: 6 },
+    { name: 'Komedi', kind: 'genre', keys: 'komedi, comedy', scene: 'Komedi', grade: 8 },
+    { name: 'Gerilim', kind: 'genre', keys: 'gerilim, thriller', scene: 'Gerilim', grade: 9 },
+    { name: 'Korku', kind: 'genre', keys: 'korku, horror', scene: 'Gizem', grade: 9, icon: 'horror' },
+    { name: 'Suç', kind: 'genre', keys: 'suç, crime, polisiye', scene: 'Suç', grade: 0 },
+    { name: 'Dram', kind: 'genre', keys: 'dram, drama', scene: 'Dram', grade: 4 },
+    { name: 'Romantik', kind: 'genre', keys: 'romantik, romance, aşk', scene: 'Müzikal', grade: 1, icon: 'romance' },
+    { name: 'Gizem', kind: 'genre', keys: 'gizem, mystery', scene: 'Gizem', grade: 7 },
+    { name: 'Savaş', kind: 'genre', keys: 'savaş, war', scene: 'Savaş', grade: 9 },
+    { name: 'Süper Kahraman', kind: 'genre', keys: 'süper kahraman, superhero, marvel, dc', scene: 'Süper Kahraman', grade: 1 },
+    { name: 'Tarih', kind: 'genre', keys: 'tarih, history', scene: 'Tarih', grade: 2 },
+    { name: 'Belgesel', kind: 'genre', keys: 'belgesel, documentary', scene: 'Belgesel', grade: 6 },
+    { name: 'Aile', kind: 'genre', keys: 'aile, family', scene: 'Aile', grade: 2 },
+    { name: 'Yerli', kind: 'genre', keys: 'yerli, türk', scene: 'Dram', grade: 0, icon: 'local' },
+    { name: 'Spor', kind: 'genre', keys: 'spor, sport', scene: 'Spor', grade: 5 }
+  ];
+  var SCENE_NAMES = Object.keys(STILLS);
+  var KEY = 'fork-categories-v1', SCENE_KEY = 'fork-category-scenes-v1';
+
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  function load(key, fallback) { try { var v = JSON.parse(localStorage.getItem(key)); return v == null ? fallback : v; } catch (e) { return fallback; } }
+  function store(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {} }
+  var cats = load(KEY, null);
+  if (!Array.isArray(cats) || !cats.length) cats = clone(DEFAULTS);
+  var seen = load(SCENE_KEY, {}); if (typeof seen !== 'object' || !seen) seen = {};
+  var counts = load('fork-category-counts-v1', {}); if (typeof counts !== 'object' || !counts) counts = {};
+  function save() { store(KEY, cats); }
+
+  var animated = true;
+  try { animated = native ? native.animated() : true; } catch (e) {}
+  document.body.classList.toggle('anim', animated);
+  // The accent of the app theme
+  try {
+    var theme = app && app.theme ? JSON.parse(app.theme()) : {};
+    if (theme.accent && /^#[0-9a-f]{6}$/i.test(theme.accent)) {
+      document.documentElement.style.setProperty('--accent', theme.accent);
+      var n = parseInt(theme.accent.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+      document.documentElement.style.setProperty('--accent-ink', (r * 299 + g * 587 + b * 114) / 1000 > 150 ? '#111' : '#fff');
+    }
+  } catch (e) {}
+
+  function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function hash(s) { var h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return Math.abs(h); }
+  function iconOf(c) {
+    if (c.icon && LINE[c.icon]) return c.icon;
+    var text = c.name + ' ' + (c.kind === 'genre' ? c.keys : c.kind);
+    for (var i = 0; i < AUTO_ICON.length; i++) if (AUTO_ICON[i][0].test(text)) return AUTO_ICON[i][1];
+    return 'popcorn';
+  }
+  function scenesOf(c) {
+    if (c.scene === 'url') return c.url ? [c.url] : [];
+    if (c.scene === 'auto') {
+      // The posters of what was found last time, else bundled scenes
+      var posters = seen[c.name];
+      if (posters && posters.length) return posters;
+      var list = AUTO_SCENE[c.kind];
+      if (!list) list = [SCENE_NAMES[hash(c.name) % SCENE_NAMES.length], SCENE_NAMES[(hash(c.name) + 7) % SCENE_NAMES.length]];
+      return list.map(function (n) { return STILLS[n]; });
+    }
+    return [STILLS[c.scene] || STILLS[SCENE_NAMES[0]]];
+  }
+
+  // ---------------------------------------------------------------- a cover
+  var rotators = [];
+  function cover(c, index, wide, count) {
+    var g = GRADES[c.grade || 0] || GRADES[0];
+    var b = el('button', 'cv' + (g.noir ? ' noir' : '') + (wide ? ' wide' : ''));
+    b.style.setProperty('--d', ((index || 0) * 0.09) + 's');
+    b.style.setProperty('--leak', g.leak);
+    var h = hash(c.name);
+    b.style.setProperty('--kb', (14 + h % 7) + 's');
+    b.style.setProperty('--fx', ((h % 5) - 2) + '%'); b.style.setProperty('--fy', ((h >> 3) % 5 - 2) + '%');
+    b.style.setProperty('--tx2', ((h >> 5) % 5 - 2) + '%'); b.style.setProperty('--ty2', ((h >> 7) % 5 - 2) + '%');
+    var scene = el('div', 'scene');
+    var imgs = scenesOf(c);
+    imgs.forEach(function (src, i) {
+      var im = el('i', i === 0 ? 'on' : '');
+      im.style.backgroundImage = 'url("' + String(src).replace(/"/g, '%22') + '")';
+      im.style.animationDelay = (-i * 3) + 's';
+      scene.appendChild(im);
+    });
+    if (imgs.length > 1) rotators.push({ scene: scene, i: 0 });
+    b.appendChild(scene);
+    var grade = el('div', 'grade'); grade.style.background = g.color; if (g.noir) grade.style.display = 'none'; b.appendChild(grade);
+    var tone = el('div', 'tone'); tone.style.background = g.tone; b.appendChild(tone);
+    b.appendChild(el('div', 'shade'));
+    b.appendChild(el('div', 'leak'));
+    b.appendChild(el('div', 'grain'));
+    b.appendChild(el('div', 'badge', LINE[iconOf(c)] || ''));
+    var t = el('div', 'txt');
+    var n = counts[c.name];
+    t.innerHTML = '<small>' + (n ? n + ' içerik' : 'Tüm depolardan') + '</small><b>' + esc(c.name) + '</b><span class="rule"></span>';
+    b.appendChild(t);
+    return b;
+  }
+  setInterval(function () {
+    if (!animated) return;
+    rotators = rotators.filter(function (r) { return document.body.contains(r.scene); });
+    rotators.forEach(function (r) {
+      var items = r.scene.children;
+      if (items.length < 2) return;
+      items[r.i].classList.remove('on');
+      r.i = (r.i + 1) % items.length;
+      items[r.i].classList.add('on');
+    });
+  }, 5200);
+
+  // ---------------------------------------------------------------- screens (the back key walks back through them)
+  var current = 's-cats';
+  function showScreen(id) {
+    current = id;
+    document.querySelectorAll('.screen').forEach(function (s) { s.classList.toggle('on', s.id === id); });
+    window.scrollTo(0, 0);
+    if (id === 's-cats') renderCats();
+    if (id !== 's-list' && native) { try { native.cancel(); } catch (e) {} }
+  }
+  function go(id) { history.pushState({ screen: id }, ''); showScreen(id); }
+  window.addEventListener('popstate', function (e) {
+    if (sheet.classList.contains('on')) { closeSheet(true); return; }
+    showScreen((e.state && e.state.screen) || 's-cats');
+  });
+  history.replaceState({ screen: 's-cats' }, '');
+  document.querySelectorAll('[data-back]').forEach(function (b) { b.addEventListener('click', function () { history.back(); }); });
+  document.getElementById('closePage').onclick = function () {
+    try { if (native) native.close(); else if (app && app.close) app.close(); } catch (e) {}
+  };
+
+  function renderCats() {
+    var pinned = document.getElementById('pinned'), others = document.getElementById('others');
+    pinned.innerHTML = ''; others.innerHTML = '';
+    var top = cats.filter(function (c) { return c.pinned; }).slice(0, 4);
+    top.forEach(function (c, i) { var b = cover(c, i); b.onclick = function () { openList(c); }; pinned.appendChild(b); });
+    var rest = cats.filter(function (c) { return top.indexOf(c) < 0; });
+    rest.forEach(function (c, i) { var b = cover(c, i + 4, true); b.onclick = function () { openList(c); }; others.appendChild(b); });
+    document.getElementById('allCount').textContent = rest.length + ' kategori';
+  }
+
+  // ---------------------------------------------------------------- one category
+  var token = 0, listCat = null, page = 1, sourcesTotal = 0, sourcesDone = 0, filter = null, found = 0;
+  var postersEl = document.getElementById('posters'), sourcesEl = document.getElementById('sources');
+  var loadText = document.getElementById('loadText'), loadBar = document.getElementById('loadBar');
+
+  function openList(c) {
+    listCat = c; page = 1; filter = null; found = 0;
+    document.getElementById('listTitle').textContent = c.name;
+    postersEl.innerHTML = ''; sourcesEl.innerHTML = '';
+    var all = el('button', 'chip on', 'Tümü');
+    all.onclick = function () { filter = null; applyFilter(); };
+    sourcesEl.appendChild(all);
+    go('s-list');
+    request();
+  }
+  function request() {
+    token++;
+    sourcesTotal = 0; sourcesDone = 0;
+    document.getElementById('loading').hidden = false;
+    document.getElementById('empty').hidden = true;
+    document.getElementById('more').hidden = true;
+    loadText.textContent = 'Depolar taranıyor…';
+    loadBar.style.width = '4%';
+    var spec = JSON.stringify({ kind: listCat.kind, keys: listCat.keys || '' });
+    if (native) { try { native.load(token, spec, page); } catch (e) {} }
+    else demo(token);
+  }
+  window.onCatStart = function (t, n) {
+    if (t !== token) return;
+    sourcesTotal = n;
+    if (!n) window.onCatDone(t);
+    else loadText.textContent = '0/' + n + ' depo tarandı';
+  };
+  window.onCatResults = function (t, json) {
+    if (t !== token) return;
+    var data; try { data = typeof json === 'string' ? JSON.parse(json) : json; } catch (e) { return; }
+    sourcesDone++;
+    loadText.textContent = sourcesDone + '/' + sourcesTotal + ' depo tarandı';
+    loadBar.style.width = Math.min(100, sourcesTotal ? sourcesDone / sourcesTotal * 100 : 50) + '%';
+    var items = data.items || [];
+    if (!items.length) return;
+    var src = data.source || '';
+    var exists = Array.prototype.some.call(sourcesEl.children, function (ch) { return ch.dataset.src === src; });
+    if (!exists) {
+      var chip = el('button', 'chip', esc(src)); chip.dataset.src = src;
+      chip.onclick = function () { filter = filter === src ? null : src; applyFilter(); };
+      sourcesEl.appendChild(chip);
+    }
+    items.forEach(function (it) {
+      var p = el('div', 'poster');
+      p.dataset.src = src;
+      var a = el('div', 'p-art');
+      var col = ['#7a0d1c', '#12245a', '#035e7b', '#4a1d6e', '#3a2a08'][hash(it.name) % 5];
+      a.style.background = 'linear-gradient(170deg,' + col + ', #0b0b0d)';
+      p.appendChild(a);
+      if (it.poster) {
+        var img = el('img'); img.loading = 'lazy'; img.alt = ''; img.referrerPolicy = 'no-referrer';
+        img.onerror = function () { img.remove(); };
+        img.src = it.poster; p.appendChild(img);
+      }
+      p.appendChild(el('span', 'p-src', esc(src)));
+      if (it.quality) p.appendChild(el('span', 'p-q', esc(it.quality)));
+      p.appendChild(el('span', 'p-name', esc(it.name)));
+      p.onclick = function () { if (native) { try { native.open(it.id); } catch (e) {} } };
+      if (filter && filter !== src) p.hidden = true;
+      postersEl.appendChild(p);
+      found++;
+    });
+    // The first posters become the scenes of the card
+    if (listCat && listCat.scene === 'auto' && page === 1) {
+      var posters = Array.prototype.slice.call(postersEl.querySelectorAll('img')).slice(0, 3).map(function (i) { return i.src; });
+      if (posters.length) { seen[listCat.name] = posters; store(SCENE_KEY, seen); }
+    }
+    applyFilter();
+  };
+  window.onCatDone = function (t) {
+    if (t !== token) return;
+    loadBar.style.width = '100%';
+    loadText.textContent = (sourcesTotal || 0) + ' depodan ' + found + ' içerik';
+    setTimeout(function () { if (t === token) document.getElementById('loading').hidden = true; }, 1500);
+    document.getElementById('empty').hidden = found > 0;
+    if (listCat && page === 1 && found) { counts[listCat.name] = found; store('fork-category-counts-v1', counts); }
+    document.getElementById('more').hidden = !(found > 0 && sourcesTotal > 0);
+  };
+  document.getElementById('more').onclick = function () { page++; request(); };
+  function applyFilter() {
+    Array.prototype.forEach.call(sourcesEl.children, function (ch, i) {
+      ch.classList.toggle('on', i === 0 ? !filter : ch.dataset.src === filter);
+    });
+    Array.prototype.forEach.call(postersEl.children, function (p) { p.hidden = !!filter && p.dataset.src !== filter; });
+  }
+  // Without the app (opened in a browser) a few example cards are shown
+  function demo(t) {
+    var names = ['FullHDFilmizlesene', 'DiziBox', 'DarknesNuvio'];
+    window.onCatStart(t, names.length);
+    names.forEach(function (s, i) {
+      setTimeout(function () {
+        window.onCatResults(t, JSON.stringify({ source: s, items: [1, 2, 3].map(function (k) { return { id: s + k, name: listCat.name + ' ' + (i * 3 + k), poster: '', quality: k === 1 ? 'HD' : '' }; }) }));
+        if (i === names.length - 1) window.onCatDone(t);
+      }, 300 * (i + 1));
+    });
+  }
+
+  // ---------------------------------------------------------------- editor
+  function renderEdit() {
+    var list = document.getElementById('editList');
+    list.innerHTML = '';
+    cats.forEach(function (c, idx) {
+      var r = el('div', 'row');
+      var mini = el('div', 'mini'); mini.appendChild(cover(c, 0)); r.appendChild(mini);
+      var kind = KINDS.filter(function (k) { return k.id === c.kind; })[0];
+      var t = el('div', 't', '<b>' + esc(c.name) + '</b><span>' + esc(kind ? kind.name : '') + ' · ' + esc((GRADES[c.grade || 0] || GRADES[0]).name) + '</span>');
+      r.appendChild(t);
+      var pin = el('button', 'pin' + (c.pinned ? ' on' : ''), c.pinned ? 'Ana ekran' : '+ Ana ekran');
+      pin.onclick = function (e) {
+        e.stopPropagation();
+        if (!c.pinned && cats.filter(function (x) { return x.pinned; }).length >= 4) { toast('En fazla 4 kategori ana ekranda durur'); return; }
+        c.pinned = !c.pinned; save(); renderEdit();
+      };
+      r.appendChild(pin);
+      t.onclick = mini.onclick = function () { openSheet(idx); };
+      list.appendChild(r);
+    });
+  }
+  document.getElementById('openEdit').onclick = function () { go('s-edit'); renderEdit(); };
+
+  var editing = -1, draft = null;
+  var sheet = document.getElementById('sheet'), back = document.getElementById('sheetBack');
+  function openSheet(idx) {
+    editing = idx;
+    draft = idx >= 0 ? clone(cats[idx]) : { name: '', kind: 'genre', keys: '', scene: 'auto', grade: hash(String(Date.now())) % 10, pinned: false };
+    document.getElementById('sheetTitle').textContent = idx >= 0 ? 'Kategoriyi düzenle' : 'Yeni kategori';
+    document.getElementById('fDelete').hidden = idx < 0;
+    document.getElementById('fName').value = draft.name;
+    document.getElementById('fKeys').value = draft.keys;
+    document.getElementById('fLink').value = draft.url || '';
+    document.getElementById('fErr').hidden = true;
+    drawSheet();
+    history.pushState({ screen: 's-edit', sheet: true }, '');
+    sheet.classList.add('on'); back.classList.add('on'); sheet.scrollTop = 0;
+  }
+  function closeSheet(fromHistory) {
+    sheet.classList.remove('on'); back.classList.remove('on');
+    if (!fromHistory) history.back();
+  }
+  function drawPreview() {
+    var pv = document.getElementById('preview'); pv.innerHTML = '';
+    var shown = clone(draft); if (!shown.name) shown.name = 'Kategori';
+    pv.appendChild(cover(shown, 0));
+  }
+  function drawSheet() {
+    drawPreview();
+    var kinds = document.getElementById('fKind'); kinds.innerHTML = '';
+    KINDS.forEach(function (k) {
+      var b = el('button', 'chip' + (draft.kind === k.id ? ' on' : ''), esc(k.name));
+      b.onclick = function () { draft.kind = k.id; drawSheet(); };
+      kinds.appendChild(b);
+    });
+    document.getElementById('fKeysWrap').hidden = !(draft.kind === 'genre' || draft.kind === 'anime');
+    var sc = document.getElementById('fScenes'); sc.innerHTML = '';
+    var auto = el('button', 'auto' + (draft.scene === 'auto' ? ' on' : ''), 'Otomatik<br>(içerikten)');
+    auto.onclick = function () { draft.scene = 'auto'; drawSheet(); };
+    sc.appendChild(auto);
+    var link = el('button', 'auto' + (draft.scene === 'url' ? ' on' : ''), 'Bağlantı<br>(link)');
+    link.onclick = function () { draft.scene = 'url'; drawSheet(); document.getElementById('fLink').focus(); };
+    sc.appendChild(link);
+    SCENE_NAMES.forEach(function (n) {
+      var b = el('button', draft.scene === n ? 'on' : '');
+      b.style.backgroundImage = 'url("' + STILLS[n] + '")';
+      b.appendChild(el('small', '', esc(n)));
+      b.onclick = function () { draft.scene = n; drawSheet(); };
+      sc.appendChild(b);
+    });
+    document.getElementById('fLinkWrap').hidden = draft.scene !== 'url';
+    var gr = document.getElementById('fGrades'); gr.innerHTML = '';
+    GRADES.forEach(function (g, i) {
+      var wrap = el('div');
+      var b = el('button', (draft.grade || 0) === i ? 'on' : '');
+      b.style.background = g.noir ? 'linear-gradient(135deg, #fff, #000)' : g.color;
+      b.setAttribute('aria-label', g.name);
+      b.onclick = function () { draft.grade = i; drawSheet(); };
+      wrap.appendChild(b); wrap.appendChild(el('small', '', esc(g.name)));
+      gr.appendChild(wrap);
+    });
+    var ic = document.getElementById('fIcons'); ic.innerHTML = '';
+    var cur = iconOf(draft);
+    Object.keys(LINE).forEach(function (key) {
+      var b = el('button', key === cur ? 'on' : '', LINE[key]);
+      b.setAttribute('aria-label', ICON_NAMES[key] || key);
+      b.onclick = function () { draft.icon = key; drawSheet(); };
+      ic.appendChild(b);
+    });
+  }
+  document.getElementById('fName').addEventListener('input', function (e) { draft.name = e.target.value; drawPreview(); });
+  document.getElementById('fKeys').addEventListener('input', function (e) { draft.keys = e.target.value; });
+  document.getElementById('fLink').addEventListener('input', function (e) { draft.url = e.target.value.trim(); drawPreview(); });
+  document.getElementById('fCancel').onclick = function () { closeSheet(false); };
+  back.onclick = function () { closeSheet(false); };
+  document.getElementById('fDelete').onclick = function () {
+    if (editing >= 0) { var gone = cats.splice(editing, 1)[0]; if (gone) delete seen[gone.name]; save(); store(SCENE_KEY, seen); }
+    closeSheet(false); renderEdit();
+  };
+  document.getElementById('fSave').onclick = function () {
+    var err = document.getElementById('fErr');
+    draft.name = draft.name.trim();
+    if (!draft.name) { err.textContent = 'Bir ad yaz'; err.hidden = false; return; }
+    if (draft.scene === 'url' && !/^https?:\/\/\S+$/i.test(draft.url || '')) { err.textContent = 'Resim bağlantısı https:// ile başlamalı'; err.hidden = false; return; }
+    if (editing >= 0) {
+      var old = cats[editing];
+      if (old && (old.name !== draft.name || old.kind !== draft.kind || old.keys !== draft.keys)) delete seen[old.name];
+      cats[editing] = draft;
+    } else cats.push(draft);
+    save(); store(SCENE_KEY, seen); closeSheet(false); renderEdit(); toast('Kaydedildi');
+  };
+  document.getElementById('addCat').onclick = function () { openSheet(-1); };
+  document.getElementById('resetAll').onclick = function () { cats = clone(DEFAULTS); seen = {}; save(); store(SCENE_KEY, seen); renderEdit(); toast('Varsayılan kategoriler geri geldi'); };
+
+  var toastEl = document.getElementById('toast'), toastTimer = 0;
+  function toast(t) { toastEl.textContent = t; toastEl.classList.add('on'); clearTimeout(toastTimer); toastTimer = setTimeout(function () { toastEl.classList.remove('on'); }, 1700); }
+
+  renderCats();
+})();
+</script>
+</body>
+</html>

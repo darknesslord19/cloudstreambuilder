@@ -55,6 +55,19 @@
                 app:searchIcon="@drawable/search_icon"
                 tools:ignore="RtlSymmetry" />
 
+            <ImageView
+                android:id="@+id/home_head_categories"
+                android:layout_width="44dp"
+                android:layout_height="50dp"
+                android:clickable="true"
+                android:contentDescription="@string/categories"
+                android:focusable="true"
+                android:foreground="@drawable/rounded_select_ripple"
+                android:padding="11dp"
+                android:src="@drawable/categories_24px"
+                android:visibility="gone"
+                app:tint="@color/white" />
+
             <LinearLayout
                 android:id="@+id/home_head_profile_padding"
                 android:layout_width="50dp"
@@ -162,6 +175,19 @@
         android:gravity="end"
         android:orientation="horizontal"
         android:paddingHorizontal="0dp">
+
+        <ImageView
+            android:id="@+id/alternate_home_head_categories"
+            android:layout_width="44dp"
+            android:layout_height="50dp"
+            android:clickable="true"
+            android:contentDescription="@string/categories"
+            android:focusable="true"
+            android:foreground="@drawable/rounded_select_ripple"
+            android:padding="11dp"
+            android:src="@drawable/categories_24px"
+            android:visibility="gone"
+            app:tint="@color/white" />
 
         <LinearLayout
             android:id="@+id/alternate_home_head_profile_padding"

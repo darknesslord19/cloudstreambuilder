@@ -170,6 +170,39 @@ object AssetPage {
             }
         }
 
+        /**
+         * Puts the page out of the way without closing it, it keeps everything it has.
+         * While hidden it neither takes touches nor keys, they go to the app below it.
+         */
+        fun hide() {
+            webView.post {
+                try {
+                    dialog.window?.addFlags(
+                        android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                                android.view.WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                    )
+                    dialog.hide()
+                } catch (t: Throwable) {
+                    logError(t)
+                }
+            }
+        }
+
+        /** Brings a page put away with [hide] back. */
+        fun reveal() {
+            webView.post {
+                try {
+                    dialog.window?.clearFlags(
+                        android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                                android.view.WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                    )
+                    dialog.show()
+                } catch (t: Throwable) {
+                    logError(t)
+                }
+            }
+        }
+
         /** Runs a piece of JavaScript in the page, from any thread. */
         fun runScript(script: String) {
             webView.post {

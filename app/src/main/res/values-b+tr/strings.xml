@@ -822,4 +822,9 @@
     <string name="motion_parallax">Kaydırma derinliği</string>
     <string name="motion_press">Dokununca büyüme</string>
     <string name="motion_off">Kapalı</string>
+    <string name="categories">Kategoriler</string>
+    <string name="categories_icon_settings">Kategoriler ikonu</string>
+    <string name="categories_icon_des">Ana sayfada profil resminin yanında göster</string>
+    <string name="categories_anim_settings">Kategori animasyonları</string>
+    <string name="categories_anim_des">Kategori afişleri hareket etsin</string>
 </resources>
