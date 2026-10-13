@@ -306,6 +306,8 @@ class ExtensionsFragment : BaseFragment<FragmentExtensionsBinding>(
 
             // The list of repositories is a bundled web page, an entry picked there is added
             // as if its address had been typed into this dialog.
+            // The list button can be switched off in the layout settings and from outside
+            binding.listBtt.isVisible = com.lagradost.cloudstream3.fork.ForkFeatures.repoListShown(context)
             binding.listBtt.setOnClickListener {
                 val act = activity ?: return@setOnClickListener
                 AssetPage.show(

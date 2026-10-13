@@ -37,6 +37,19 @@ object ForkFeatures {
         )
     }
 
+    /** The repository list button of the "Add repository" dialog, also switched in the layout settings */
+    const val PREF_REPOLIST = "fork_repolist"
+
+    fun repoListShown(context: Context?): Boolean {
+        val ctx = context(context) ?: return true
+        if (!isOn(Feature.REPOLIST, ctx)) return false
+        return try {
+            androidx.preference.PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean(PREF_REPOLIST, true)
+        } catch (t: Throwable) {
+            true
+        }
+    }
+
     /** If [feature] is switched on. Everything is on until the documents say otherwise. */
     fun isOn(feature: Feature, context: Context? = null): Boolean {
         cached?.let { return it[feature] != false }

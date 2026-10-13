@@ -863,4 +863,5 @@
     <string name="categories_icon_des">Show the categories next to the profile picture on the home screen</string>
     <string name="categories_anim_settings">Moving categories</string>
     <string name="categories_anim_des">Let the category cards move</string>
+    <string name="repolist_switch_des">Show the list button in the "Add repository" window</string>
 </resources>

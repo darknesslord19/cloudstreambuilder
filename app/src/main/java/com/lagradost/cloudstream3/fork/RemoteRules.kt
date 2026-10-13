@@ -107,6 +107,7 @@ object RemoteRules {
         ICONS("icons"),
         MOTION("animated_posters"),
         CATEGORIES("categories"),
+        REPOLIST("repolist"),
     }
 
     /**

@@ -52,70 +52,55 @@
   .tip { position: absolute; z-index: 3; top: 62px; right: 50px; padding: 8px 12px; border-radius: 12px; background: var(--accent); color: var(--accent-ink); font-size: 13px; font-weight: 700; }
   .tip::after { content: ""; position: absolute; top: -6px; right: 14px; border: 6px solid transparent; border-top: 0; border-bottom-color: var(--accent); }
 
-  /* ---------- cinematic covers ---------- */
-  .grid4 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 4px 16px 6px; perspective: 1000px; }
-  .wide-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 16px; perspective: 1000px; }
+  /* ---------- cinematic covers (kept light: few layers, only what is on screen moves) ---------- */
+  .grid4 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 4px 16px 6px; }
+  .wide-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 16px; }
   .cv {
-    position: relative; display: block; width: 100%; overflow: hidden; isolation: isolate; border: 0; padding: 0; cursor: pointer; text-align: left;
-    aspect-ratio: 3 / 4; border-radius: 20px; color: #fff; background: #000;
-    box-shadow: 0 18px 36px -12px rgba(0,0,0,.8), 0 0 0 1px rgba(255,255,255,.07) inset;
-    --tx: 0deg; --ty: 0deg; transform: rotateX(var(--ty)) rotateY(var(--tx)); transition: transform .3s cubic-bezier(.2,.7,.2,1);
+    position: relative; display: block; width: 100%; overflow: hidden; border: 0; padding: 0; cursor: pointer; text-align: left;
+    aspect-ratio: 3 / 4; border-radius: 20px; color: #fff; background: #15171a;
+    box-shadow: 0 12px 26px -14px rgba(0,0,0,.9); transform: translateZ(0); contain: layout paint;
+    transition: transform .25s cubic-bezier(.2,.7,.2,1);
   }
   .wide-list .cv { aspect-ratio: 16 / 10; border-radius: 16px; }
   .cv:active { transform: scale(.97); }
-  .anim .grid4 .cv, .anim .wide-list .cv { animation: rise .7s cubic-bezier(.2,.7,.2,1) backwards; animation-delay: var(--d, 0s); }
-  @keyframes rise { from { opacity: 0; transform: translateY(22px) scale(.96); } to { opacity: 1; transform: none; } }
-  /* the scene, slowly moving like a film camera */
-  .cv .scene { position: absolute; inset: 0; z-index: -6; }
-  .cv .scene i { position: absolute; inset: -6%; background-size: cover; background-position: center; opacity: 0; transition: opacity 1.4s ease; transform: scale(1.08); }
+  .anim .cv.enter { animation: rise .6s cubic-bezier(.2,.7,.2,1) backwards; animation-delay: var(--d, 0s); }
+  @keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+  /* the scene, slowly moving like a film camera while it is on screen */
+  .cv .scene { position: absolute; inset: 0; z-index: 0; }
+  .cv .scene i { position: absolute; inset: -7%; background-size: cover; background-position: center; opacity: 0; transition: opacity 1.2s ease; transform: scale(1.06); }
   .cv .scene i.on { opacity: 1; }
-  .anim .cv .scene i { animation: kb var(--kb, 16s) ease-in-out infinite alternate; }
-  @keyframes kb { from { transform: scale(1.06) translate(var(--fx, -2%), var(--fy, 1%)); } to { transform: scale(1.2) translate(var(--tx2, 2%), var(--ty2, -2%)); } }
-  .cv.noir .scene i { filter: grayscale(1) contrast(1.15) brightness(.9); }
-  /* the colour grade */
-  .cv .grade { position: absolute; inset: 0; z-index: -5; mix-blend-mode: color; opacity: .55; }
-  .cv .tone { position: absolute; inset: 0; z-index: -4; mix-blend-mode: soft-light; opacity: .7; }
-  .cv .shade { position: absolute; inset: 0; z-index: -3;
-    background: linear-gradient(180deg, rgba(0,0,0,.35) 0%, transparent 28%, transparent 42%, rgba(0,0,0,.88) 100%),
-                radial-gradient(120% 90% at 50% 40%, transparent 55%, rgba(0,0,0,.55) 100%); }
-  /* a light leak that drifts */
-  .cv .leak { position: absolute; z-index: -2; width: 120%; aspect-ratio: 1; left: -60%; top: -50%; border-radius: 50%;
-    background: radial-gradient(closest-side, var(--leak, #ffb38a), transparent); mix-blend-mode: screen; opacity: .0; }
-  .anim .cv .leak { animation: leak 11s ease-in-out infinite; animation-delay: calc(var(--d, 0s) * -4); }
-  @keyframes leak { 0%, 100% { transform: translate(0, 0); opacity: .0; } 30% { opacity: .38; } 50% { transform: translate(70%, 40%); opacity: .22; } 75% { opacity: .32; } }
-  /* film grain */
-  .cv .grain { position: absolute; inset: -50%; z-index: -1; opacity: .13; pointer-events: none; mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
-  .anim .cv .grain { animation: grain .9s steps(5) infinite; }
-  @keyframes grain { 0% { transform: translate(0, 0); } 20% { transform: translate(-8%, 6%); } 40% { transform: translate(6%, -10%); } 60% { transform: translate(-4%, 12%); } 80% { transform: translate(10%, 4%); } 100% { transform: translate(0, 0); } }
-  /* a sheen that passes over now and then */
-  .cv::after { content: ""; position: absolute; inset: -40% -90%; pointer-events: none; opacity: 0; z-index: 3;
-    background: linear-gradient(105deg, transparent 44%, rgba(255,255,255,.16) 50%, transparent 56%); transform: translateX(-60%); }
-  .anim .cv::after { animation: sheen 7s ease-in-out infinite; animation-delay: calc(1.6s + var(--d, 0s) * 2.5); }
-  @keyframes sheen { 0% { transform: translateX(-60%); opacity: 0; } 4% { opacity: 1; } 16%, 100% { transform: translateX(60%); opacity: 0; } }
-  /* glass badge with a line icon */
-  .cv .badge { position: absolute; top: 12px; left: 12px; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
-    background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22); -webkit-backdrop-filter: blur(10px) saturate(1.4); backdrop-filter: blur(10px) saturate(1.4);
-    box-shadow: 0 6px 18px rgba(0,0,0,.35); transform: translateZ(40px); }
+  .anim .cv.live .scene i.on { animation: kb var(--kb, 16s) ease-in-out infinite alternate; }
+  @keyframes kb { from { transform: scale(1.06) translate(var(--fx, -2%), var(--fy, 1%)); } to { transform: scale(1.18) translate(var(--tx2, 2%), var(--ty2, -2%)); } }
+  .cv.noir .scene i { filter: grayscale(1) contrast(1.1); }
+  /* the colour tone and the shade that keeps the name readable */
+  .cv .grade { position: absolute; inset: 0; z-index: 1; opacity: .42; }
+  .cv .shade { position: absolute; inset: 0; z-index: 2;
+    background: linear-gradient(180deg, rgba(0,0,0,.4) 0%, transparent 26%, transparent 38%, rgba(0,0,0,.92) 100%); }
+  /* a sheen that passes over the big cards now and then */
+  .cv::after { content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none; opacity: 0;
+    background: linear-gradient(105deg, transparent 38%, rgba(255,255,255,.15) 50%, transparent 62%); transform: translateX(-100%); }
+  .anim .grid4 .cv.live::after { animation: sheen 7s ease-in-out infinite; animation-delay: calc(1.6s + var(--d, 0s) * 2.5); }
+  @keyframes sheen { 0% { transform: translateX(-100%); opacity: 0; } 4% { opacity: 1; } 16%, 100% { transform: translateX(100%); opacity: 0; } }
+  /* badge with a line icon */
+  .cv .badge { position: absolute; z-index: 4; top: 12px; left: 12px; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
+    background: rgba(0,0,0,.38); border: 1px solid rgba(255,255,255,.28); }
   .wide-list .cv .badge { width: 34px; height: 34px; top: 10px; left: 10px; }
   .cv .badge svg { width: 20px; height: 20px; stroke: #fff; }
   .wide-list .cv .badge svg { width: 17px; height: 17px; }
-  .cv .badge svg * { stroke-dasharray: 80; stroke-dashoffset: 0; }
-  .anim .cv .badge svg * { animation: trace 7s ease-in-out infinite; animation-delay: calc(.4s + var(--d, 0s)); }
-  @keyframes trace { 0% { stroke-dashoffset: 80; } 22%, 100% { stroke-dashoffset: 0; } }
-  .anim .cv .badge { animation: badge 7s ease-in-out infinite; animation-delay: calc(.4s + var(--d, 0s)); }
-  @keyframes badge { 0%, 100% { box-shadow: 0 6px 18px rgba(0,0,0,.35); } 20% { box-shadow: 0 0 0 6px rgba(255,255,255,.08), 0 6px 22px var(--leak, #fff); } }
-  .cv .txt { position: absolute; left: 14px; right: 12px; bottom: 14px; transform: translateZ(30px); }
+  .anim .cv.enter .badge svg * { stroke-dasharray: 80; animation: trace 1.4s ease-out backwards; animation-delay: calc(.3s + var(--d, 0s)); }
+  @keyframes trace { from { stroke-dashoffset: 80; } to { stroke-dashoffset: 0; } }
+  .cv .txt { position: absolute; z-index: 5; left: 14px; right: 12px; bottom: 14px; }
   .wide-list .cv .txt { left: 12px; bottom: 10px; }
-  .cv .txt small { display: block; font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.72); }
-  .cv .txt b { display: block; margin-top: 2px; font-size: clamp(20px, 6vw, 27px); line-height: 1.02; font-weight: 900; letter-spacing: -.01em; text-transform: uppercase; text-shadow: 0 2px 18px rgba(0,0,0,.6); }
+  .cv .txt small { display: block; font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.78); }
+  .cv .txt b { display: block; margin-top: 2px; font-size: clamp(17px, 5.2vw, 26px); line-height: 1.04; font-weight: 900; letter-spacing: -.01em; text-transform: uppercase; text-shadow: 0 2px 10px rgba(0,0,0,.7); }
   .wide-list .cv .txt b { font-size: 16px; letter-spacing: .02em; }
-  .cv .txt .rule { display: block; height: 3px; width: 0; margin-top: 8px; border-radius: 3px; background: linear-gradient(90deg, var(--leak, #fff), transparent); }
-  .anim .cv .txt .rule { animation: rule 1s cubic-bezier(.2,.7,.2,1) forwards; animation-delay: calc(.35s + var(--d, 0s)); }
-  .cv:not(.wide) .txt .rule { width: 0; }
-  body:not(.anim) .cv .txt .rule { width: 46%; }
-  @keyframes rule { to { width: 46%; } }
+  .cv .txt .rule { display: block; height: 3px; width: 46%; margin-top: 8px; border-radius: 3px; background: linear-gradient(90deg, var(--leak, #fff), transparent); transform-origin: left; }
+  .anim .cv.enter .txt .rule { animation: rule .9s cubic-bezier(.2,.7,.2,1) backwards; animation-delay: calc(.35s + var(--d, 0s)); }
+  @keyframes rule { from { transform: scaleX(0); } to { transform: scaleX(1); } }
   .wide-list .cv .txt .rule { display: none; }
+  /* one still grain over the whole page instead of one moving grain per card */
+  body::after { content: ""; position: fixed; inset: 0; z-index: 50; pointer-events: none; opacity: .05;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
 
   .section-title { display: flex; align-items: baseline; justify-content: space-between; margin: 24px 16px 10px; }
   .section-title h2 { margin: 0; font-size: 17px; font-weight: 800; }
@@ -199,7 +184,7 @@
   .empty b { display: block; color: var(--ink); font-size: 17px; margin-bottom: 6px; }
   .poster img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .poster .p-q { position: absolute; z-index: 1; top: 6px; right: 6px; padding: 1px 6px; border-radius: 6px; background: var(--accent); color: var(--accent-ink); font-size: 9px; font-weight: 800; }
-  .poster { cursor: pointer; }
+  .poster { cursor: pointer; content-visibility: auto; contain-intrinsic-size: 120px 180px; }
   /* ---------- TV: a wider page and a clear frame on what the remote has chosen ---------- */
   .tv .app { max-width: 1240px; padding: 0 24px; }
   .tv .grid4 { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
@@ -409,13 +394,10 @@ var LINE = {"film": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\
       im.style.animationDelay = (-i * 3) + 's';
       scene.appendChild(im);
     });
-    if (imgs.length > 1) rotators.push({ scene: scene, i: 0 });
+    if (imgs.length > 1) rotators.push({ scene: scene, card: b, i: 0 });
     b.appendChild(scene);
     var grade = el('div', 'grade'); grade.style.background = g.color; if (g.noir) grade.style.display = 'none'; b.appendChild(grade);
-    var tone = el('div', 'tone'); tone.style.background = g.tone; b.appendChild(tone);
     b.appendChild(el('div', 'shade'));
-    b.appendChild(el('div', 'leak'));
-    b.appendChild(el('div', 'grain'));
     b.appendChild(el('div', 'badge', LINE[iconOf(c)] || ''));
     var t = el('div', 'txt');
     var n = counts[c.name];
@@ -428,7 +410,8 @@ var LINE = {"film": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\
     rotators = rotators.filter(function (r) { return document.body.contains(r.scene); });
     rotators.forEach(function (r) {
       var items = r.scene.children;
-      if (items.length < 2) return;
+      // Only the cards on screen change their scene
+      if (items.length < 2 || !r.card.classList.contains('live')) return;
       items[r.i].classList.remove('on');
       r.i = (r.i + 1) % items.length;
       items[r.i].classList.add('on');
@@ -456,13 +439,37 @@ var LINE = {"film": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\
     try { if (native) native.close(); else if (app && app.close) app.close(); } catch (e) {}
   };
 
+  // A long name gets smaller instead of breaking inside a word
+  function fitNames() {
+    Array.prototype.forEach.call(document.querySelectorAll('.cv .txt b'), function (b) {
+      var size = parseFloat(getComputedStyle(b).fontSize), guard = 0;
+      while (b.scrollWidth > b.clientWidth + 1 && size > 12 && guard++ < 12) { size -= 1; b.style.fontSize = size + 'px'; }
+    });
+  }
+  window.addEventListener('resize', function () { requestAnimationFrame(fitNames); });
+
+  // Only the cards on screen move, the others rest
+  var watcher = 'IntersectionObserver' in window ? new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) { e.target.classList.toggle('live', e.isIntersecting); });
+  }, { rootMargin: '40px' }) : null;
+  function watch(b) { if (watcher) watcher.observe(b); else b.classList.add('live'); }
+  var firstRender = true;
   function renderCats() {
+    if (watcher) watcher.disconnect();
     var pinned = document.getElementById('pinned'), others = document.getElementById('others');
     pinned.innerHTML = ''; others.innerHTML = '';
     var top = cats.filter(function (c) { return c.pinned; }).slice(0, 4);
-    top.forEach(function (c, i) { var b = cover(c, i); b.onclick = function () { openList(c); }; pinned.appendChild(b); });
+    top.forEach(function (c, i) {
+      var b = cover(c, i); if (firstRender) b.classList.add('enter');
+      b.onclick = function () { openList(c); }; pinned.appendChild(b); watch(b);
+    });
     var rest = cats.filter(function (c) { return top.indexOf(c) < 0; });
-    rest.forEach(function (c, i) { var b = cover(c, i + 4, true); b.onclick = function () { openList(c); }; others.appendChild(b); });
+    rest.forEach(function (c, i) {
+      var b = cover(c, Math.min(i + 4, 9), true); if (firstRender) b.classList.add('enter');
+      b.onclick = function () { openList(c); }; others.appendChild(b); watch(b);
+    });
+    firstRender = false;
+    requestAnimationFrame(fitNames);
     document.getElementById('allCount').textContent = rest.length + ' kategori';
   }
 
@@ -522,7 +529,7 @@ var LINE = {"film": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\
       a.style.background = 'linear-gradient(170deg,' + col + ', #0b0b0d)';
       p.appendChild(a);
       if (it.poster) {
-        var img = el('img'); img.loading = 'lazy'; img.alt = ''; img.referrerPolicy = 'no-referrer';
+        var img = el('img'); img.loading = 'lazy'; img.decoding = 'async'; img.alt = ''; img.referrerPolicy = 'no-referrer';
         img.onerror = function () { img.remove(); };
         img.src = it.poster; p.appendChild(img);
       }

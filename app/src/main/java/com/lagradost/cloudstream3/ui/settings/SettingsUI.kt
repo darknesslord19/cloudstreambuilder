@@ -81,6 +81,8 @@ class SettingsUI : BasePreferenceFragmentCompat() {
         val categoriesOn = Categories.available(requireContext())
         findPreference<Preference>(Categories.PREF_ICON)?.isVisible = categoriesOn
         findPreference<Preference>(Categories.PREF_ANIM)?.isVisible = categoriesOn
+        findPreference<Preference>(ForkFeatures.PREF_REPOLIST)?.isVisible =
+            ForkFeatures.isOn(RemoteRules.Feature.REPOLIST, requireContext())
 
         // The moving posters, only there while they are switched on from outside
         findPreference<Preference>(PosterMotion.PREF_KEY)?.let { pref ->

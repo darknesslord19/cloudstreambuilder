@@ -39,6 +39,12 @@
             android:key="fork_categories_anim"
             android:summary="@string/categories_anim_des"
             android:title="@string/categories_anim_settings" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:icon="@drawable/extension_24px"
+            android:key="fork_repolist"
+            android:summary="@string/repolist_switch_des"
+            android:title="@string/repository_list" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/pref_category_ui_features">
