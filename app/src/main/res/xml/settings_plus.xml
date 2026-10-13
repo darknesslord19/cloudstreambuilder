@@ -21,6 +21,13 @@
             android:summary="@string/categories_anim_des"
             android:title="@string/categories_anim_settings" />
         <SwitchPreference
+            android:defaultValue="false"
+            android:dependency="fork_categories_anim"
+            android:icon="@drawable/plus_sparkle_24px"
+            android:key="fork_categories_rich"
+            android:summary="@string/categories_rich_des"
+            android:title="@string/categories_rich_settings" />
+        <SwitchPreference
             android:defaultValue="true"
             android:icon="@drawable/title_24px"
             android:key="fork_categories_badges"

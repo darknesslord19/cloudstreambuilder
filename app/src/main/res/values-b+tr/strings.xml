@@ -838,4 +838,6 @@
     <string name="plus_remote_on">Açık · %d kategori</string>
     <string name="plus_remote_off">Kapalı</string>
     <string name="plus_remote_none">Şu an yok</string>
+    <string name="categories_rich_settings">Sinematik mod</string>
+    <string name="categories_rich_des">İlk tasarımın bütün efektleri: gezen ışık, film greni, cam simgeler. ⚠ Zayıf telefon ve TV kutularında kasabilir</string>
 </resources>

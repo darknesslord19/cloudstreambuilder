@@ -31,7 +31,7 @@ class SettingsPlus : BasePreferenceFragmentCompat() {
         // What is switched off from outside is not offered
         val categoriesOn = Categories.available(context)
         for (key in listOf(
-            "fork_plus_open_categories", Categories.PREF_ICON, Categories.PREF_ANIM,
+            "fork_plus_open_categories", Categories.PREF_ICON, Categories.PREF_ANIM, Categories.PREF_RICH,
             Categories.PREF_BADGES, "fork_plus_remote_categories"
         )) {
             findPreference<Preference>(key)?.isVisible = categoriesOn

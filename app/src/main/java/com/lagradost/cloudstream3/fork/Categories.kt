@@ -69,6 +69,9 @@ object Categories {
     /** What the page keeps is saved under this prefix in the settings */
     private const val STORE_PREFIX = "fork_cat_store_"
 
+    /** The richer cinematic look with every effect, heavier, off unless switched on */
+    const val PREF_RICH = "fork_categories_rich"
+
     /** Badges for dubbing and subtitles on the posters */
     const val PREF_BADGES = "fork_categories_badges"
 
@@ -208,6 +211,10 @@ object Categories {
 
         @JavascriptInterface
         fun animated(): Boolean = animated(activity)
+
+        /** The cinematic mode is switched on in Plus */
+        @JavascriptInterface
+        fun rich(): Boolean = PreferenceManager.getDefaultSharedPreferences(activity).getBoolean(PREF_RICH, false)
 
         /** The page is used with a remote */
         @JavascriptInterface

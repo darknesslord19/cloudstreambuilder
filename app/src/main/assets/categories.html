@@ -184,6 +184,27 @@
   .empty b { display: block; color: var(--ink); font-size: 17px; margin-bottom: 6px; }
   .poster img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .poster .p-q { position: absolute; z-index: 1; top: 6px; right: 6px; padding: 1px 6px; border-radius: 6px; background: var(--accent); color: var(--accent-ink); font-size: 9px; font-weight: 800; }
+
+  /* ---------- cinematic mode (Plus): the first look with every effect, only on the cards on screen ---------- */
+  .rich .cv .grade { mix-blend-mode: color; opacity: .55; }
+  .rich .cv .tone { position: absolute; inset: 0; z-index: 1; mix-blend-mode: soft-light; opacity: .7; }
+  .rich .cv .leak { position: absolute; z-index: 2; width: 120%; aspect-ratio: 1; left: -60%; top: -50%; border-radius: 50%;
+    background: radial-gradient(closest-side, var(--leak, #ffb38a), transparent); mix-blend-mode: screen; opacity: 0; }
+  .anim.rich .cv.live .leak { animation: leak 11s ease-in-out infinite; animation-delay: calc(var(--d, 0s) * -4); }
+  @keyframes leak { 0%, 100% { transform: translate(0, 0); opacity: 0; } 30% { opacity: .38; } 50% { transform: translate(70%, 40%); opacity: .22; } 75% { opacity: .32; } }
+  .rich .cv .grain { position: absolute; inset: -50%; z-index: 2; opacity: .13; pointer-events: none; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+  .anim.rich .cv.live .grain { animation: grain .9s steps(5) infinite; }
+  @keyframes grain { 0% { transform: translate(0, 0); } 20% { transform: translate(-8%, 6%); } 40% { transform: translate(6%, -10%); } 60% { transform: translate(-4%, 12%); } 80% { transform: translate(10%, 4%); } 100% { transform: translate(0, 0); } }
+  .rich .cv.live .badge { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.22);
+    -webkit-backdrop-filter: blur(10px) saturate(1.4); backdrop-filter: blur(10px) saturate(1.4); box-shadow: 0 6px 18px rgba(0,0,0,.35); }
+  .anim.rich .cv.live .badge { animation: badge 7s ease-in-out infinite; animation-delay: calc(.4s + var(--d, 0s)); }
+  .anim.rich .cv.live .badge svg * { stroke-dasharray: 80; animation: trace-loop 7s ease-in-out infinite; animation-delay: calc(.4s + var(--d, 0s)); }
+  @keyframes trace-loop { 0% { stroke-dashoffset: 80; } 22%, 100% { stroke-dashoffset: 0; } }
+  @keyframes badge { 0%, 100% { box-shadow: 0 6px 18px rgba(0,0,0,.35); } 20% { box-shadow: 0 0 0 6px rgba(255,255,255,.08), 0 6px 22px var(--leak, #fff); } }
+  .anim.rich .wide-list .cv.live::after { animation: sheen 7s ease-in-out infinite; animation-delay: calc(1.6s + var(--d, 0s) * 2.5); }
+  .rich body::after, body.rich::after { opacity: 0; }
+  .scrolling .cv *, .scrolling .cv::after { animation-play-state: paused !important; }
   .tools { display: flex; gap: 8px; align-items: center; margin: 0 16px 10px; }
   .search { flex: 1; display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; border-radius: 14px; border: 1px solid var(--line); background: var(--field); }
   .search svg { width: 18px; height: 18px; color: var(--muted); flex: none; }
@@ -425,6 +446,21 @@ var LINE = {"film": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\
   var animated = true;
   try { animated = native ? native.animated() : true; } catch (e) {}
   document.body.classList.toggle('anim', animated);
+  // Cinematic mode: the first, richer look with every effect. It is heavier, so it is switched
+  // on in Plus only, and even then only the cards on screen carry the effects.
+  var rich = false;
+  try { rich = !!(native && native.rich && native.rich()); } catch (e) {}
+  if (/[?&]rich=1/.test(location.search)) rich = true;
+  document.body.classList.toggle('rich', rich);
+  // While the page is scrolled the effects wait, so scrolling stays smooth
+  if (rich) {
+    var scrollTimer = 0;
+    window.addEventListener('scroll', function () {
+      document.body.classList.add('scrolling');
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(function () { document.body.classList.remove('scrolling'); }, 160);
+    }, { passive: true });
+  }
   // The accent of the app theme
   try {
     var theme = app && app.theme ? JSON.parse(app.theme()) : {};
@@ -479,7 +515,9 @@ var LINE = {"film": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\
     if (imgs.length > 1) rotators.push({ scene: scene, card: b, i: 0 });
     b.appendChild(scene);
     var grade = el('div', 'grade'); grade.style.background = g.color; if (g.noir) grade.style.display = 'none'; b.appendChild(grade);
+    if (rich) { var tone = el('div', 'tone'); tone.style.background = g.tone; b.appendChild(tone); }
     b.appendChild(el('div', 'shade'));
+    if (rich) { b.appendChild(el('div', 'leak')); b.appendChild(el('div', 'grain')); }
     b.appendChild(el('div', 'badge', LINE[iconOf(c)] || ''));
     var t = el('div', 'txt');
     var n = counts[c.name];
