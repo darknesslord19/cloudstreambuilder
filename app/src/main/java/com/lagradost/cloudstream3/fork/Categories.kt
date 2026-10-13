@@ -17,6 +17,9 @@ import com.lagradost.cloudstream3.mvvm.Resource
 import com.lagradost.cloudstream3.mvvm.logError
 import com.lagradost.cloudstream3.ui.APIRepository
 import com.lagradost.cloudstream3.ui.settings.AssetPage
+import com.lagradost.cloudstream3.ui.settings.Globals.EMULATOR
+import com.lagradost.cloudstream3.ui.settings.Globals.TV
+import com.lagradost.cloudstream3.ui.settings.Globals.isLayout
 import com.lagradost.cloudstream3.utils.AppContextUtils.filterProviderByPreferredMedia
 import com.lagradost.cloudstream3.utils.AppContextUtils.loadSearchResult
 import kotlinx.coroutines.CoroutineScope
@@ -144,6 +147,10 @@ object Categories {
 
         @JavascriptInterface
         fun animated(): Boolean = animated(activity)
+
+        /** The page is used with a remote */
+        @JavascriptInterface
+        fun isTv(): Boolean = isLayout(TV or EMULATOR)
 
         @JavascriptInterface
         fun cancel() {

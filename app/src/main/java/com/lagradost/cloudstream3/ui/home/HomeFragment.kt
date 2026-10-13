@@ -1,5 +1,6 @@
 package com.lagradost.cloudstream3.ui.home
 
+import com.lagradost.cloudstream3.fork.Categories
 import com.lagradost.cloudstream3.fork.PosterMotion
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -690,6 +691,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
             homePreviewSearchButton.setOnClickListener { _ ->
                 // Open blank screen.
                 homeViewModel.queryTextSubmit("")
+            }
+
+            // The categories, on TV next to the search
+            root.findViewById<View>(R.id.home_categories_button_tv)?.let { button ->
+                button.isVisible = isLayout(TV or EMULATOR) && Categories.iconShown(button.context)
+                button.setOnClickListener { activity?.let { Categories.show(it) } }
             }
 
             // Load value for toggling Tv layout real time clock. Hide by default at startup

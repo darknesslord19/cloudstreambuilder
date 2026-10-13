@@ -6,7 +6,7 @@
 <title>Kategoriler</title>
 <!--
   Kategoriler: hareketli kategori afişleri; içerikler eklenmiş bütün depolardan toplanır.
-  Uygulamaya: Cats.load(token, spec, page), Cats.open(id), Cats.cancel(), Cats.close(), Cats.animated()
+  Uygulamaya: Cats.load(token, spec, page), Cats.open(id), Cats.cancel(), Cats.close(), Cats.animated(), Cats.isTv()
   Uygulamadan: onCatStart(token, n), onCatResults(token, json), onCatDone(token)
   Çizgi simgeler: Lucide (ISC lisansı) — https://lucide.dev
 -->
@@ -63,7 +63,7 @@
   }
   .wide-list .cv { aspect-ratio: 16 / 10; border-radius: 16px; }
   .cv:active { transform: scale(.97); }
-  .anim .grid4 .cv, .anim .wide-list .cv { opacity: 0; animation: rise .7s cubic-bezier(.2,.7,.2,1) forwards; animation-delay: var(--d, 0s); }
+  .anim .grid4 .cv, .anim .wide-list .cv { animation: rise .7s cubic-bezier(.2,.7,.2,1) backwards; animation-delay: var(--d, 0s); }
   @keyframes rise { from { opacity: 0; transform: translateY(22px) scale(.96); } to { opacity: 1; transform: none; } }
   /* the scene, slowly moving like a film camera */
   .cv .scene { position: absolute; inset: 0; z-index: -6; }
@@ -200,6 +200,22 @@
   .poster img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .poster .p-q { position: absolute; z-index: 1; top: 6px; right: 6px; padding: 1px 6px; border-radius: 6px; background: var(--accent); color: var(--accent-ink); font-size: 9px; font-weight: 800; }
   .poster { cursor: pointer; }
+  /* ---------- TV: a wider page and a clear frame on what the remote has chosen ---------- */
+  .tv .app { max-width: 1240px; padding: 0 24px; }
+  .tv .grid4 { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
+  .tv .grid4 .cv { aspect-ratio: 4 / 3; }
+  .tv .wide-list { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+  .tv .posters { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 14px; }
+  .tv .sheet { max-width: 760px; }
+  .tv :focus { outline: none; }
+  .tv .cv:focus { transform: scale(1.06); box-shadow: 0 0 0 3px var(--accent), 0 24px 48px -10px rgba(0,0,0,.9); z-index: 2; }
+  .tv .poster:focus { transform: scale(1.07); box-shadow: 0 0 0 3px var(--accent), 0 16px 34px rgba(0,0,0,.8); z-index: 2; }
+  .tv .poster { transition: transform .2s cubic-bezier(.2,.7,.2,1), box-shadow .2s; }
+  .tv .chip:focus, .tv .icon-btn:focus, .tv .pin:focus, .tv .btn:focus, .tv .more:focus, .tv .add:focus,
+  .tv .scenes button:focus, .tv .grades button:focus, .tv .icons button:focus, .tv .row .t:focus, .tv .row .mini:focus,
+  .tv .field input:focus { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .tv .icon-btn:focus { background: rgba(255,255,255,.12); }
+
   .poster:active { transform: scale(.97); }
 </style>
 </head>
@@ -335,6 +351,10 @@ var LINE = {"film": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\
   var counts = load('fork-category-counts-v1', {}); if (typeof counts !== 'object' || !counts) counts = {};
   function save() { store(KEY, cats); }
 
+  var tv = false;
+  try { tv = !!(native && native.isTv && native.isTv()); } catch (e) {}
+  if (/[?&]tv=1/.test(location.search)) tv = true;
+  document.body.classList.toggle('tv', tv);
   var animated = true;
   try { animated = native ? native.animated() : true; } catch (e) {}
   document.body.classList.toggle('anim', animated);
@@ -423,6 +443,7 @@ var LINE = {"film": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\
     window.scrollTo(0, 0);
     if (id === 's-cats') renderCats();
     if (id !== 's-list' && native) { try { native.cancel(); } catch (e) {} }
+    if (tv) setTimeout(function () { focusFirst(document.getElementById(id), id === 's-cats' ? '.cv' : null); }, 30);
   }
   function go(id) { history.pushState({ screen: id }, ''); showScreen(id); }
   window.addEventListener('popstate', function (e) {
@@ -508,6 +529,7 @@ var LINE = {"film": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\
       p.appendChild(el('span', 'p-src', esc(src)));
       if (it.quality) p.appendChild(el('span', 'p-q', esc(it.quality)));
       p.appendChild(el('span', 'p-name', esc(it.name)));
+      p.tabIndex = 0;
       p.onclick = function () { if (native) { try { native.open(it.id); } catch (e) {} } };
       if (filter && filter !== src) p.hidden = true;
       postersEl.appendChild(p);
@@ -565,6 +587,7 @@ var LINE = {"film": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\
         c.pinned = !c.pinned; save(); renderEdit();
       };
       r.appendChild(pin);
+      t.tabIndex = 0; mini.tabIndex = 0;
       t.onclick = mini.onclick = function () { openSheet(idx); };
       list.appendChild(r);
     });
@@ -585,9 +608,11 @@ var LINE = {"film": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\
     drawSheet();
     history.pushState({ screen: 's-edit', sheet: true }, '');
     sheet.classList.add('on'); back.classList.add('on'); sheet.scrollTop = 0;
+    if (tv) setTimeout(function () { document.getElementById('fName').focus(); }, 50);
   }
   function closeSheet(fromHistory) {
     sheet.classList.remove('on'); back.classList.remove('on');
+    if (tv) setTimeout(function () { focusFirst(document.getElementById('s-edit')); }, 30);
     if (!fromHistory) history.back();
   }
   function drawPreview() {
@@ -662,10 +687,66 @@ var LINE = {"film": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\
   document.getElementById('addCat').onclick = function () { openSheet(-1); };
   document.getElementById('resetAll').onclick = function () { cats = clone(DEFAULTS); seen = {}; save(); store(SCENE_KEY, seen); renderEdit(); toast('Varsayılan kategoriler geri geldi'); };
 
+
+  // ---------------------------------------------------------------- remote control (TV)
+  function shown(e) {
+    if (!e || e.offsetParent === null) return false;
+    var r = e.getBoundingClientRect();
+    return r.width > 0 && r.height > 0;
+  }
+  function area() { return sheet.classList.contains('on') ? sheet : document.querySelector('.screen.on'); }
+  function focusables() {
+    return Array.prototype.filter.call(area().querySelectorAll('button, input, [tabindex="0"]'), shown);
+  }
+  function focusFirst(root, selector) {
+    if (!root) return;
+    var list = Array.prototype.filter.call(root.querySelectorAll(selector || 'button, input, [tabindex="0"]'), shown);
+    var first = list[0];
+    if (first) { first.focus({ preventScroll: true }); first.scrollIntoView({ block: 'nearest' }); }
+  }
+  function move(dir) {
+    var all = focusables();
+    var cur = document.activeElement;
+    if (!cur || all.indexOf(cur) < 0) { if (all[0]) { all[0].focus(); } return; }
+    var a = cur.getBoundingClientRect(), ax = a.left + a.width / 2, ay = a.top + a.height / 2;
+    var best = null, bestScore = Infinity;
+    all.forEach(function (e) {
+      if (e === cur) return;
+      var r = e.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+      var dx = x - ax, dy = y - ay, main, side;
+      if (dir === 'left') { if (r.right > a.left + 4 || dx >= -4) return; main = -dx; side = Math.abs(dy); }
+      else if (dir === 'right') { if (r.left < a.right - 4 || dx <= 4) return; main = dx; side = Math.abs(dy); }
+      else if (dir === 'up') { if (r.bottom > a.top + 4 || dy >= -4) return; main = -dy; side = Math.abs(dx); }
+      else { if (r.top < a.bottom - 4 || dy <= 4) return; main = dy; side = Math.abs(dx); }
+      var score = main + side * 2.2;
+      if (score < bestScore) { bestScore = score; best = e; }
+    });
+    if (best) {
+      best.focus({ preventScroll: true });
+      best.scrollIntoView({ block: 'center', inline: 'nearest', behavior: animated ? 'smooth' : 'auto' });
+    }
+  }
+  document.addEventListener('keydown', function (e) {
+    if (!tv) return;
+    var dirs = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down' };
+    var dir = dirs[e.key];
+    var target = document.activeElement;
+    if (dir) {
+      // Left and right move the cursor inside a text field
+      if (target && target.tagName === 'INPUT' && (dir === 'left' || dir === 'right')) return;
+      e.preventDefault();
+      move(dir);
+    } else if ((e.key === 'Enter' || e.key === ' ') && target && target.tagName !== 'BUTTON' && target.tagName !== 'INPUT' && target.tabIndex === 0) {
+      e.preventDefault();
+      target.click();
+    }
+  });
+
   var toastEl = document.getElementById('toast'), toastTimer = 0;
   function toast(t) { toastEl.textContent = t; toastEl.classList.add('on'); clearTimeout(toastTimer); toastTimer = setTimeout(function () { toastEl.classList.remove('on'); }, 1700); }
 
   renderCats();
+  if (tv) setTimeout(function () { focusFirst(document.getElementById('s-cats'), '.cv'); }, 60);
 })();
 </script>
 </body>
