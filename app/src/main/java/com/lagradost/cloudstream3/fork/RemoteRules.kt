@@ -71,11 +71,14 @@ object RemoteRules {
         val buttonUrl: String?,
         /** false: shown at every start instead of once */
         val once: Boolean,
+        /** A picture shown above the message */
+        val image: String? = null,
     )
 
     /**
      * { "show": true, "id": 1, "title": "...", "message": "...",
-     *   "button_text": "Telegram", "button_url": "https://t.me/...", "once": true }
+     *   "button_text": "Telegram", "button_url": "https://t.me/...", "once": true,
+     *   "image": "https://.../afis.jpg" }
      * @return null if there is nothing to show.
      */
     fun announcement(json: JsonNode?): Announcement? {
@@ -92,6 +95,8 @@ object RemoteRules {
             buttonText = json.string("button_text", "buttonText", "button"),
             buttonUrl = url,
             once = json.flag(true, "once"),
+            image = json.string("image", "image_url", "imageUrl", "resim")
+                ?.takeIf { it.startsWith("https://") || it.startsWith("http://") },
         )
     }
 

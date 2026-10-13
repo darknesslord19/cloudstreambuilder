@@ -232,6 +232,7 @@ class SettingsFragment : BaseFragment<MainSettingsBinding>(
                 settingsProviders to R.id.action_navigation_global_to_navigation_settings_providers,
                 settingsUpdates to R.id.action_navigation_global_to_navigation_settings_updates,
                 settingsExtensions to R.id.action_navigation_global_to_navigation_settings_extensions,
+                settingsPlus to R.id.action_navigation_global_to_navigation_settings_plus,
             ).forEach { (view, navigationId) ->
                 view.apply {
                     setOnClickListener {
@@ -325,7 +326,7 @@ class SettingsFragment : BaseFragment<MainSettingsBinding>(
 
             val cards = listOf(
                 settingsProfileCard, settingsAccountCard, settingsCardMain,
-                settingsCardData, settingsCardExtensions, settingsCardAbout
+                settingsCardData, settingsCardExtensions, settingsCardPlus, settingsCardAbout
             )
             SettingsLook.clipCards(cards)
             SettingsLook.riseIn(cards + appVersionInfo)

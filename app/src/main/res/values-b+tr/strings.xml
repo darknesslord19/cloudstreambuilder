@@ -828,4 +828,14 @@
     <string name="categories_anim_settings">Kategori animasyonları</string>
     <string name="categories_anim_des">Kategori afişleri hareket etsin</string>
     <string name="repolist_switch_des">"Depo ekle" penceresinde liste düğmesini göster</string>
+    <string name="plus">Plus</string>
+    <string name="plus_summary">Kategoriler, Depo listesi, Rozetler</string>
+    <string name="plus_open_categories">Kategorileri aç</string>
+    <string name="plus_open_categories_des">Hareketli kategori afişleri</string>
+    <string name="categories_badges_settings">Dublaj ve altyazı rozetleri</string>
+    <string name="categories_badges_des">Kategorilerdeki afişlerde "TR Dublaj" ve "Altyazılı" göster</string>
+    <string name="plus_remote_categories">Geliştiricinin kategorileri</string>
+    <string name="plus_remote_on">Açık · %d kategori</string>
+    <string name="plus_remote_off">Kapalı</string>
+    <string name="plus_remote_none">Şu an yok</string>
 </resources>

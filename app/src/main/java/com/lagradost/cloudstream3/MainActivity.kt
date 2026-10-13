@@ -519,6 +519,7 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
             R.id.navigation_settings_player,
             R.id.navigation_settings_updates,
             R.id.navigation_settings_ui,
+            R.id.navigation_settings_plus,
             R.id.navigation_settings_account,
             R.id.navigation_settings_providers,
             R.id.navigation_settings_general,
@@ -595,6 +596,7 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
                     R.id.navigation_settings_player,
                     R.id.navigation_settings_updates,
                     R.id.navigation_settings_ui,
+                    R.id.navigation_settings_plus,
                     R.id.navigation_settings_account,
                     R.id.navigation_settings_providers,
                     R.id.navigation_settings_general,
@@ -2015,6 +2017,8 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
                 AddonManager.reapply()
             }
             if (changed.contains(RemoteRules.Feature.ICONS)) Looks.syncIcon(this@MainActivity)
+            // The categories the developer gives everyone
+            com.lagradost.cloudstream3.fork.Categories.refreshRemote(this@MainActivity)
         }
 
         FcastManager().init(this, false)

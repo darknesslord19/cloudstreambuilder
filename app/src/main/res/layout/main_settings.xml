@@ -291,7 +291,7 @@
                     android:id="@+id/settings_extensions"
                     style="@style/SettingsRow"
                     android:nextFocusUp="@id/settings_credits"
-                    android:nextFocusDown="@id/settings_about">
+                    android:nextFocusDown="@id/settings_plus">
 
                     <com.lagradost.cloudstream3.fork.IconBox
                         style="@style/SettingsRowIcon"
@@ -315,13 +315,44 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/settings_card_plus"
+                style="@style/SettingsCard">
+
+                <LinearLayout
+                    android:id="@+id/settings_plus"
+                    style="@style/SettingsRow"
+                    android:nextFocusUp="@id/settings_extensions"
+                    android:nextFocusDown="@id/settings_about">
+
+                    <com.lagradost.cloudstream3.fork.IconBox
+                        style="@style/SettingsRowIcon"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/plus_sparkle_24px" />
+
+                    <LinearLayout style="@style/SettingsRowTexts">
+
+                        <TextView
+                            style="@style/SettingsRowTitle"
+                            android:text="@string/plus" />
+
+                        <TextView
+                            android:id="@+id/settings_plus_summary"
+                            style="@style/SettingsRowSummary"
+                            android:text="@string/plus_summary" />
+                    </LinearLayout>
+
+                    <ImageView style="@style/SettingsRowChevron" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/settings_card_about"
                 style="@style/SettingsCard">
 
                 <LinearLayout
                     android:id="@+id/settings_about"
                     style="@style/SettingsRow"
-                    android:nextFocusUp="@id/settings_extensions">
+                    android:nextFocusUp="@id/settings_plus">
 
                     <com.lagradost.cloudstream3.fork.IconBox
                         style="@style/SettingsRowIcon"

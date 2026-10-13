@@ -62,6 +62,67 @@ object Categories {
     /** Sections of one repository asked for one category */
     private const val SECTIONS_PER_SOURCE = 2
 
+    /** How long gathered results are kept */
+    private const val CACHE_MS = 20 * 60 * 1000L
+    private const val CACHE_ENTRIES = 30
+
+    /** What the page keeps is saved under this prefix in the settings */
+    private const val STORE_PREFIX = "fork_cat_store_"
+
+    /** Badges for dubbing and subtitles on the posters */
+    const val PREF_BADGES = "fork_categories_badges"
+
+    /** Results gathered lately, by kind, keywords and page */
+    private val cache = ConcurrentHashMap<String, Pair<Long, List<Pair<String, List<SearchResponse>>>>>()
+
+    fun badgesShown(context: Context): Boolean =
+        PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREF_BADGES, true)
+
+    private val dubWords = Regex("dublaj|dubbed|türkçe ses|turkce ses|tr dub", RegexOption.IGNORE_CASE)
+    private val subWords = Regex("altyaz|subbed|\\bsub\\b", RegexOption.IGNORE_CASE)
+
+    /** "TR Dublaj", "Altyazılı" or nothing, from what the repository tells about an item. */
+    fun dubBadge(card: SearchResponse): String {
+        val status = (card as? com.lagradost.cloudstream3.AnimeSearchResponse)?.dubStatus
+        val name = card.name
+        return when {
+            status?.contains(com.lagradost.cloudstream3.DubStatus.Dubbed) == true || dubWords.containsMatchIn(name) -> "TR Dublaj"
+            status?.contains(com.lagradost.cloudstream3.DubStatus.Subbed) == true || subWords.containsMatchIn(name) -> "Altyazılı"
+            else -> ""
+        }
+    }
+
+    // ---------------------------------------------------------------- the developer's categories
+
+    /**
+     * Categories the developer gives everyone, read from [REMOTE_URL] when the app starts:
+     *
+     *   { "settings": { "enabled": true, "user_can_hide": true, "pinned_override": true },
+     *     "categories": [ { "id": "ramazan", "name": "...", "kind": "genre", "keys": "...",
+     *                       "scene": "Dram", "grade": 2, "icon": "local", "pinned": true,
+     *                       "active": true, "until": "2027-04-01" } ] }
+     *
+     * Without the document nothing changes. The page does the merging, this only keeps the text.
+     */
+    private const val REMOTE_URL = "https://darknes-lord-paste-default-rtdb.firebaseio.com/pastes/Cloudstreamcatagory.json"
+    private const val REMOTE_PREFS = "fork_remote_categories"
+
+    fun remoteDocument(context: Context): String? =
+        context.applicationContext.getSharedPreferences(REMOTE_PREFS, Context.MODE_PRIVATE).getString("doc", null)
+
+    /** Reads the document again, what could not be read leaves the last one in place. */
+    suspend fun refreshRemote(context: Context) {
+        try {
+            val response = com.lagradost.cloudstream3.app.get(REMOTE_URL)
+            if (response.code !in 200..299) return
+            val text = response.text.trim()
+            context.applicationContext.getSharedPreferences(REMOTE_PREFS, Context.MODE_PRIVATE).edit()
+                .putString("doc", if (text == "null") "" else text).apply()
+        } catch (t: Throwable) {
+            // Offline, the last document stays
+        }
+    }
+
     fun available(context: Context?): Boolean = ForkFeatures.isOn(Feature.CATEGORIES, context)
 
     fun iconShown(context: Context?): Boolean {
@@ -157,13 +218,65 @@ object Categories {
             job?.cancel()
         }
 
+        /** The badges on the posters (dubbing, subtitles) are shown */
+        @JavascriptInterface
+        fun badges(): Boolean = badgesShown(activity)
+
+        /** The categories the developer gives everyone, the document as it was read last. */
+        @JavascriptInterface
+        fun remote(): String = remoteDocument(activity) ?: ""
+
+        /**
+         * What the page keeps (the user's categories and choices). It lives in the settings of
+         * the app, so the backup of the app takes it along.
+         */
+        @JavascriptInterface
+        fun getStore(key: String?): String? {
+            key ?: return null
+            return PreferenceManager.getDefaultSharedPreferences(activity).getString(STORE_PREFIX + key, null)
+        }
+
+        @JavascriptInterface
+        fun setStore(key: String?, value: String?) {
+            key ?: return
+            PreferenceManager.getDefaultSharedPreferences(activity).edit().apply {
+                if (value == null) remove(STORE_PREFIX + key) else putString(STORE_PREFIX + key, value)
+            }.apply()
+        }
+
         /**
          * Gathers a category. [spec] is { "kind": "movie|series|anime|new|genre", "keys": "a, b" }.
          * Answers with window.onCatStart(token, sources), window.onCatResults(token, {source, items})
-         * for every repository that found something, and window.onCatDone(token).
+         * for every repository that found something, and window.onCatDone(token, fromCache).
+         * What was gathered is kept for a while, opening the same category again is then at once.
          */
         @JavascriptInterface
-        fun load(token: Int, spec: String?, page: Int) {
+        fun load(token: Int, spec: String?, page: Int) = gatherCategory(token, spec, page, false)
+
+        /** Like [load], without the kept results. */
+        @JavascriptInterface
+        fun reload(token: Int, spec: String?, page: Int) = gatherCategory(token, spec, page, true)
+
+        private fun itemOf(card: SearchResponse, badges: Boolean): JSONObject {
+            val id = counter.incrementAndGet().toString()
+            cards[id] = card
+            return JSONObject()
+                .put("id", id)
+                .put("name", card.name)
+                .put("poster", card.posterUrl ?: "")
+                .put("type", card.type?.name ?: "")
+                .put("quality", card.quality?.name ?: "")
+                .put("dub", if (badges) dubBadge(card) else "")
+        }
+
+        private fun emit(token: Int, source: String, found: List<SearchResponse>, badges: Boolean) {
+            val items = JSONArray()
+            for (card in found) items.put(itemOf(card, badges))
+            val payload = JSONObject().put("source", source).put("items", items).toString()
+            send("window.onCatResults && window.onCatResults($token, ${JSONObject.quote(payload)})")
+        }
+
+        private fun gatherCategory(token: Int, spec: String?, page: Int, fresh: Boolean) {
             val json = try {
                 JSONObject(spec ?: "{}")
             } catch (t: Throwable) {
@@ -177,8 +290,17 @@ object Categories {
                 else -> Kind.GENRE
             }
             val keys = json.optString("keys").split(',').map { it.trim() }.filter { it.isNotEmpty() }
+            val cacheKey = "${kind.name}|${keys.joinToString(",") { normalize(it) }}|$page"
+            val badges = badgesShown(activity)
             job?.cancel()
             job = scope.launch {
+                val kept = cache[cacheKey]
+                if (!fresh && kept != null && System.currentTimeMillis() - kept.first < CACHE_MS) {
+                    send("window.onCatStart && window.onCatStart($token, ${kept.second.size})")
+                    for ((source, found) in kept.second) emit(token, source, found, badges)
+                    send("window.onCatDone && window.onCatDone($token, true)")
+                    return@launch
+                }
                 val providers = try {
                     activity.filterProviderByPreferredMedia(hasHomePageIsRequired = true)
                 } catch (t: Throwable) {
@@ -191,29 +313,25 @@ object Categories {
                 }
                 send("window.onCatStart && window.onCatStart($token, ${work.size})")
                 val gate = Semaphore(PARALLEL)
+                val results = java.util.Collections.synchronizedList(ArrayList<Pair<String, List<SearchResponse>>>())
                 work.map { (api, sections, byType) ->
                     async {
                         gate.withPermit {
                             val found = withTimeoutOrNull(TIMEOUT_MS) { gather(api, sections, byType, kind, page) }.orEmpty()
-                            val items = JSONArray()
-                            for (card in found) {
-                                val id = counter.incrementAndGet().toString()
-                                cards[id] = card
-                                items.put(
-                                    JSONObject()
-                                        .put("id", id)
-                                        .put("name", card.name)
-                                        .put("poster", card.posterUrl ?: "")
-                                        .put("type", card.type?.name ?: "")
-                                        .put("quality", card.quality?.name ?: "")
-                                )
-                            }
-                            val payload = JSONObject().put("source", api.name).put("items", items).toString()
-                            send("window.onCatResults && window.onCatResults($token, ${JSONObject.quote(payload)})")
+                            if (found.isNotEmpty()) results.add(api.name to found)
+                            emit(token, api.name, found, badges)
                         }
                     }
                 }.awaitAll()
-                send("window.onCatDone && window.onCatDone($token)")
+                if (results.isNotEmpty()) {
+                    cache[cacheKey] = System.currentTimeMillis() to results.toList()
+                    // Old entries go, so the kept results stay small
+                    if (cache.size > CACHE_ENTRIES) {
+                        cache.entries.sortedBy { it.value.first }.take(cache.size - CACHE_ENTRIES)
+                            .forEach { cache.remove(it.key) }
+                    }
+                }
+                send("window.onCatDone && window.onCatDone($token, false)")
             }
         }
 

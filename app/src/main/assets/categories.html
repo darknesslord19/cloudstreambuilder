@@ -184,6 +184,16 @@
   .empty b { display: block; color: var(--ink); font-size: 17px; margin-bottom: 6px; }
   .poster img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .poster .p-q { position: absolute; z-index: 1; top: 6px; right: 6px; padding: 1px 6px; border-radius: 6px; background: var(--accent); color: var(--accent-ink); font-size: 9px; font-weight: 800; }
+  .tools { display: flex; gap: 8px; align-items: center; margin: 0 16px 10px; }
+  .search { flex: 1; display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; border-radius: 14px; border: 1px solid var(--line); background: var(--field); }
+  .search svg { width: 18px; height: 18px; color: var(--muted); flex: none; }
+  .search input { flex: 1; min-width: 0; border: 0; background: none; color: var(--ink); font: inherit; outline: none; }
+  .tools .chip { flex: none; min-height: 44px; }
+  .poster .p-dub { position: absolute; z-index: 1; left: 6px; bottom: 26px; padding: 1px 6px; border-radius: 6px; background: rgba(255,255,255,.9); color: #111; font-size: 9px; font-weight: 800; }
+  .poster .p-dub.dub { background: #e30a17; color: #fff; }
+  .row.off { opacity: .55; }
+  .row .tag { font-style: normal; font-size: 10px; font-weight: 800; padding: 1px 6px; margin-left: 4px; border-radius: 6px; background: var(--accent); color: var(--accent-ink); vertical-align: middle; }
+  .tv .search:focus-within { outline: 3px solid var(--accent); outline-offset: 2px; }
   .poster { cursor: pointer; content-visibility: auto; contain-intrinsic-size: 120px 180px; }
   /* ---------- TV: a wider page and a clear frame on what the remote has chosen ---------- */
   .tv .app { max-width: 1240px; padding: 0 24px; }
@@ -223,6 +233,11 @@
     <div class="bar">
       <button class="icon-btn" data-back aria-label="Geri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
       <h1 id="listTitle"></h1>
+      <button class="icon-btn" id="refreshList" aria-label="Yenile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 4v5h-5"/></svg></button>
+    </div>
+    <div class="tools">
+      <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="q" type="search" placeholder="Bu kategoride ara" autocomplete="off"></label>
+      <button class="chip" id="sortBtn">Önerilen</button>
     </div>
     <div class="loading" id="loading"><span id="loadText"></span><span class="bar-p"><i id="loadBar"></i></span></div>
     <div class="sources" id="sources"></div>
@@ -328,13 +343,80 @@ var LINE = {"film": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\
   var KEY = 'fork-categories-v1', SCENE_KEY = 'fork-category-scenes-v1';
 
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
-  function load(key, fallback) { try { var v = JSON.parse(localStorage.getItem(key)); return v == null ? fallback : v; } catch (e) { return fallback; } }
-  function store(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {} }
+  // What the page keeps lives in the settings of the app, so the app's backup takes it along.
+  // Older versions kept it in the page itself, that is moved over once.
+  var hasStore = !!(native && native.getStore && native.setStore);
+  function load(key, fallback) {
+    try {
+      var raw = hasStore ? native.getStore(key) : null;
+      if (raw == null) {
+        try { raw = localStorage.getItem(key); } catch (e) { raw = null; }
+        if (raw != null && hasStore) native.setStore(key, raw);
+      }
+      var v = raw == null ? null : JSON.parse(raw);
+      return v == null ? fallback : v;
+    } catch (e) { return fallback; }
+  }
+  function store(key, value) {
+    var raw = JSON.stringify(value);
+    try { if (hasStore) native.setStore(key, raw); else localStorage.setItem(key, raw); } catch (e) {}
+  }
   var cats = load(KEY, null);
   if (!Array.isArray(cats) || !cats.length) cats = clone(DEFAULTS);
   var seen = load(SCENE_KEY, {}); if (typeof seen !== 'object' || !seen) seen = {};
   var counts = load('fork-category-counts-v1', {}); if (typeof counts !== 'object' || !counts) counts = {};
   function save() { store(KEY, cats); }
+
+  // ---------------------------------------------------------------- the developer's categories (Firebase)
+  var remoteDoc = {};
+  try { var rt = native && native.remote ? native.remote() : ''; remoteDoc = rt ? JSON.parse(rt) : {}; } catch (e) { remoteDoc = {}; }
+  if (typeof remoteDoc === 'string') { try { remoteDoc = JSON.parse(remoteDoc); } catch (e) { remoteDoc = {}; } }
+  if (!remoteDoc || typeof remoteDoc !== 'object') remoteDoc = {};
+  function flag(v, dflt) {
+    if (v === true || v === false) return v;
+    if (typeof v === 'string') { var t = v.toLowerCase(); if (t === 'true' || t === '1' || t === 'evet') return true; if (t === 'false' || t === '0' || t === 'hayır' || t === 'hayir') return false; }
+    if (typeof v === 'number') return v !== 0;
+    return dflt;
+  }
+  var RS = remoteDoc.settings || {};
+  var remoteOn = flag(RS.enabled, true);
+  var canHide = flag(RS.user_can_hide, true);
+  var pinnedOverride = flag(RS.pinned_override, true);
+  var KIND_IDS = ['movie', 'series', 'anime', 'new', 'genre'];
+  var REMOTE = (function () {
+    var list = remoteDoc.categories;
+    if (list && !Array.isArray(list) && typeof list === 'object') list = Object.keys(list).map(function (k) { return list[k]; });
+    if (!Array.isArray(list)) return [];
+    var now = Date.now();
+    return list.filter(function (r) { return r && r.name; }).map(function (r, i) {
+      var scene = String(r.scene || 'auto'), url = '';
+      if (/^https?:\/\//i.test(scene)) { url = scene; scene = 'url'; }
+      else if (scene !== 'auto' && !STILLS[scene]) scene = 'auto';
+      var until = r.until ? Date.parse(String(r.until).length === 10 ? r.until + 'T23:59:59' : r.until) : NaN;
+      return {
+        id: String(r.id || ('r' + i)), name: String(r.name).slice(0, 30),
+        kind: KIND_IDS.indexOf(r.kind) >= 0 ? r.kind : 'genre', keys: String(r.keys || ''),
+        scene: scene, url: url, grade: Math.max(0, Math.min(9, parseInt(r.grade, 10) || 0)),
+        icon: r.icon ? String(r.icon) : undefined, pinned: flag(r.pinned, false),
+        active: flag(r.active, true) && !(until < now), remote: true
+      };
+    }).filter(function (r) { return r.active; });
+  })();
+  var remoteState = load('fork-remote-state-v1', {}); if (typeof remoteState !== 'object' || !remoteState) remoteState = {};
+  var pinsChanged = !!load('fork-pins-changed-v1', false);
+  function hiddenRemote(c) { return canHide && remoteState[c.id] && remoteState[c.id].hidden; }
+  function remoteShown() { return remoteOn ? REMOTE.filter(function (c) { return !hiddenRemote(c); }) : []; }
+  /** The four big cards and the rest, the developer's and the user's together */
+  function arrange() {
+    var rc = remoteShown(), own = cats;
+    var rp = rc.filter(function (c) { return c.pinned; }), op = own.filter(function (c) { return c.pinned; });
+    var top;
+    if (pinnedOverride) top = rp.concat(op);
+    else top = pinsChanged ? op.concat(rp) : rp.concat(op);
+    top = top.slice(0, 4);
+    var rest = rc.concat(own).filter(function (c) { return top.indexOf(c) < 0; });
+    return { top: top, rest: rest };
+  }
 
   var tv = false;
   try { tv = !!(native && native.isTv && native.isTv()); } catch (e) {}
@@ -458,12 +540,12 @@ var LINE = {"film": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\
     if (watcher) watcher.disconnect();
     var pinned = document.getElementById('pinned'), others = document.getElementById('others');
     pinned.innerHTML = ''; others.innerHTML = '';
-    var top = cats.filter(function (c) { return c.pinned; }).slice(0, 4);
+    var arranged = arrange(), top = arranged.top;
     top.forEach(function (c, i) {
       var b = cover(c, i); if (firstRender) b.classList.add('enter');
       b.onclick = function () { openList(c); }; pinned.appendChild(b); watch(b);
     });
-    var rest = cats.filter(function (c) { return top.indexOf(c) < 0; });
+    var rest = arranged.rest;
     rest.forEach(function (c, i) {
       var b = cover(c, Math.min(i + 4, 9), true); if (firstRender) b.classList.add('enter');
       b.onclick = function () { openList(c); }; others.appendChild(b); watch(b);
@@ -479,7 +561,8 @@ var LINE = {"film": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\
   var loadText = document.getElementById('loadText'), loadBar = document.getElementById('loadBar');
 
   function openList(c) {
-    listCat = c; page = 1; filter = null; found = 0;
+    listCat = c; page = 1; filter = null; found = 0; order = 0;
+    qEl.value = ''; sortIndex = 0; sortBtn.textContent = SORTS[0]; sortBtn.classList.remove('on');
     document.getElementById('listTitle').textContent = c.name;
     postersEl.innerHTML = ''; sourcesEl.innerHTML = '';
     var all = el('button', 'chip on', 'Tümü');
@@ -488,7 +571,7 @@ var LINE = {"film": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\
     go('s-list');
     request();
   }
-  function request() {
+  function request(fresh) {
     token++;
     sourcesTotal = 0; sourcesDone = 0;
     document.getElementById('loading').hidden = false;
@@ -497,7 +580,7 @@ var LINE = {"film": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\
     loadText.textContent = 'Depolar taranıyor…';
     loadBar.style.width = '4%';
     var spec = JSON.stringify({ kind: listCat.kind, keys: listCat.keys || '' });
-    if (native) { try { native.load(token, spec, page); } catch (e) {} }
+    if (native) { try { if (fresh && native.reload) native.reload(token, spec, page); else native.load(token, spec, page); } catch (e) {} }
     else demo(token);
   }
   window.onCatStart = function (t, n) {
@@ -524,6 +607,9 @@ var LINE = {"film": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\
     items.forEach(function (it) {
       var p = el('div', 'poster');
       p.dataset.src = src;
+      p.dataset.name = (it.name || '').toLocaleLowerCase('tr');
+      p.dataset.q = QUALITY[it.quality] || 0;
+      p.dataset.i = order++;
       var a = el('div', 'p-art');
       var col = ['#7a0d1c', '#12245a', '#035e7b', '#4a1d6e', '#3a2a08'][hash(it.name) % 5];
       a.style.background = 'linear-gradient(170deg,' + col + ', #0b0b0d)';
@@ -534,7 +620,8 @@ var LINE = {"film": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\
         img.src = it.poster; p.appendChild(img);
       }
       p.appendChild(el('span', 'p-src', esc(src)));
-      if (it.quality) p.appendChild(el('span', 'p-q', esc(it.quality)));
+      if (it.quality) p.appendChild(el('span', 'p-q', esc(QUALITY_NAMES[it.quality] || it.quality)));
+      if (it.dub) p.appendChild(el('span', 'p-dub' + (/dublaj/i.test(it.dub) ? ' dub' : ''), esc(it.dub)));
       p.appendChild(el('span', 'p-name', esc(it.name)));
       p.tabIndex = 0;
       p.onclick = function () { if (native) { try { native.open(it.id); } catch (e) {} } };
@@ -547,23 +634,51 @@ var LINE = {"film": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\
       var posters = Array.prototype.slice.call(postersEl.querySelectorAll('img')).slice(0, 3).map(function (i) { return i.src; });
       if (posters.length) { seen[listCat.name] = posters; store(SCENE_KEY, seen); }
     }
+    if (sortIndex) applySort();
     applyFilter();
   };
-  window.onCatDone = function (t) {
+  window.onCatDone = function (t, fromCache) {
     if (t !== token) return;
     loadBar.style.width = '100%';
-    loadText.textContent = (sourcesTotal || 0) + ' depodan ' + found + ' içerik';
+    loadText.textContent = (sourcesTotal || 0) + ' depodan ' + found + ' içerik' + (fromCache ? ' · kayıtlı, yenilemek için ↻' : '');
+    applySort();
     setTimeout(function () { if (t === token) document.getElementById('loading').hidden = true; }, 1500);
     document.getElementById('empty').hidden = found > 0;
     if (listCat && page === 1 && found) { counts[listCat.name] = found; store('fork-category-counts-v1', counts); }
     document.getElementById('more').hidden = !(found > 0 && sourcesTotal > 0);
   };
   document.getElementById('more').onclick = function () { page++; request(); };
+  document.getElementById('refreshList').onclick = function () {
+    if (!listCat) return;
+    page = 1; found = 0; filter = null; postersEl.innerHTML = '';
+    while (sourcesEl.children.length > 1) sourcesEl.removeChild(sourcesEl.lastChild);
+    request(true);
+  };
+  // Search and sort inside the category
+  var QUALITY = { FourK: 6, UHD: 6, BlueRay: 5, FullHD: 4, HQ: 3, HD: 3, HDR: 4, SDR: 2, WebRip: 2, DVD: 2, SD: 1, Cam: 0, CamRip: 0, HdCam: 0, Telesync: 0, WorkPrint: 0, Telecine: 0 };
+  var QUALITY_NAMES = { FourK: '4K', BlueRay: 'BluRay', FullHD: 'FHD', HdCam: 'HDCam', CamRip: 'CAM', Cam: 'CAM', WebRip: 'WEB' };
+  var SORTS = ['Önerilen', 'A–Z', 'Z–A', 'Kalite'], sortIndex = 0, order = 0;
+  var qEl = document.getElementById('q'), sortBtn = document.getElementById('sortBtn');
+  qEl.addEventListener('input', function () { applyFilter(); });
+  sortBtn.onclick = function () { sortIndex = (sortIndex + 1) % SORTS.length; sortBtn.textContent = SORTS[sortIndex]; sortBtn.classList.toggle('on', sortIndex > 0); applySort(); };
+  function applySort() {
+    var list = Array.prototype.slice.call(postersEl.children);
+    list.sort(function (a, b) {
+      if (sortIndex === 1) return a.dataset.name.localeCompare(b.dataset.name, 'tr');
+      if (sortIndex === 2) return b.dataset.name.localeCompare(a.dataset.name, 'tr');
+      if (sortIndex === 3) return (b.dataset.q - a.dataset.q) || (a.dataset.i - b.dataset.i);
+      return a.dataset.i - b.dataset.i;
+    });
+    list.forEach(function (p) { postersEl.appendChild(p); });
+  }
   function applyFilter() {
     Array.prototype.forEach.call(sourcesEl.children, function (ch, i) {
       ch.classList.toggle('on', i === 0 ? !filter : ch.dataset.src === filter);
     });
-    Array.prototype.forEach.call(postersEl.children, function (p) { p.hidden = !!filter && p.dataset.src !== filter; });
+    var q = (qEl.value || '').trim().toLocaleLowerCase('tr');
+    Array.prototype.forEach.call(postersEl.children, function (p) {
+      p.hidden = (!!filter && p.dataset.src !== filter) || (!!q && p.dataset.name.indexOf(q) < 0);
+    });
   }
   // Without the app (opened in a browser) a few example cards are shown
   function demo(t) {
@@ -571,7 +686,7 @@ var LINE = {"film": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\
     window.onCatStart(t, names.length);
     names.forEach(function (s, i) {
       setTimeout(function () {
-        window.onCatResults(t, JSON.stringify({ source: s, items: [1, 2, 3].map(function (k) { return { id: s + k, name: listCat.name + ' ' + (i * 3 + k), poster: '', quality: k === 1 ? 'HD' : '' }; }) }));
+        window.onCatResults(t, JSON.stringify({ source: s, items: [1, 2, 3].map(function (k) { return { id: s + k, name: listCat.name + ' ' + (i * 3 + k), poster: '', quality: k === 1 ? 'HD' : (k === 2 ? 'FourK' : ''), dub: k === 2 ? 'TR Dublaj' : (k === 3 ? 'Altyazılı' : '') }; }) }));
         if (i === names.length - 1) window.onCatDone(t);
       }, 300 * (i + 1));
     });
@@ -581,6 +696,24 @@ var LINE = {"film": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\
   function renderEdit() {
     var list = document.getElementById('editList');
     list.innerHTML = '';
+    if (remoteOn) REMOTE.forEach(function (c) {
+      var r = el('div', 'row' + (hiddenRemote(c) ? ' off' : ''));
+      var mini = el('div', 'mini'); mini.appendChild(cover(c, 0)); r.appendChild(mini);
+      var t = el('div', 't', '<b>' + esc(c.name) + ' <em class="tag">Önerilen</em></b><span>' + (hiddenRemote(c) ? 'Gizli' : (c.pinned ? 'Ana ekranda' : 'Geliştirici ekledi')) + '</span>');
+      r.appendChild(t);
+      if (canHide) {
+        var hide = el('button', 'pin' + (hiddenRemote(c) ? ' on' : ''), hiddenRemote(c) ? 'Göster' : 'Gizle');
+        hide.onclick = function (e) {
+          e.stopPropagation();
+          remoteState[c.id] = { hidden: !hiddenRemote(c) };
+          store('fork-remote-state-v1', remoteState); renderEdit();
+        };
+        r.appendChild(hide);
+      }
+      t.tabIndex = 0;
+      t.onclick = mini.onclick = function () { toast('Bu kategoriyi geliştirici ekledi, değiştirilemez'); };
+      list.appendChild(r);
+    });
     cats.forEach(function (c, idx) {
       var r = el('div', 'row');
       var mini = el('div', 'mini'); mini.appendChild(cover(c, 0)); r.appendChild(mini);
@@ -591,7 +724,9 @@ var LINE = {"film": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\
       pin.onclick = function (e) {
         e.stopPropagation();
         if (!c.pinned && cats.filter(function (x) { return x.pinned; }).length >= 4) { toast('En fazla 4 kategori ana ekranda durur'); return; }
-        c.pinned = !c.pinned; save(); renderEdit();
+        c.pinned = !c.pinned; save();
+        pinsChanged = true; store('fork-pins-changed-v1', true);
+        renderEdit();
       };
       r.appendChild(pin);
       t.tabIndex = 0; mini.tabIndex = 0;
@@ -692,7 +827,11 @@ var LINE = {"film": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\
     save(); store(SCENE_KEY, seen); closeSheet(false); renderEdit(); toast('Kaydedildi');
   };
   document.getElementById('addCat').onclick = function () { openSheet(-1); };
-  document.getElementById('resetAll').onclick = function () { cats = clone(DEFAULTS); seen = {}; save(); store(SCENE_KEY, seen); renderEdit(); toast('Varsayılan kategoriler geri geldi'); };
+  document.getElementById('resetAll').onclick = function () {
+    cats = clone(DEFAULTS); seen = {}; remoteState = {}; pinsChanged = false;
+    save(); store(SCENE_KEY, seen); store('fork-remote-state-v1', remoteState); store('fork-pins-changed-v1', false);
+    renderEdit(); toast('Varsayılan kategoriler geri geldi');
+  };
 
 
   // ---------------------------------------------------------------- remote control (TV)

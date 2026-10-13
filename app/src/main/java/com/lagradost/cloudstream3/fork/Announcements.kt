@@ -11,6 +11,7 @@ import com.lagradost.cloudstream3.R
 import com.lagradost.cloudstream3.app
 import com.lagradost.cloudstream3.mvvm.logError
 import com.lagradost.cloudstream3.utils.Coroutines.ioSafe
+import com.lagradost.cloudstream3.utils.ImageLoader.loadImage
 
 /**
  * A message from the developer, shown when the app starts. It is read from [URL]:
@@ -30,6 +31,47 @@ object Announcements {
     @Volatile
     private var shownThisStart = false
 
+    /** The picture with the message below it, for an announcement that has an "image". */
+    private fun pictureView(activity: Activity, url: String, message: String): android.view.View {
+        val density = activity.resources.displayMetrics.density
+        fun dp(value: Int) = (value * density).toInt()
+        val column = android.widget.LinearLayout(activity).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            setPadding(dp(20), dp(12), dp(20), 0)
+        }
+        val picture = android.widget.ImageView(activity).apply {
+            adjustViewBounds = true
+            maxHeight = dp(280)
+            scaleType = android.widget.ImageView.ScaleType.FIT_CENTER
+            clipToOutline = true
+            background = android.graphics.drawable.GradientDrawable().apply {
+                cornerRadius = dp(16).toFloat()
+                setColor(SettingsLook.themeColor(activity, R.attr.primaryBlackBackground, 0xFF111111.toInt()))
+            }
+            minimumHeight = dp(120)
+        }
+        column.addView(
+            picture,
+            android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        )
+        try {
+            picture.loadImage(url)
+        } catch (t: Throwable) {
+            logError(t)
+        }
+        val text = android.widget.TextView(activity).apply {
+            this.text = message
+            textSize = 16f
+            setTextColor(SettingsLook.themeColor(activity, R.attr.textColor, 0xFFFFFFFF.toInt()))
+            setPadding(0, dp(14), 0, dp(4))
+        }
+        column.addView(text)
+        return android.widget.ScrollView(activity).apply { addView(column) }
+    }
+
     fun check(activity: Activity) {
         if (shownThisStart) return
         ioSafe {
@@ -48,8 +90,13 @@ object Announcements {
                 if (!AccessGate.state(activity).granted) return@runOnUiThread
                 try {
                     val builder = AlertDialog.Builder(activity, R.style.AlertDialogCustom)
-                        .setMessage(announcement.message)
                         .setPositiveButton(R.string.ok) { _, _ -> }
+                    val image = announcement.image
+                    if (image == null) {
+                        builder.setMessage(announcement.message)
+                    } else {
+                        builder.setView(pictureView(activity, image, announcement.message))
+                    }
                     announcement.title?.let { builder.setTitle(it) }
                     val url = announcement.buttonUrl
                     if (url != null) {
