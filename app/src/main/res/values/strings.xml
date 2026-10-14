@@ -512,6 +512,16 @@
     <string name="batch_download_nothing_to_download_format" formatted="true">All %s already downloaded</string>
     <string name="no_plugins_found_error">No plugins found in repository</string>
     <string name="no_repository_found_error">Repository not found, check the URL and try VPN</string>
+    <!-- install all on the plugin list -->
+    <string name="plugins_install_all">Install all</string>
+    <string name="plugins_installed_count" formatted="true">%1$d / %2$d plugins installed</string>
+    <string name="plugins_all_installed" formatted="true">All installed · %d plugins</string>
+    <string name="plugins_installing" formatted="true">Installing… %1$d / %2$d</string>
+    <string name="plugins_install_missing" formatted="true">Everything missing (%1$d) · %2$s</string>
+    <string name="plugins_install_shown" formatted="true">Only what is on the list (%1$d) · %2$s</string>
+    <string name="plugins_installed_done" formatted="true">%d plugins installed</string>
+    <string name="plugins_nothing_missing">Everything is installed already</string>
+    <string name="plugins_install_confirm">Install</string>
     <string name="batch_download">Batch download</string>
     <string name="plugin_singular">plugin</string>
     <string name="plugin">plugins</string>

@@ -1,16 +1,20 @@
 package com.lagradost.cloudstream3.ui.settings.extensions
 
 import android.os.Bundle
+import android.text.format.Formatter.formatShortFileSize
 import android.view.View
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import com.lagradost.cloudstream3.AllLanguagesName
-import com.lagradost.cloudstream3.BuildConfig
+import com.lagradost.cloudstream3.CommonActivity.showToast
 import com.lagradost.cloudstream3.R
 import com.lagradost.cloudstream3.TvType
 import com.lagradost.cloudstream3.databinding.FragmentPluginsBinding
 import com.lagradost.cloudstream3.mvvm.observe
+import com.lagradost.cloudstream3.plugins.PluginWrapper
 import com.lagradost.cloudstream3.ui.BaseFragment
 import com.lagradost.cloudstream3.ui.home.HomeFragment.Companion.bindChips
 import com.lagradost.cloudstream3.ui.result.FOCUS_SELF
@@ -27,6 +31,7 @@ import com.lagradost.cloudstream3.utils.AppUtils.toJson
 import com.lagradost.cloudstream3.utils.AppUtils.tryParseJson
 import com.lagradost.cloudstream3.utils.SingleSelectionHelper.showMultiDialog
 import com.lagradost.cloudstream3.utils.SubtitleHelper.getNameNextToFlagEmoji
+import com.lagradost.cloudstream3.utils.UIHelper.colorFromAttribute
 import com.lagradost.cloudstream3.utils.UIHelper.toPx
 
 const val PLUGINS_BUNDLE_DATA = "data"
@@ -36,6 +41,82 @@ class PluginsFragment : BaseFragment<FragmentPluginsBinding>(
     BaseFragment.BindingCreator.Inflate(FragmentPluginsBinding::inflate)
 ) {
     private lateinit var pluginViewModel: PluginsViewModel
+
+    /** "Install all" is running */
+    private var installing = false
+
+    /** The line with how many plugins are installed, and the button to install the rest */
+    private fun updateSummary(binding: FragmentPluginsBinding) {
+        val box = binding.pluginsSummaryBox
+        val all = pluginViewModel.allPlugins()
+        box.root.isVisible = all.isNotEmpty()
+        if (all.isEmpty() || installing) return
+        val installed = all.count { it.isDownloaded }
+        val missing = all.size - installed
+        box.pluginsSummaryText.text = if (missing == 0) {
+            getString(R.string.plugins_all_installed, all.size)
+        } else {
+            getString(R.string.plugins_installed_count, installed, all.size)
+        }
+        box.pluginsSummaryButton.isVisible = missing > 0
+        box.pluginsSummaryProgress.isVisible = false
+    }
+
+    /** Asks what to install: everything missing, or only what the filters show. */
+    private fun askInstall(binding: FragmentPluginsBinding, repositoryData: RepositoryData) {
+        if (installing) return
+        val ctx = context ?: return
+        val missing = pluginViewModel.allPlugins().filter { !it.isDownloaded }.map { it.pluginWrapper }
+        if (missing.isEmpty()) {
+            showToast(R.string.plugins_nothing_missing, Toast.LENGTH_SHORT)
+            return
+        }
+        val shown = pluginViewModel.shownPlugins().filter { !it.isDownloaded }.map { it.pluginWrapper }
+        fun size(list: List<PluginWrapper>): String =
+            formatShortFileSize(ctx, list.sumOf { it.plugin.fileSize ?: 0L })
+
+        val choices = mutableListOf(missing)
+        val labels = mutableListOf(getString(R.string.plugins_install_missing, missing.size, size(missing)))
+        if (shown.isNotEmpty() && shown.size < missing.size) {
+            choices.add(shown)
+            labels.add(getString(R.string.plugins_install_shown, shown.size, size(shown)))
+        }
+        var picked = 0
+        AlertDialog.Builder(ctx, R.style.AlertDialogCustom)
+            .setTitle(R.string.plugins_install_all)
+            .setSingleChoiceItems(labels.toTypedArray(), 0) { _, which -> picked = which }
+            .setPositiveButton(R.string.plugins_install_confirm) { _, _ ->
+                install(binding, repositoryData, choices[picked])
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun install(binding: FragmentPluginsBinding, repositoryData: RepositoryData, list: List<PluginWrapper>) {
+        installing = true
+        val box = binding.pluginsSummaryBox
+        box.pluginsSummaryButton.isVisible = false
+        box.pluginsSummaryProgress.max = list.size
+        box.pluginsSummaryProgress.setProgressCompat(0, false)
+        box.pluginsSummaryProgress.isVisible = true
+        box.pluginsSummaryText.text = getString(R.string.plugins_installing, 0, list.size)
+        PluginsViewModel.installPlugins(
+            activity, repositoryData, list, pluginViewModel,
+            onProgress = { done, total ->
+                if (isAdded) {
+                    box.pluginsSummaryProgress.setProgressCompat(done, true)
+                    box.pluginsSummaryText.text = getString(R.string.plugins_installing, done, total)
+                }
+            },
+            onDone = { count ->
+                installing = false
+                if (isAdded) {
+                    showToast(getString(R.string.plugins_installed_done, count), Toast.LENGTH_SHORT)
+                    updateSummary(binding)
+                }
+            }
+        )
+    }
 
     override fun onDestroyView() {
         pluginViewModel.clear() // clear for the next observe
@@ -79,9 +160,7 @@ class PluginsFragment : BaseFragment<FragmentPluginsBinding>(
         binding.settingsToolbar.apply {
             setOnMenuItemClickListener { menuItem ->
                 when (menuItem?.itemId) {
-                    R.id.download_all -> {
-                        PluginsViewModel.downloadAll(activity, repositoryData, pluginViewModel)
-                    }
+                    R.id.download_all -> askInstall(binding, repositoryData)
 
                     R.id.lang_filter -> {
                         val languagesTagName = pluginViewModel.pluginLanguages
@@ -172,6 +251,7 @@ class PluginsFragment : BaseFragment<FragmentPluginsBinding>(
 
         observe(pluginViewModel.filteredPlugins) { (scrollToTop, list) ->
             (binding.pluginRecyclerView.adapter as? PluginAdapter)?.submitList(list)
+            if (!isLocal) updateSummary(binding)
             if (scrollToTop) {
                 binding.pluginRecyclerView.scrollToPosition(0)
             }
@@ -184,11 +264,15 @@ class PluginsFragment : BaseFragment<FragmentPluginsBinding>(
             pluginViewModel.updatePluginListLocal()
 
             binding.tvtypesChipsScroll.root.isVisible = false
+            binding.pluginsSummaryBox.root.isVisible = false
         } else {
             pluginViewModel.updatePluginList(context, listOf(repositoryData))
             binding.tvtypesChipsScroll.root.isVisible = true
-            // not needed for users but may be useful for devs
-            downloadAllButton?.isVisible = BuildConfig.DEBUG
+            // Install all: in the bar on top and on the line above the list
+            downloadAllButton?.isVisible = true
+            context?.let { ctx -> downloadAllButton?.icon?.mutate()?.setTint(ctx.colorFromAttribute(R.attr.colorPrimary)) }
+            binding.pluginsSummaryBox.root.isVisible = false
+            binding.pluginsSummaryBox.pluginsSummaryButton.setOnClickListener { askInstall(binding, repositoryData) }
 
             bindChips(
                 binding.tvtypesChipsScroll.tvtypesChips,
@@ -199,7 +283,7 @@ class PluginsFragment : BaseFragment<FragmentPluginsBinding>(
                     pluginViewModel.tvTypes.addAll(list.map { it.name })
                     pluginViewModel.updateFilteredPlugins()
                 },
-                nextFocusDown = R.id.plugin_recycler_view,
+                nextFocusDown = R.id.plugins_summary_button,
                 nextFocusUp = null,
             )
         }

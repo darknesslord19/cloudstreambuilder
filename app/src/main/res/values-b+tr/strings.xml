@@ -400,6 +400,16 @@
     <string name="batch_download_start_format" formatted="true">%1$d %2$s indirilmeye başlandı…</string>
     <string name="batch_download_finish_format" formatted="true">%1$d %2$s indirildi</string>
     <string name="batch_download_nothing_to_download_format" formatted="true">%s\'nin tamamı zaten indirildi</string>
+    <!-- install all on the plugin list -->
+    <string name="plugins_install_all">Hepsini yükle</string>
+    <string name="plugins_installed_count" formatted="true">%1$d / %2$d eklenti yüklü</string>
+    <string name="plugins_all_installed" formatted="true">Hepsi yüklü · %d eklenti</string>
+    <string name="plugins_installing" formatted="true">Yükleniyor… %1$d / %2$d</string>
+    <string name="plugins_install_missing" formatted="true">Eksik olanların hepsi (%1$d) · %2$s</string>
+    <string name="plugins_install_shown" formatted="true">Sadece listede görünenler (%1$d) · %2$s</string>
+    <string name="plugins_installed_done" formatted="true">%d eklenti yüklendi</string>
+    <string name="plugins_nothing_missing">Hepsi zaten yüklü</string>
+    <string name="plugins_install_confirm">Yükle</string>
     <string name="batch_download">Toplu indir</string>
     <string name="plugin_singular">eklenti</string>
     <string name="plugin">eklentiler</string>

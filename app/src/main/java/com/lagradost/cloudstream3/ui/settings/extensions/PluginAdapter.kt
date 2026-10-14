@@ -1,6 +1,12 @@
 package com.lagradost.cloudstream3.ui.settings.extensions
 
 import android.annotation.SuppressLint
+import android.graphics.Outline
+import android.graphics.Typeface
+import android.view.Gravity
+import android.view.View
+import android.view.ViewOutlineProvider
+import androidx.core.content.ContextCompat
 import android.text.format.Formatter.formatShortFileSize
 import android.util.Log
 import android.view.LayoutInflater
@@ -53,9 +59,48 @@ class PluginAdapter(
         val layout = if (isLayout(TV)) R.layout.repository_item_tv else R.layout.repository_item
         val inflated = LayoutInflater.from(parent.context).inflate(layout, parent, false)
 
-        return RepositoryViewHolderState(
-            RepositoryItemBinding.bind(inflated) // may crash
+        val binding = RepositoryItemBinding.bind(inflated) // may crash
+        styleAsCard(binding)
+        return RepositoryViewHolderState(binding)
+    }
+
+    /** Each plugin as a slim rounded card in the colours of the theme, with an outline on TV. */
+    private fun styleAsCard(binding: RepositoryItemBinding) {
+        val root = binding.root
+        val context = root.context
+        root.background = ContextCompat.getDrawable(
+            context,
+            if (isLayout(TV)) R.drawable.plugin_card_tv else R.drawable.plugin_card
         )
+        (root.layoutParams as? ViewGroup.MarginLayoutParams)?.setMargins(12.toPx, 4.toPx, 12.toPx, 4.toPx)
+        root.setPadding(12.toPx, 10.toPx, 6.toPx, 10.toPx)
+
+        binding.entryIcon.layoutParams = binding.entryIcon.layoutParams.apply {
+            width = 46.toPx
+            height = 46.toPx
+        }
+        (binding.entryIcon.layoutParams as? ViewGroup.MarginLayoutParams)?.marginEnd = 12.toPx
+        binding.entryIcon.outlineProvider = object : ViewOutlineProvider() {
+            override fun getOutline(view: View, outline: Outline) {
+                outline.setRoundRect(0, 0, view.width, view.height, 12.toPx.toFloat())
+            }
+        }
+        binding.entryIcon.clipToOutline = true
+
+        binding.mainText.setTypeface(binding.mainText.typeface, Typeface.BOLD)
+        binding.subText.setPadding(0, 4.toPx, 0, 0)
+        for (chip in listOf(binding.langIcon, binding.extVersion, binding.extFilesize, binding.extVotes)) {
+            chip.background = ContextCompat.getDrawable(context, R.drawable.plugin_chip)
+            chip.setPadding(6.toPx, 1.toPx, 6.toPx, 1.toPx)
+            chip.textSize = 11f
+            chip.gravity = Gravity.CENTER_VERTICAL
+            (chip.layoutParams as? ViewGroup.MarginLayoutParams)?.let {
+                it.height = ViewGroup.LayoutParams.WRAP_CONTENT
+                it.marginEnd = 4.toPx
+                it.topMargin = 3.toPx
+                chip.layoutParams = it
+            }
+        }
     }
 
     override fun onClearView(holder: ViewHolderState<Any>) {

@@ -20,7 +20,7 @@
     <item
         android:id="@+id/download_all"
         android:icon="@drawable/netflix_download"
-        android:title="@string/batch_download"
-        app:showAsAction="collapseActionView|ifRoom"
+        android:title="@string/plugins_install_all"
+        app:showAsAction="always"
         android:visible="false"/>
 </menu>

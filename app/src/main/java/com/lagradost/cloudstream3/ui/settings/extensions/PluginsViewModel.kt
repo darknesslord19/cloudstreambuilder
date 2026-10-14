@@ -148,7 +148,48 @@ class PluginsViewModel : ViewModel() {
                     }
                 }
             }
+
+        /**
+         * Installs [list] from [repository] at the same time, telling how far it is after each
+         * one and how many worked at the end. Used by "install all" on the plugin list.
+         */
+        fun installPlugins(
+            activity: Activity?,
+            repository: RepositoryData,
+            list: List<PluginWrapper>,
+            viewModel: PluginsViewModel?,
+            onProgress: (done: Int, total: Int) -> Unit,
+            onDone: (installed: Int) -> Unit,
+        ) = ioSafe {
+            if (activity == null) return@ioSafe
+            val done = java.util.concurrent.atomic.AtomicInteger()
+            val results = list.amap { (_, repo, metadata) ->
+                val ok = try {
+                    PluginManager.downloadPlugin(
+                        activity,
+                        metadata.url,
+                        metadata.fileHash,
+                        metadata.internalName,
+                        repo.url,
+                        metadata.status != PROVIDER_STATUS_DOWN
+                    )
+                } catch (t: Throwable) {
+                    false
+                }
+                val count = done.incrementAndGet()
+                main { onProgress(count, list.size) }
+                ok
+            }
+            viewModel?.updatePluginListPrivate(activity, listOf(repository))
+            main { onDone(results.count { it }) }
+        }
     }
+
+    /** Every plugin of the repository, without the filters */
+    fun allPlugins(): List<PluginViewData> = plugins
+
+    /** The plugins on screen at the moment, after the filters and the search */
+    fun shownPlugins(): List<PluginViewData> = _filteredPlugins.value?.second ?: emptyList()
 
     /**
      * @param isLocal defines if the plugin data is from local data instead of repo
