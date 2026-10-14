@@ -62,6 +62,9 @@ class HomeScrollAdapter(
         when (binding) {
             is HomeScrollViewBinding -> {
                 binding.homeScrollPreview.loadImage(posterUrl, item.posterHeaders)
+                if (item.backgroundPosterUrl.isNullOrEmpty()) {
+                    com.lagradost.cloudstream3.fork.TmdbPosters.fillHero(binding.homeScrollPreview, item.name, item.type, item.year, item.url)
+                }
                 binding.homeScrollPreviewTags.apply {
                     // Home screen settings: year, duration and score above the kinds
                     val rich = com.lagradost.cloudstream3.fork.HomeTweaks.heroTags(context, item)
@@ -85,6 +88,9 @@ class HomeScrollAdapter(
                     callback.invoke(view ?: return@setOnClickListener, position, item)
                 }
                 binding.homeScrollPreview.loadImage(posterUrl, item.posterHeaders)
+                if (item.backgroundPosterUrl.isNullOrEmpty()) {
+                    com.lagradost.cloudstream3.fork.TmdbPosters.fillHero(binding.homeScrollPreview, item.name, item.type, item.year, item.url)
+                }
             }
         }
     }

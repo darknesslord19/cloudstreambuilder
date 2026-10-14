@@ -293,13 +293,45 @@ object Categories {
         @JavascriptInterface
         fun reload(token: Int, spec: String?, page: Int) = gatherCategory(token, spec, page, true)
 
+        /** TMDB posters are looked for on this page */
+        @JavascriptInterface
+        fun tmdbOn(): Boolean = TmdbPosters.active(activity, TmdbPosters.Where.CATEGORIES)
+
+        /** The small "TMDB" label is shown on the posters from TMDB */
+        @JavascriptInterface
+        fun tmdbBadge(): Boolean = TmdbPosters.badgeShown(activity)
+
+        /**
+         * An item has no picture or its picture did not open: looks on TMDB and answers with
+         * window.onCatPoster(id, url).
+         */
+        @JavascriptInterface
+        fun tmdb(id: String?) {
+            val card = cards[id ?: return] ?: return
+            if (!TmdbPosters.active(activity, TmdbPosters.Where.CATEGORIES)) return
+            scope.launch {
+                val year = when (card) {
+                    is com.lagradost.cloudstream3.MovieSearchResponse -> card.year
+                    is com.lagradost.cloudstream3.TvSeriesSearchResponse -> card.year
+                    is com.lagradost.cloudstream3.AnimeSearchResponse -> card.year
+                    else -> null
+                }
+                val url = TmdbPosters.find(activity, card.name, card.type, year, false) ?: return@launch
+                send("window.onCatPoster && window.onCatPoster(${JSONObject.quote(id)}, ${JSONObject.quote(url)})")
+            }
+        }
+
         private fun itemOf(card: SearchResponse, badges: Boolean): JSONObject {
             val id = counter.incrementAndGet().toString()
             cards[id] = card
+            val kept = if (card.posterUrl.isNullOrEmpty() && TmdbPosters.active(activity, TmdbPosters.Where.CATEGORIES)) {
+                TmdbPosters.cachedPoster(activity, card)
+            } else null
             return JSONObject()
                 .put("id", id)
                 .put("name", card.name)
-                .put("poster", card.posterUrl ?: "")
+                .put("poster", kept ?: card.posterUrl ?: "")
+                .put("tmdb", kept != null)
                 .put("type", card.type?.name ?: "")
                 .put("quality", card.quality?.name ?: "")
                 .put("dub", if (badges) dubBadge(card) else "")

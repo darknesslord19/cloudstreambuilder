@@ -61,6 +61,9 @@ object PlusSheet {
 
         /** A small title between the rows */
         data class Header(val title: String) : Item()
+
+        /** A row made by the caller */
+        class Custom(val dependsOn: String? = null, val build: (Activity) -> View) : Item()
     }
 
     fun show(activity: Activity, title: String, subtitle: String?, items: List<Item>) {
@@ -167,6 +170,8 @@ object PlusSheet {
                     }
                 }
 
+                is Item.Custom -> item.build(activity)
+
                 is Item.Info -> row(activity, item.title, item.summary, item.icon, null).apply {
                     isFocusable = false
                     isClickable = false
@@ -178,6 +183,7 @@ object PlusSheet {
                 is Item.Switch -> item.dependsOn
                 is Item.Choice -> item.dependsOn
                 is Item.Action -> item.dependsOn
+                is Item.Custom -> item.dependsOn
                 else -> null
             }
             if (dep != null) followers.add(dep to row)

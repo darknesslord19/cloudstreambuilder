@@ -60,6 +60,12 @@ object RemoteRules {
         return default
     }
 
+    /** The first of [names] that holds a text in [json]. */
+    fun text(json: JsonNode?, vararg names: String): String? = json.string(*names)
+
+    /** The first of [names] that holds a yes or no in [json], [default] when none does. */
+    fun flagOf(json: JsonNode?, default: Boolean, vararg names: String): Boolean = json.flag(default, *names)
+
     // ---------------------------------------------------------------- announcement
 
     class Announcement(
@@ -116,6 +122,7 @@ object RemoteRules {
         CATEGORY_EFFECTS("category_effects"),
         AUTO_SUBS("auto_subtitles"),
         HOME_TWEAKS("home_tweaks"),
+        TMDB_POSTERS("tmdb_posters"),
     }
 
     /**

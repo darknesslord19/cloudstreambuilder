@@ -50,6 +50,18 @@ object ForkFeatures {
         }
     }
 
+    /** The general document (Cloudstreamplus.json) as it was read last. */
+    fun general(context: Context?): com.fasterxml.jackson.databind.JsonNode? {
+        val ctx = context(context) ?: return null
+        return try {
+            RemoteRules.parse(
+                ctx.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY_GENERAL, null)
+            )
+        } catch (t: Throwable) {
+            null
+        }
+    }
+
     /** If [feature] is switched on. Everything is on until the documents say otherwise. */
     fun isOn(feature: Feature, context: Context? = null): Boolean {
         cached?.let { return it[feature] != false }

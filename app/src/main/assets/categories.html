@@ -183,6 +183,7 @@
   .empty { margin: 30px 24px; text-align: center; color: var(--muted); }
   .empty b { display: block; color: var(--ink); font-size: 17px; margin-bottom: 6px; }
   .poster img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .poster .p-tmdb { position: absolute; z-index: 1; right: 6px; bottom: 24px; padding: 1px 4px; border-radius: 4px; background: #01b4e4; color: #032541; font-size: 8.5px; font-weight: 800; }
   .poster .p-q { position: absolute; z-index: 1; top: 6px; right: 6px; padding: 1px 6px; border-radius: 6px; background: var(--accent); color: var(--accent-ink); font-size: 9px; font-weight: 800; }
 
   /* ---------- cinematic mode (Plus): the first look with every effect, only on the cards on screen ---------- */
@@ -1074,6 +1075,22 @@ var LINE = {"film": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\
     if (!n) window.onCatDone(t);
     else loadText.textContent = '0/' + n + ' depo tarandı';
   };
+  // TMDB posters: items without a picture ask the app, the answer comes to onCatPoster
+  var tmdbEls = {};
+  var tmdbOn = false, tmdbBadge = false;
+  try { tmdbOn = !!(native && native.tmdbOn && native.tmdbOn()); tmdbBadge = !!(native && native.tmdbBadge && native.tmdbBadge()); } catch (e) {}
+  function tmdbAsk(id) { if (!tmdbOn) return; try { native.tmdb(String(id)); } catch (e) {} }
+  window.onCatPoster = function (id, url) {
+    var p = tmdbEls[id];
+    if (!p || !url || !p.isConnected || p.querySelector('img')) return;
+    var img = el('img'); img.decoding = 'async'; img.alt = ''; img.referrerPolicy = 'no-referrer';
+    img.onerror = function () { img.remove(); };
+    img.onload = function () { img.classList.add('ready'); };
+    img.src = url;
+    var art = p.querySelector('.p-art');
+    p.insertBefore(img, art ? art.nextSibling : p.firstChild);
+    if (tmdbBadge) p.appendChild(el('span', 'p-tmdb', 'TMDB'));
+  };
   window.onCatResults = function (t, json) {
     if (t !== token) return;
     var data; try { data = typeof json === 'string' ? JSON.parse(json) : json; } catch (e) { return; }
@@ -1100,11 +1117,15 @@ var LINE = {"film": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\
       var col = ['#7a0d1c', '#12245a', '#035e7b', '#4a1d6e', '#3a2a08'][hash(it.name) % 5];
       a.style.background = 'linear-gradient(170deg,' + col + ', #0b0b0d)';
       p.appendChild(a);
+      tmdbEls[it.id] = p;
       if (it.poster) {
         var img = el('img'); img.loading = 'lazy'; img.decoding = 'async'; img.alt = ''; img.referrerPolicy = 'no-referrer';
-        img.onerror = function () { img.remove(); };
+        img.onerror = function () { img.remove(); if (!it.tmdb) tmdbAsk(it.id); };
         img.onload = function () { img.classList.add('ready'); };
         img.src = it.poster; p.appendChild(img);
+        if (it.tmdb && tmdbBadge) p.appendChild(el('span', 'p-tmdb', 'TMDB'));
+      } else {
+        tmdbAsk(it.id);
       }
       p.appendChild(el('span', 'p-src', esc(src)));
       if (it.quality) p.appendChild(el('span', 'p-q', esc(QUALITY_NAMES[it.quality] || it.quality)));

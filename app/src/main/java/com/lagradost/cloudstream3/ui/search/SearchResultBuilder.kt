@@ -132,11 +132,17 @@ object SearchResultBuilder {
         cardText?.text = card.name
         cardText?.isVisible = showTitle
         cardView.isVisible = true
+        // TMDB posters: a card without a picture, or whose picture does not open, gets one from TMDB
+        com.lagradost.cloudstream3.fork.TmdbPosters.bind(cardView, card)
         if (!card.posterUrl.isNullOrEmpty()) {
             cardView.loadImage(card.posterUrl, card.posterHeaders) {
                 error { getImageFromDrawable(itemView.context, R.drawable.default_cover) }
+                listener(onError = { _, _ -> com.lagradost.cloudstream3.fork.TmdbPosters.fill(cardView, card) })
             }
-        } else cardView.loadImage(R.drawable.default_cover)
+        } else {
+            cardView.loadImage(R.drawable.default_cover)
+            com.lagradost.cloudstream3.fork.TmdbPosters.fill(cardView, card)
+        }
 
         fun click(view: View?) {
             clickCallback.invoke(
