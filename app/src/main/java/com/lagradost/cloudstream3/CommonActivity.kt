@@ -477,8 +477,11 @@ object CommonActivity {
         if (act == null) return
         val settingsManager = PreferenceManager.getDefaultSharedPreferences(act)
 
-        val themeName = settingsManager.getString(act.getString(R.string.app_theme_key), "AmoledLight")
-            ?: "AmoledLight"
+        val themeName = com.lagradost.cloudstream3.fork.ThemePack.guard(
+            act,
+            settingsManager.getString(act.getString(R.string.app_theme_key), "AmoledLight") ?: "AmoledLight",
+            act.getString(R.string.app_theme_key)
+        )
         val currentTheme = themeStyleOf(act, themeName)
         val currentOverlayTheme = accentStyleOf(
             themeName, settingsManager.getString(act.getString(R.string.primary_color_key), "Normal")

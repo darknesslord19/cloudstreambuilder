@@ -648,6 +648,12 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
 
     override fun onResume() {
         super.onResume()
+        // The theme reached the screen, and the glow of its corners
+        com.lagradost.cloudstream3.fork.ThemePack.started(this)
+        com.lagradost.cloudstream3.fork.ThemePack.glow(
+            this, (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as? androidx.navigation.fragment.NavHostFragment)
+                ?.navController?.currentDestination?.id != R.id.navigation_player
+        )
         afterPluginsLoadedEvent += ::onAllPluginsLoaded
         // Home screen settings: names under the icons of the bottom bar
         try {
@@ -1699,6 +1705,7 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
         navController.addOnDestinationChangedListener { _: NavController, navDestination: NavDestination, bundle: Bundle? ->
             // Intercept search and add a query
             updateNavBar(navDestination)
+            com.lagradost.cloudstream3.fork.ThemePack.glow(this, navDestination.id != R.id.navigation_player)
             if (navDestination.matchDestination(R.id.navigation_search) && !nextSearchQuery.isNullOrBlank()) {
                 bundle?.apply {
                     this.putString(SearchFragment.SEARCH_QUERY, nextSearchQuery)
