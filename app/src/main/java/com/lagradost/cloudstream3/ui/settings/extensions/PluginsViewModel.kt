@@ -183,6 +183,34 @@ class PluginsViewModel : ViewModel() {
             viewModel?.updatePluginListPrivate(activity, listOf(repository))
             main { onDone(results.count { it }) }
         }
+
+        /**
+         * Deletes the installed plugins in [list] one after the other (the list of plugins is
+         * written after each one), telling how far it is. Used by "delete all" on the plugin list.
+         */
+        fun deletePlugins(
+            activity: Activity?,
+            repository: RepositoryData,
+            list: List<PluginWrapper>,
+            viewModel: PluginsViewModel?,
+            onProgress: (done: Int, total: Int) -> Unit,
+            onDone: (deleted: Int) -> Unit,
+        ) = ioSafe {
+            if (activity == null) return@ioSafe
+            var deleted = 0
+            list.forEachIndexed { index, wrapper ->
+                val ok = try {
+                    val file = getPluginPath(activity, wrapper.plugin.internalName, wrapper.repositoryData.url)
+                    file.exists() && PluginManager.deletePlugin(file)
+                } catch (t: Throwable) {
+                    false
+                }
+                if (ok) deleted++
+                main { onProgress(index + 1, list.size) }
+            }
+            viewModel?.updatePluginListPrivate(activity, listOf(repository))
+            main { onDone(deleted) }
+        }
     }
 
     /** Every plugin of the repository, without the filters */

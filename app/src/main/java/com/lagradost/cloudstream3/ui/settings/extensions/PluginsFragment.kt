@@ -59,6 +59,7 @@ class PluginsFragment : BaseFragment<FragmentPluginsBinding>(
             getString(R.string.plugins_installed_count, installed, all.size)
         }
         box.pluginsSummaryButton.isVisible = missing > 0
+        box.pluginsSummaryDelete.isVisible = installed > 0
         box.pluginsSummaryProgress.isVisible = false
     }
 
@@ -96,6 +97,7 @@ class PluginsFragment : BaseFragment<FragmentPluginsBinding>(
         installing = true
         val box = binding.pluginsSummaryBox
         box.pluginsSummaryButton.isVisible = false
+        box.pluginsSummaryDelete.isVisible = false
         box.pluginsSummaryProgress.max = list.size
         box.pluginsSummaryProgress.setProgressCompat(0, false)
         box.pluginsSummaryProgress.isVisible = true
@@ -112,6 +114,60 @@ class PluginsFragment : BaseFragment<FragmentPluginsBinding>(
                 installing = false
                 if (isAdded) {
                     showToast(getString(R.string.plugins_installed_done, count), Toast.LENGTH_SHORT)
+                    updateSummary(binding)
+                }
+            }
+        )
+    }
+
+    /** Asks what to delete: every installed plugin of the repository, or only the ones shown. */
+    private fun askDelete(binding: FragmentPluginsBinding, repositoryData: RepositoryData) {
+        if (installing) return
+        val ctx = context ?: return
+        val installed = pluginViewModel.allPlugins().filter { it.isDownloaded }.map { it.pluginWrapper }
+        if (installed.isEmpty()) {
+            showToast(R.string.plugins_nothing_installed, Toast.LENGTH_SHORT)
+            return
+        }
+        val shown = pluginViewModel.shownPlugins().filter { it.isDownloaded }.map { it.pluginWrapper }
+        val choices = mutableListOf(installed)
+        val labels = mutableListOf(getString(R.string.plugins_delete_installed, installed.size))
+        if (shown.isNotEmpty() && shown.size < installed.size) {
+            choices.add(shown)
+            labels.add(getString(R.string.plugins_delete_shown, shown.size))
+        }
+        var picked = 0
+        AlertDialog.Builder(ctx, R.style.AlertDialogCustom)
+            .setTitle(R.string.plugins_delete_all)
+            .setSingleChoiceItems(labels.toTypedArray(), 0) { _, which -> picked = which }
+            .setPositiveButton(R.string.plugins_delete_confirm) { _, _ ->
+                delete(binding, repositoryData, choices[picked])
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun delete(binding: FragmentPluginsBinding, repositoryData: RepositoryData, list: List<PluginWrapper>) {
+        installing = true
+        val box = binding.pluginsSummaryBox
+        box.pluginsSummaryButton.isVisible = false
+        box.pluginsSummaryDelete.isVisible = false
+        box.pluginsSummaryProgress.max = list.size
+        box.pluginsSummaryProgress.setProgressCompat(0, false)
+        box.pluginsSummaryProgress.isVisible = true
+        box.pluginsSummaryText.text = getString(R.string.plugins_deleting, 0, list.size)
+        PluginsViewModel.deletePlugins(
+            activity, repositoryData, list, pluginViewModel,
+            onProgress = { done, total ->
+                if (isAdded) {
+                    box.pluginsSummaryProgress.setProgressCompat(done, true)
+                    box.pluginsSummaryText.text = getString(R.string.plugins_deleting, done, total)
+                }
+            },
+            onDone = { count ->
+                installing = false
+                if (isAdded) {
+                    showToast(getString(R.string.plugins_deleted_done, count), Toast.LENGTH_SHORT)
                     updateSummary(binding)
                 }
             }
@@ -273,6 +329,7 @@ class PluginsFragment : BaseFragment<FragmentPluginsBinding>(
             context?.let { ctx -> downloadAllButton?.icon?.mutate()?.setTint(ctx.colorFromAttribute(R.attr.colorPrimary)) }
             binding.pluginsSummaryBox.root.isVisible = false
             binding.pluginsSummaryBox.pluginsSummaryButton.setOnClickListener { askInstall(binding, repositoryData) }
+            binding.pluginsSummaryBox.pluginsSummaryDelete.setOnClickListener { askDelete(binding, repositoryData) }
 
             bindChips(
                 binding.tvtypesChipsScroll.tvtypesChips,

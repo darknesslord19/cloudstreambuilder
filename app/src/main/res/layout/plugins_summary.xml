@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- How many plugins of the repository are installed, with "install all" -->
+<!-- How many plugins of the repository are installed, with "install all" and "delete all" -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -40,12 +40,31 @@
             android:layout_marginEnd="0dp"
             android:focusable="true"
             android:nextFocusUp="@id/tvtypes_chips"
+            android:nextFocusRight="@id/plugins_summary_delete"
             android:nextFocusDown="@id/plugin_recycler_view"
             android:paddingStart="14dp"
             android:paddingEnd="14dp"
             android:text="@string/plugins_install_all"
             android:textSize="13sp"
             app:icon="@drawable/netflix_download"
+            app:iconSize="18dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/plugins_summary_delete"
+            style="@style/BlackButton"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="0dp"
+            android:focusable="true"
+            android:nextFocusLeft="@id/plugins_summary_button"
+            android:nextFocusUp="@id/tvtypes_chips"
+            android:nextFocusDown="@id/plugin_recycler_view"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:text="@string/plugins_delete_all"
+            android:textSize="13sp"
+            app:icon="@drawable/ic_baseline_delete_outline_24"
             app:iconSize="18dp" />
     </LinearLayout>
 

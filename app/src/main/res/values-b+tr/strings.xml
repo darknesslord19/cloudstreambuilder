@@ -461,6 +461,13 @@
     <string name="plugins_install_shown" formatted="true">Sadece listede görünenler (%1$d) · %2$s</string>
     <string name="plugins_installed_done" formatted="true">%d eklenti yüklendi</string>
     <string name="plugins_nothing_missing">Hepsi zaten yüklü</string>
+    <string name="plugins_delete_all">Hepsini sil</string>
+    <string name="plugins_delete_installed" formatted="true">Yüklü olanların hepsi (%d)</string>
+    <string name="plugins_delete_shown" formatted="true">Sadece listede görünenler (%d)</string>
+    <string name="plugins_deleting" formatted="true">Siliniyor… %1$d / %2$d</string>
+    <string name="plugins_deleted_done" formatted="true">%d eklenti silindi</string>
+    <string name="plugins_nothing_installed">Yüklü eklenti yok</string>
+    <string name="plugins_delete_confirm">Sil</string>
     <string name="plugins_install_confirm">Yükle</string>
     <string name="batch_download">Toplu indir</string>
     <string name="plugin_singular">eklenti</string>

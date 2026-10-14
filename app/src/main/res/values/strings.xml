@@ -573,6 +573,13 @@
     <string name="plugins_install_shown" formatted="true">Only what is on the list (%1$d) · %2$s</string>
     <string name="plugins_installed_done" formatted="true">%d plugins installed</string>
     <string name="plugins_nothing_missing">Everything is installed already</string>
+    <string name="plugins_delete_all">Delete all</string>
+    <string name="plugins_delete_installed" formatted="true">All installed (%d)</string>
+    <string name="plugins_delete_shown" formatted="true">Only those in the list (%d)</string>
+    <string name="plugins_deleting" formatted="true">Deleting… %1$d / %2$d</string>
+    <string name="plugins_deleted_done" formatted="true">%d plugins deleted</string>
+    <string name="plugins_nothing_installed">No installed plugins</string>
+    <string name="plugins_delete_confirm">Delete</string>
     <string name="plugins_install_confirm">Install</string>
     <string name="batch_download">Batch download</string>
     <string name="plugin_singular">plugin</string>
