@@ -98,6 +98,7 @@ object SettingsLook {
         private val gapAfter = dp(context, 4f).toInt()
         private val lineInset = dp(context, 78f)
         private val plainInset = dp(context, 20f)
+        private val topGap = dp(context, 14f).toInt()
         private val cardPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = themeColor(context, R.attr.primaryGrayBackground, 0xFF2B2C30.toInt())
         }
@@ -133,9 +134,12 @@ object SettingsLook {
             parent: RecyclerView,
             state: RecyclerView.State
         ) {
-            val (_, last) = place(parent, parent.getChildAdapterPosition(view)) ?: return
+            val position = parent.getChildAdapterPosition(view)
+            val (_, last) = place(parent, position) ?: return
             outRect.left = margin
             outRect.right = margin
+            // A little room under the bar on top, so the first card does not touch it
+            if (position == 0) outRect.top = topGap
             if (last) outRect.bottom = gapAfter
         }
 
