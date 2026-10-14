@@ -30,7 +30,7 @@
                     style="@style/SettingsRow"
                     android:minHeight="96dp"
                     android:paddingStart="18dp"
-                    android:nextFocusDown="@id/settings_account_info">
+                    android:nextFocusDown="@id/settings_plus">
 
                     <FrameLayout
                         android:id="@+id/settings_profile_ring"
@@ -86,7 +86,7 @@
                     android:id="@+id/settings_account_info"
                     style="@style/SettingsRow"
                     android:nextFocusUp="@id/settings_profile"
-                    android:nextFocusDown="@id/settings_general">
+                    android:nextFocusDown="@id/settings_plus">
 
                     <com.lagradost.cloudstream3.fork.IconBox
                         style="@style/SettingsRowIcon"
@@ -109,6 +109,66 @@
                 </LinearLayout>
             </LinearLayout>
 
+            <!-- Plus Menü and Geliştirici, together right under the profile -->
+            <LinearLayout
+                android:id="@+id/settings_card_plus"
+                style="@style/SettingsCard">
+
+                <LinearLayout
+                    android:id="@+id/settings_plus"
+                    style="@style/SettingsRow"
+                    android:nextFocusUp="@id/settings_account_info"
+                    android:nextFocusDown="@id/settings_about">
+
+                    <com.lagradost.cloudstream3.fork.IconBox
+                        style="@style/SettingsRowIcon"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/plus_sparkle_24px" />
+
+                    <LinearLayout style="@style/SettingsRowTexts">
+
+                        <TextView
+                            style="@style/SettingsRowTitle"
+                            android:text="@string/plus" />
+
+                        <TextView
+                            android:id="@+id/settings_plus_summary"
+                            style="@style/SettingsRowSummary"
+                            android:text="@string/plus_summary" />
+                    </LinearLayout>
+
+                    <ImageView style="@style/SettingsRowChevron" />
+                </LinearLayout>
+
+                <View style="@style/SettingsDivider" />
+
+                <LinearLayout
+                    android:id="@+id/settings_about"
+                    style="@style/SettingsRow"
+                    android:nextFocusUp="@id/settings_plus"
+                    android:nextFocusDown="@id/settings_general">
+
+                    <com.lagradost.cloudstream3.fork.IconBox
+                        style="@style/SettingsRowIcon"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/code_24px" />
+
+                    <LinearLayout style="@style/SettingsRowTexts">
+
+                        <TextView
+                            style="@style/SettingsRowTitle"
+                            android:text="@string/developer" />
+
+                        <TextView
+                            android:id="@+id/settings_about_summary"
+                            style="@style/SettingsRowSummary"
+                            tools:text="First, Second, Third" />
+                    </LinearLayout>
+
+                    <ImageView style="@style/SettingsRowChevron" />
+                </LinearLayout>
+            </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/settings_card_main"
                 style="@style/SettingsCard">
@@ -116,7 +176,7 @@
                 <LinearLayout
                     android:id="@+id/settings_general"
                     style="@style/SettingsRow"
-                    android:nextFocusUp="@id/settings_account_info"
+                    android:nextFocusUp="@id/settings_about"
                     android:nextFocusDown="@id/settings_player">
 
                     <com.lagradost.cloudstream3.fork.IconBox
@@ -290,8 +350,7 @@
                 <LinearLayout
                     android:id="@+id/settings_extensions"
                     style="@style/SettingsRow"
-                    android:nextFocusUp="@id/settings_credits"
-                    android:nextFocusDown="@id/settings_plus">
+                    android:nextFocusUp="@id/settings_credits">
 
                     <com.lagradost.cloudstream3.fork.IconBox
                         style="@style/SettingsRowIcon"
@@ -306,67 +365,6 @@
 
                         <TextView
                             android:id="@+id/settings_extensions_summary"
-                            style="@style/SettingsRowSummary"
-                            tools:text="First, Second, Third" />
-                    </LinearLayout>
-
-                    <ImageView style="@style/SettingsRowChevron" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/settings_card_plus"
-                style="@style/SettingsCard">
-
-                <LinearLayout
-                    android:id="@+id/settings_plus"
-                    style="@style/SettingsRow"
-                    android:nextFocusUp="@id/settings_extensions"
-                    android:nextFocusDown="@id/settings_about">
-
-                    <com.lagradost.cloudstream3.fork.IconBox
-                        style="@style/SettingsRowIcon"
-                        android:importantForAccessibility="no"
-                        android:src="@drawable/plus_sparkle_24px" />
-
-                    <LinearLayout style="@style/SettingsRowTexts">
-
-                        <TextView
-                            style="@style/SettingsRowTitle"
-                            android:text="@string/plus" />
-
-                        <TextView
-                            android:id="@+id/settings_plus_summary"
-                            style="@style/SettingsRowSummary"
-                            android:text="@string/plus_summary" />
-                    </LinearLayout>
-
-                    <ImageView style="@style/SettingsRowChevron" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/settings_card_about"
-                style="@style/SettingsCard">
-
-                <LinearLayout
-                    android:id="@+id/settings_about"
-                    style="@style/SettingsRow"
-                    android:nextFocusUp="@id/settings_plus">
-
-                    <com.lagradost.cloudstream3.fork.IconBox
-                        style="@style/SettingsRowIcon"
-                        android:importantForAccessibility="no"
-                        android:src="@drawable/code_24px" />
-
-                    <LinearLayout style="@style/SettingsRowTexts">
-
-                        <TextView
-                            style="@style/SettingsRowTitle"
-                            android:text="@string/developer" />
-
-                        <TextView
-                            android:id="@+id/settings_about_summary"
                             style="@style/SettingsRowSummary"
                             tools:text="First, Second, Third" />
                     </LinearLayout>

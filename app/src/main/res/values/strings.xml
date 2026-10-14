@@ -926,7 +926,7 @@
     <string name="categories_anim_settings">Moving categories</string>
     <string name="categories_anim_des">Let the category cards move</string>
     <string name="repolist_switch_des">Show the list button in the "Add repository" window</string>
-    <string name="plus">Plus</string>
+    <string name="plus">Plus Menu</string>
     <string name="plus_summary">Categories, repository list, badges</string>
     <string name="plus_open_categories">Open categories</string>
     <string name="plus_open_categories_des">The moving category cards</string>

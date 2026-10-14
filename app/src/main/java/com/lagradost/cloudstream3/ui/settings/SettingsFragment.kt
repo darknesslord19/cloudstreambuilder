@@ -325,8 +325,8 @@ class SettingsFragment : BaseFragment<MainSettingsBinding>(
             }
 
             val cards = listOf(
-                settingsProfileCard, settingsAccountCard, settingsCardMain,
-                settingsCardData, settingsCardExtensions, settingsCardPlus, settingsCardAbout
+                settingsProfileCard, settingsAccountCard, settingsCardPlus, settingsCardMain,
+                settingsCardData, settingsCardExtensions
             )
             SettingsLook.clipCards(cards)
             SettingsLook.riseIn(cards + appVersionInfo)
