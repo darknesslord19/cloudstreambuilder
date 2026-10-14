@@ -92,7 +92,7 @@ class SettingsPlus : BasePreferenceFragmentCompat() {
         PlusSheet.show(activity, getString(R.string.plus_home), getString(R.string.plus_home_sheet_des), items)
     }
 
-    private fun showCategories(activity: android.app.Activity) {
+    private fun showCategories(activity: androidx.fragment.app.FragmentActivity) {
         val context = activity
         val effectsAllowed = ForkFeatures.isOn(RemoteRules.Feature.CATEGORY_EFFECTS, context)
         val items = ArrayList<PlusSheet.Item>()
