@@ -64,10 +64,9 @@ class SettingsUI : BasePreferenceFragmentCompat() {
                 settingsManager.getString(getString(R.string.primary_color_key), colorValues.firstOrNull())
             )
             val themeValues = resources.getStringArray(R.array.themes_names_values).toList()
-            getPref(R.string.app_theme_key)?.summary = nameOf(
-                resources.getStringArray(R.array.themes_names), themeValues,
-                settingsManager.getString(getString(R.string.app_theme_key), themeValues.firstOrNull())
-            )
+            val savedTheme = settingsManager.getString(getString(R.string.app_theme_key), themeValues.firstOrNull())
+            getPref(R.string.app_theme_key)?.summary = com.lagradost.cloudstream3.fork.ThemePack.nameOf(savedTheme)
+                ?: nameOf(resources.getStringArray(R.array.themes_names), themeValues, savedTheme)
             val layoutValues = resources.getIntArray(R.array.app_layout_values).map { it.toString() }
             getPref(R.string.app_layout_key)?.summary = nameOf(
                 resources.getStringArray(R.array.app_layout), layoutValues,

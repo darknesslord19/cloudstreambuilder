@@ -344,10 +344,11 @@ object CommonActivity {
      * that goes with it. The accent is used until the user picks a primary colour.
      */
     private val extraThemes: Map<String, Pair<Int, Int>>
-        get() = if (ForkFeatures.isOn(RemoteRules.Feature.THEMES)) allExtraThemes else emptyMap()
+        get() = (if (ForkFeatures.isOn(RemoteRules.Feature.THEMES)) allExtraThemes else emptyMap()) +
+                (if (ForkFeatures.isOn(RemoteRules.Feature.THEME_PACK)) com.lagradost.cloudstream3.fork.ThemePack.styles else emptyMap())
 
     /** The saved names of the themes this build adds. */
-    val extraThemeNames: Set<String> get() = allExtraThemes.keys
+    val extraThemeNames: Set<String> get() = allExtraThemes.keys + com.lagradost.cloudstream3.fork.ThemePack.styles.keys
 
     private val allExtraThemes: Map<String, Pair<Int, Int>> = mapOf(
         "MidnightBlue" to (R.style.MidnightBlueMode to R.style.OverlayPrimaryColorThemeMidnightBlue),

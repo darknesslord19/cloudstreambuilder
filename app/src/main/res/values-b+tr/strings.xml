@@ -939,4 +939,13 @@
     <string name="tmdb_testing">Deneniyor…</string>
     <string name="tmdb_saved">Anahtar çalışıyor ✓ Kaydedildi</string>
     <string name="tmdb_bad_key">Anahtar çalışmadı, kontrol edip tekrar dene</string>
+    <string name="tp_title">Temalar</string>
+    <string name="tp_summary">100 tema · koyu ve açık</string>
+    <string name="tp_current" formatted="true">Seçili: %s</string>
+    <string name="tp_des">Bir temaya dokun, uygulama o temaya geçer</string>
+    <string name="tp_dark">Koyu temalar</string>
+    <string name="tp_light">Açık temalar</string>
+    <string name="tp_new">YENİ</string>
+    <string name="tp_active">Aktif</string>
+    <string name="tp_reset">Varsayılan temaya dön</string>
 </resources>

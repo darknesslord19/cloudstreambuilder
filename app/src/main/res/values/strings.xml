@@ -975,4 +975,13 @@
     <string name="tmdb_testing">Trying…</string>
     <string name="tmdb_saved">The key works ✓ Saved</string>
     <string name="tmdb_bad_key">The key did not work, check it and try again</string>
+    <string name="tp_title">Themes</string>
+    <string name="tp_summary">100 themes · dark and light</string>
+    <string name="tp_current" formatted="true">Selected: %s</string>
+    <string name="tp_des">Tap a theme to switch the app to it</string>
+    <string name="tp_dark">Dark themes</string>
+    <string name="tp_light">Light themes</string>
+    <string name="tp_new">NEW</string>
+    <string name="tp_active">Active</string>
+    <string name="tp_reset">Back to the default theme</string>
 </resources>

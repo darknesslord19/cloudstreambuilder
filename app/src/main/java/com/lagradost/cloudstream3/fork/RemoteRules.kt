@@ -123,6 +123,7 @@ object RemoteRules {
         AUTO_SUBS("auto_subtitles"),
         HOME_TWEAKS("home_tweaks"),
         TMDB_POSTERS("tmdb_posters"),
+        THEME_PACK("theme_pack"),
     }
 
     /**

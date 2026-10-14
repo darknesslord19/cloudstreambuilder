@@ -1,0 +1,2164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- The 100 themes of the theme pack (Plus > Temalar). Generated, one Mode and one accent each. -->
+
+    <style name="CtKomurMode">
+        <item name="primaryGrayBackground">#161618</item>
+        <item name="primaryBlackBackground">#0b0b0c</item>
+        <item name="iconGrayBackground">#101012</item>
+        <item name="boxItemBackground">#1d1e20</item>
+        <item name="textColor">#f2f2f3</item>
+        <item name="grayTextColor">#a8aaae</item>
+        <item name="iconColor">#a8aaae</item>
+        <item name="white">#f2f2f3</item>
+        <item name="black">#0b0b0c</item>
+        <item name="colorOnPrimary">#f2f2f3</item>
+    </style>
+    <style name="OverlayCtKomur">
+        <item name="colorPrimary">#f2994a</item>
+        <item name="android:colorPrimary">#f2994a</item>
+        <item name="colorPrimaryDark">#c2571a</item>
+        <item name="colorAccent">#f2994a</item>
+        <item name="colorOnPrimary">#131416</item>
+        <item name="android:colorAccent">#f2994a</item>
+    </style>
+
+    <style name="CtDevetuyuMode">
+        <item name="primaryGrayBackground">#352e27</item>
+        <item name="primaryBlackBackground">#26211c</item>
+        <item name="iconGrayBackground">#2c2620</item>
+        <item name="boxItemBackground">#41382f</item>
+        <item name="textColor">#f3f2f1</item>
+        <item name="grayTextColor">#b2aba3</item>
+        <item name="iconColor">#b2aba3</item>
+        <item name="white">#f3f2f1</item>
+        <item name="black">#26211c</item>
+        <item name="colorOnPrimary">#f3f2f1</item>
+    </style>
+    <style name="OverlayCtDevetuyu">
+        <item name="colorPrimary">#c9a27a</item>
+        <item name="android:colorPrimary">#c9a27a</item>
+        <item name="colorPrimaryDark">#8b6a45</item>
+        <item name="colorAccent">#c9a27a</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#c9a27a</item>
+    </style>
+
+    <style name="CtAntrasitMode">
+        <item name="primaryGrayBackground">#151719</item>
+        <item name="primaryBlackBackground">#0a0b0d</item>
+        <item name="iconGrayBackground">#0f1112</item>
+        <item name="boxItemBackground">#1c1f21</item>
+        <item name="textColor">#f2f2f3</item>
+        <item name="grayTextColor">#a7abaf</item>
+        <item name="iconColor">#a7abaf</item>
+        <item name="white">#f2f2f3</item>
+        <item name="black">#0a0b0d</item>
+        <item name="colorOnPrimary">#f2f2f3</item>
+    </style>
+    <style name="OverlayCtAntrasit">
+        <item name="colorPrimary">#7dd3c0</item>
+        <item name="android:colorPrimary">#7dd3c0</item>
+        <item name="colorPrimaryDark">#3a9e8c</item>
+        <item name="colorAccent">#7dd3c0</item>
+        <item name="colorOnPrimary">#131416</item>
+        <item name="android:colorAccent">#7dd3c0</item>
+    </style>
+
+    <style name="CtEspressoMode">
+        <item name="primaryGrayBackground">#1c1511</item>
+        <item name="primaryBlackBackground">#0e0b09</item>
+        <item name="iconGrayBackground">#15100d</item>
+        <item name="boxItemBackground">#261d17</item>
+        <item name="textColor">#f4f2f0</item>
+        <item name="grayTextColor">#b6a8a0</item>
+        <item name="iconColor">#b6a8a0</item>
+        <item name="white">#f4f2f0</item>
+        <item name="black">#0e0b09</item>
+        <item name="colorOnPrimary">#f4f2f0</item>
+    </style>
+    <style name="OverlayCtEspresso">
+        <item name="colorPrimary">#d4a373</item>
+        <item name="android:colorPrimary">#d4a373</item>
+        <item name="colorPrimaryDark">#9c6644</item>
+        <item name="colorAccent">#d4a373</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#d4a373</item>
+    </style>
+
+    <style name="CtSarapMode">
+        <item name="primaryGrayBackground">#1d1114</item>
+        <item name="primaryBlackBackground">#0f080a</item>
+        <item name="iconGrayBackground">#150c0e</item>
+        <item name="boxItemBackground">#27161a</item>
+        <item name="textColor">#f4f0f1</item>
+        <item name="grayTextColor">#b69fa5</item>
+        <item name="iconColor">#b69fa5</item>
+        <item name="white">#f4f0f1</item>
+        <item name="black">#0f080a</item>
+        <item name="colorOnPrimary">#f4f0f1</item>
+    </style>
+    <style name="OverlayCtSarap">
+        <item name="colorPrimary">#c94f6d</item>
+        <item name="android:colorPrimary">#c94f6d</item>
+        <item name="colorPrimaryDark">#e8a87c</item>
+        <item name="colorAccent">#c94f6d</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#c94f6d</item>
+    </style>
+
+    <style name="CtZeytinMode">
+        <item name="primaryGrayBackground">#191c12</item>
+        <item name="primaryBlackBackground">#0d0e09</item>
+        <item name="iconGrayBackground">#12140d</item>
+        <item name="boxItemBackground">#222518</item>
+        <item name="textColor">#f3f4f1</item>
+        <item name="grayTextColor">#afb4a2</item>
+        <item name="iconColor">#afb4a2</item>
+        <item name="white">#f3f4f1</item>
+        <item name="black">#0d0e09</item>
+        <item name="colorOnPrimary">#f3f4f1</item>
+    </style>
+    <style name="OverlayCtZeytin">
+        <item name="colorPrimary">#a8b545</item>
+        <item name="android:colorPrimary">#a8b545</item>
+        <item name="colorPrimaryDark">#6f7a26</item>
+        <item name="colorAccent">#a8b545</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#a8b545</item>
+    </style>
+
+    <style name="CtPetrolMode">
+        <item name="primaryGrayBackground">#0d1d21</item>
+        <item name="primaryBlackBackground">#070e10</item>
+        <item name="iconGrayBackground">#0a1518</item>
+        <item name="boxItemBackground">#12262b</item>
+        <item name="textColor">#f0f3f4</item>
+        <item name="grayTextColor">#9fb2b6</item>
+        <item name="iconColor">#9fb2b6</item>
+        <item name="white">#f0f3f4</item>
+        <item name="black">#070e10</item>
+        <item name="colorOnPrimary">#f0f3f4</item>
+    </style>
+    <style name="OverlayCtPetrol">
+        <item name="colorPrimary">#1fb5b8</item>
+        <item name="android:colorPrimary">#1fb5b8</item>
+        <item name="colorPrimaryDark">#0e6f7a</item>
+        <item name="colorAccent">#1fb5b8</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#1fb5b8</item>
+    </style>
+
+    <style name="CtLacivertaltinMode">
+        <item name="primaryGrayBackground">#0d1221</item>
+        <item name="primaryBlackBackground">#060911</item>
+        <item name="iconGrayBackground">#090d18</item>
+        <item name="boxItemBackground">#11182c</item>
+        <item name="textColor">#f0f1f4</item>
+        <item name="grayTextColor">#9fa5b6</item>
+        <item name="iconColor">#9fa5b6</item>
+        <item name="white">#f0f1f4</item>
+        <item name="black">#060911</item>
+        <item name="colorOnPrimary">#f0f1f4</item>
+    </style>
+    <style name="OverlayCtLacivertaltin">
+        <item name="colorPrimary">#e0b85a</item>
+        <item name="android:colorPrimary">#e0b85a</item>
+        <item name="colorPrimaryDark">#3b5bdb</item>
+        <item name="colorAccent">#e0b85a</item>
+        <item name="colorOnPrimary">#0b101e</item>
+        <item name="android:colorAccent">#e0b85a</item>
+    </style>
+
+    <style name="CtMurdumMode">
+        <item name="primaryGrayBackground">#1c111c</item>
+        <item name="primaryBlackBackground">#0e090e</item>
+        <item name="iconGrayBackground">#150d15</item>
+        <item name="boxItemBackground">#261726</item>
+        <item name="textColor">#f4f0f4</item>
+        <item name="grayTextColor">#b6a0b6</item>
+        <item name="iconColor">#b6a0b6</item>
+        <item name="white">#f4f0f4</item>
+        <item name="black">#0e090e</item>
+        <item name="colorOnPrimary">#f4f0f4</item>
+    </style>
+    <style name="OverlayCtMurdum">
+        <item name="colorPrimary">#c77dba</item>
+        <item name="android:colorPrimary">#c77dba</item>
+        <item name="colorPrimaryDark">#7e3a75</item>
+        <item name="colorAccent">#c77dba</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#c77dba</item>
+    </style>
+
+    <style name="CtBakirpatinaMode">
+        <item name="primaryGrayBackground">#111d1d</item>
+        <item name="primaryBlackBackground">#090e0e</item>
+        <item name="iconGrayBackground">#0c1515</item>
+        <item name="boxItemBackground">#172626</item>
+        <item name="textColor">#f0f4f4</item>
+        <item name="grayTextColor">#9fb6b6</item>
+        <item name="iconColor">#9fb6b6</item>
+        <item name="white">#f0f4f4</item>
+        <item name="black">#090e0e</item>
+        <item name="colorOnPrimary">#f0f4f4</item>
+    </style>
+    <style name="OverlayCtBakirpatina">
+        <item name="colorPrimary">#d9824f</item>
+        <item name="android:colorPrimary">#d9824f</item>
+        <item name="colorPrimaryDark">#3fb0a0</item>
+        <item name="colorAccent">#d9824f</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#d9824f</item>
+    </style>
+
+    <style name="CtFildisigeceMode">
+        <item name="primaryGrayBackground">#191815</item>
+        <item name="primaryBlackBackground">#0d0c0a</item>
+        <item name="iconGrayBackground">#12110f</item>
+        <item name="boxItemBackground">#22201c</item>
+        <item name="textColor">#f3f3f1</item>
+        <item name="grayTextColor">#afaca6</item>
+        <item name="iconColor">#afaca6</item>
+        <item name="white">#f3f3f1</item>
+        <item name="black">#0d0c0a</item>
+        <item name="colorOnPrimary">#f3f3f1</item>
+    </style>
+    <style name="OverlayCtFildisigece">
+        <item name="colorPrimary">#efe4cc</item>
+        <item name="android:colorPrimary">#efe4cc</item>
+        <item name="colorPrimaryDark">#b9a77e</item>
+        <item name="colorAccent">#efe4cc</item>
+        <item name="colorOnPrimary">#161512</item>
+        <item name="android:colorAccent">#efe4cc</item>
+    </style>
+
+    <style name="CtDumanMode">
+        <item name="primaryGrayBackground">#2c2b31</item>
+        <item name="primaryBlackBackground">#201f23</item>
+        <item name="iconGrayBackground">#252429</item>
+        <item name="boxItemBackground">#36353b</item>
+        <item name="textColor">#f2f2f3</item>
+        <item name="grayTextColor">#a9a8ae</item>
+        <item name="iconColor">#a9a8ae</item>
+        <item name="white">#f2f2f3</item>
+        <item name="black">#201f23</item>
+        <item name="colorOnPrimary">#f2f2f3</item>
+    </style>
+    <style name="OverlayCtDuman">
+        <item name="colorPrimary">#b9a7e8</item>
+        <item name="android:colorPrimary">#b9a7e8</item>
+        <item name="colorPrimaryDark">#7c6bb8</item>
+        <item name="colorAccent">#b9a7e8</item>
+        <item name="colorOnPrimary">#141316</item>
+        <item name="android:colorAccent">#b9a7e8</item>
+    </style>
+
+    <style name="CtTarcinMode">
+        <item name="primaryGrayBackground">#1f140f</item>
+        <item name="primaryBlackBackground">#0f0a08</item>
+        <item name="iconGrayBackground">#160e0b</item>
+        <item name="boxItemBackground">#291a14</item>
+        <item name="textColor">#f4f1f0</item>
+        <item name="grayTextColor">#b6a69f</item>
+        <item name="iconColor">#b6a69f</item>
+        <item name="white">#f4f1f0</item>
+        <item name="black">#0f0a08</item>
+        <item name="colorOnPrimary">#f4f1f0</item>
+    </style>
+    <style name="OverlayCtTarcin">
+        <item name="colorPrimary">#e07a3a</item>
+        <item name="android:colorPrimary">#e07a3a</item>
+        <item name="colorPrimaryDark">#a3401a</item>
+        <item name="colorAccent">#e07a3a</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#e07a3a</item>
+    </style>
+
+    <style name="CtHardalMode">
+        <item name="primaryGrayBackground">#1d1a11</item>
+        <item name="primaryBlackBackground">#0e0d08</item>
+        <item name="iconGrayBackground">#15130c</item>
+        <item name="boxItemBackground">#272317</item>
+        <item name="textColor">#f4f3f0</item>
+        <item name="grayTextColor">#b6b19f</item>
+        <item name="iconColor">#b6b19f</item>
+        <item name="white">#f4f3f0</item>
+        <item name="black">#0e0d08</item>
+        <item name="colorOnPrimary">#f4f3f0</item>
+    </style>
+    <style name="OverlayCtHardal">
+        <item name="colorPrimary">#e3b21b</item>
+        <item name="android:colorPrimary">#e3b21b</item>
+        <item name="colorPrimaryDark">#a37a06</item>
+        <item name="colorAccent">#e3b21b</item>
+        <item name="colorOnPrimary">#1a170f</item>
+        <item name="android:colorAccent">#e3b21b</item>
+    </style>
+
+    <style name="CtYosunMode">
+        <item name="primaryGrayBackground">#151c12</item>
+        <item name="primaryBlackBackground">#0b0e09</item>
+        <item name="iconGrayBackground">#0f140d</item>
+        <item name="boxItemBackground">#1c2518</item>
+        <item name="textColor">#f2f4f1</item>
+        <item name="grayTextColor">#a7b5a1</item>
+        <item name="iconColor">#a7b5a1</item>
+        <item name="white">#f2f4f1</item>
+        <item name="black">#0b0e09</item>
+        <item name="colorOnPrimary">#f2f4f1</item>
+    </style>
+    <style name="OverlayCtYosun">
+        <item name="colorPrimary">#8fc25a</item>
+        <item name="android:colorPrimary">#8fc25a</item>
+        <item name="colorPrimaryDark">#4e7f2a</item>
+        <item name="colorAccent">#8fc25a</item>
+        <item name="colorOnPrimary">#131910</item>
+        <item name="android:colorAccent">#8fc25a</item>
+    </style>
+
+    <style name="CtTurkuazmercanMode">
+        <item name="primaryGrayBackground">#0f1d1f</item>
+        <item name="primaryBlackBackground">#070e0f</item>
+        <item name="iconGrayBackground">#0b1516</item>
+        <item name="boxItemBackground">#142629</item>
+        <item name="textColor">#f0f4f4</item>
+        <item name="grayTextColor">#9fb3b6</item>
+        <item name="iconColor">#9fb3b6</item>
+        <item name="white">#f0f4f4</item>
+        <item name="black">#070e0f</item>
+        <item name="colorOnPrimary">#f0f4f4</item>
+    </style>
+    <style name="OverlayCtTurkuazmercan">
+        <item name="colorPrimary">#19c3c8</item>
+        <item name="android:colorPrimary">#19c3c8</item>
+        <item name="colorPrimaryDark">#ff7a59</item>
+        <item name="colorAccent">#19c3c8</item>
+        <item name="colorOnPrimary">#0d1a1c</item>
+        <item name="android:colorAccent">#19c3c8</item>
+    </style>
+
+    <style name="CtMercanMode">
+        <item name="primaryGrayBackground">#1c1312</item>
+        <item name="primaryBlackBackground">#0e0a09</item>
+        <item name="iconGrayBackground">#140e0d</item>
+        <item name="boxItemBackground">#251a18</item>
+        <item name="textColor">#f4f1f1</item>
+        <item name="grayTextColor">#b5a3a1</item>
+        <item name="iconColor">#b5a3a1</item>
+        <item name="white">#f4f1f1</item>
+        <item name="black">#0e0a09</item>
+        <item name="colorOnPrimary">#f4f1f1</item>
+    </style>
+    <style name="OverlayCtMercan">
+        <item name="colorPrimary">#ff6f61</item>
+        <item name="android:colorPrimary">#ff6f61</item>
+        <item name="colorPrimaryDark">#c93d32</item>
+        <item name="colorAccent">#ff6f61</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#ff6f61</item>
+    </style>
+
+    <style name="CtKehribarMode">
+        <item name="primaryGrayBackground">#1e1810</item>
+        <item name="primaryBlackBackground">#0f0c08</item>
+        <item name="iconGrayBackground">#16110b</item>
+        <item name="boxItemBackground">#282015</item>
+        <item name="textColor">#f4f3f0</item>
+        <item name="grayTextColor">#b6ad9f</item>
+        <item name="iconColor">#b6ad9f</item>
+        <item name="white">#f4f3f0</item>
+        <item name="black">#0f0c08</item>
+        <item name="colorOnPrimary">#f4f3f0</item>
+    </style>
+    <style name="OverlayCtKehribar">
+        <item name="colorPrimary">#ffb000</item>
+        <item name="android:colorPrimary">#ffb000</item>
+        <item name="colorPrimaryDark">#d06a00</item>
+        <item name="colorAccent">#ffb000</item>
+        <item name="colorOnPrimary">#1b150e</item>
+        <item name="android:colorAccent">#ffb000</item>
+    </style>
+
+    <style name="CtLeylakgecesiMode">
+        <item name="primaryGrayBackground">#2d2537</item>
+        <item name="primaryBlackBackground">#211b28</item>
+        <item name="iconGrayBackground">#261f2e</item>
+        <item name="boxItemBackground">#372d43</item>
+        <item name="textColor">#f2f1f4</item>
+        <item name="grayTextColor">#aaa2b4</item>
+        <item name="iconColor">#aaa2b4</item>
+        <item name="white">#f2f1f4</item>
+        <item name="black">#211b28</item>
+        <item name="colorOnPrimary">#f2f1f4</item>
+    </style>
+    <style name="OverlayCtLeylakgecesi">
+        <item name="colorPrimary">#c3a8f0</item>
+        <item name="android:colorPrimary">#c3a8f0</item>
+        <item name="colorPrimaryDark">#8a64d6</item>
+        <item name="colorAccent">#c3a8f0</item>
+        <item name="colorOnPrimary">#141018</item>
+        <item name="android:colorAccent">#c3a8f0</item>
+    </style>
+
+    <style name="CtMurekkepMode">
+        <item name="primaryGrayBackground">#10121e</item>
+        <item name="primaryBlackBackground">#08090f</item>
+        <item name="iconGrayBackground">#0c0d16</item>
+        <item name="boxItemBackground">#151828</item>
+        <item name="textColor">#f0f1f4</item>
+        <item name="grayTextColor">#9fa2b6</item>
+        <item name="iconColor">#9fa2b6</item>
+        <item name="white">#f0f1f4</item>
+        <item name="black">#08090f</item>
+        <item name="colorOnPrimary">#f0f1f4</item>
+    </style>
+    <style name="OverlayCtMurekkep">
+        <item name="colorPrimary">#7aa2f7</item>
+        <item name="android:colorPrimary">#7aa2f7</item>
+        <item name="colorPrimaryDark">#bb9af7</item>
+        <item name="colorAccent">#7aa2f7</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#7aa2f7</item>
+    </style>
+
+    <style name="CtCamMode">
+        <item name="primaryGrayBackground">#101e17</item>
+        <item name="primaryBlackBackground">#080f0c</item>
+        <item name="iconGrayBackground">#0c1611</item>
+        <item name="boxItemBackground">#15281f</item>
+        <item name="textColor">#f0f4f2</item>
+        <item name="grayTextColor">#9fb6ac</item>
+        <item name="iconColor">#9fb6ac</item>
+        <item name="white">#f0f4f2</item>
+        <item name="black">#080f0c</item>
+        <item name="colorOnPrimary">#f0f4f2</item>
+    </style>
+    <style name="OverlayCtCam">
+        <item name="colorPrimary">#3fae7a</item>
+        <item name="android:colorPrimary">#3fae7a</item>
+        <item name="colorPrimaryDark">#d9b56f</item>
+        <item name="colorAccent">#3fae7a</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#3fae7a</item>
+    </style>
+
+    <style name="CtKirazMode">
+        <item name="primaryGrayBackground">#1c1113</item>
+        <item name="primaryBlackBackground">#0e0909</item>
+        <item name="iconGrayBackground">#150d0e</item>
+        <item name="boxItemBackground">#261719</item>
+        <item name="textColor">#f4f0f1</item>
+        <item name="grayTextColor">#b6a0a3</item>
+        <item name="iconColor">#b6a0a3</item>
+        <item name="white">#f4f0f1</item>
+        <item name="black">#0e0909</item>
+        <item name="colorOnPrimary">#f4f0f1</item>
+    </style>
+    <style name="OverlayCtKiraz">
+        <item name="colorPrimary">#e0245e</item>
+        <item name="android:colorPrimary">#e0245e</item>
+        <item name="colorPrimaryDark">#f2b33d</item>
+        <item name="colorAccent">#e0245e</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#e0245e</item>
+    </style>
+
+    <style name="CtGulkurusuMode">
+        <item name="primaryGrayBackground">#34272b</item>
+        <item name="primaryBlackBackground">#261d1f</item>
+        <item name="iconGrayBackground">#2c2124</item>
+        <item name="boxItemBackground">#403034</item>
+        <item name="textColor">#f3f1f2</item>
+        <item name="grayTextColor">#b1a4a8</item>
+        <item name="iconColor">#b1a4a8</item>
+        <item name="white">#f3f1f2</item>
+        <item name="black">#261d1f</item>
+        <item name="colorOnPrimary">#f3f1f2</item>
+    </style>
+    <style name="OverlayCtGulkurusu">
+        <item name="colorPrimary">#d79aa8</item>
+        <item name="android:colorPrimary">#d79aa8</item>
+        <item name="colorPrimaryDark">#a5647a</item>
+        <item name="colorAccent">#d79aa8</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#d79aa8</item>
+    </style>
+
+    <style name="CtArdicMode">
+        <item name="primaryGrayBackground">#12181c</item>
+        <item name="primaryBlackBackground">#090c0e</item>
+        <item name="iconGrayBackground">#0d1214</item>
+        <item name="boxItemBackground">#182125</item>
+        <item name="textColor">#f1f3f4</item>
+        <item name="grayTextColor">#a2aeb4</item>
+        <item name="iconColor">#a2aeb4</item>
+        <item name="white">#f1f3f4</item>
+        <item name="black">#090c0e</item>
+        <item name="colorOnPrimary">#f1f3f4</item>
+    </style>
+    <style name="OverlayCtArdic">
+        <item name="colorPrimary">#73b3b3</item>
+        <item name="android:colorPrimary">#73b3b3</item>
+        <item name="colorPrimaryDark">#4a7c8c</item>
+        <item name="colorAccent">#73b3b3</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#73b3b3</item>
+    </style>
+
+    <style name="CtKadifeMode">
+        <item name="primaryGrayBackground">#130f1f</item>
+        <item name="primaryBlackBackground">#0a070f</item>
+        <item name="iconGrayBackground">#0e0b16</item>
+        <item name="boxItemBackground">#1a1429</item>
+        <item name="textColor">#f1f0f4</item>
+        <item name="grayTextColor">#a59fb6</item>
+        <item name="iconColor">#a59fb6</item>
+        <item name="white">#f1f0f4</item>
+        <item name="black">#0a070f</item>
+        <item name="colorOnPrimary">#f1f0f4</item>
+    </style>
+    <style name="OverlayCtKadife">
+        <item name="colorPrimary">#9d7bff</item>
+        <item name="android:colorPrimary">#9d7bff</item>
+        <item name="colorPrimaryDark">#e879b9</item>
+        <item name="colorAccent">#9d7bff</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#9d7bff</item>
+    </style>
+
+    <style name="CtKiremitMode">
+        <item name="primaryGrayBackground">#1c1412</item>
+        <item name="primaryBlackBackground">#0e0a09</item>
+        <item name="iconGrayBackground">#140f0d</item>
+        <item name="boxItemBackground">#251b18</item>
+        <item name="textColor">#f4f1f1</item>
+        <item name="grayTextColor">#b5a6a1</item>
+        <item name="iconColor">#b5a6a1</item>
+        <item name="white">#f4f1f1</item>
+        <item name="black">#0e0a09</item>
+        <item name="colorOnPrimary">#f4f1f1</item>
+    </style>
+    <style name="OverlayCtKiremit">
+        <item name="colorPrimary">#d0704a</item>
+        <item name="android:colorPrimary">#d0704a</item>
+        <item name="colorPrimaryDark">#8c3f22</item>
+        <item name="colorAccent">#d0704a</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#d0704a</item>
+    </style>
+
+    <style name="CtMaunMode">
+        <item name="primaryGrayBackground">#20110e</item>
+        <item name="primaryBlackBackground">#100807</item>
+        <item name="iconGrayBackground">#170c0a</item>
+        <item name="boxItemBackground">#2a1613</item>
+        <item name="textColor">#f4f1f0</item>
+        <item name="grayTextColor">#b6a29f</item>
+        <item name="iconColor">#b6a29f</item>
+        <item name="white">#f4f1f0</item>
+        <item name="black">#100807</item>
+        <item name="colorOnPrimary">#f4f1f0</item>
+    </style>
+    <style name="OverlayCtMaun">
+        <item name="colorPrimary">#c4502f</item>
+        <item name="android:colorPrimary">#c4502f</item>
+        <item name="colorPrimaryDark">#e0a060</item>
+        <item name="colorAccent">#c4502f</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#c4502f</item>
+    </style>
+
+    <style name="CtGumusMode">
+        <item name="primaryGrayBackground">#2a2e32</item>
+        <item name="primaryBlackBackground">#1e2124</item>
+        <item name="iconGrayBackground">#232629</item>
+        <item name="boxItemBackground">#34383d</item>
+        <item name="textColor">#f2f2f3</item>
+        <item name="grayTextColor">#a7abaf</item>
+        <item name="iconColor">#a7abaf</item>
+        <item name="white">#f2f2f3</item>
+        <item name="black">#1e2124</item>
+        <item name="colorOnPrimary">#f2f2f3</item>
+    </style>
+    <style name="OverlayCtGumus">
+        <item name="colorPrimary">#cbd6e2</item>
+        <item name="android:colorPrimary">#cbd6e2</item>
+        <item name="colorPrimaryDark">#8a9bb0</item>
+        <item name="colorAccent">#cbd6e2</item>
+        <item name="colorOnPrimary">#131416</item>
+        <item name="android:colorAccent">#cbd6e2</item>
+    </style>
+
+    <style name="CtPlatinMode">
+        <item name="primaryGrayBackground">#181716</item>
+        <item name="primaryBlackBackground">#0c0c0b</item>
+        <item name="iconGrayBackground">#111110</item>
+        <item name="boxItemBackground">#201f1d</item>
+        <item name="textColor">#f3f2f2</item>
+        <item name="grayTextColor">#adaba9</item>
+        <item name="iconColor">#adaba9</item>
+        <item name="white">#f3f2f2</item>
+        <item name="black">#0c0c0b</item>
+        <item name="colorOnPrimary">#f3f2f2</item>
+    </style>
+    <style name="OverlayCtPlatin">
+        <item name="colorPrimary">#e6e0d4</item>
+        <item name="android:colorPrimary">#e6e0d4</item>
+        <item name="colorPrimaryDark">#a39d90</item>
+        <item name="colorAccent">#e6e0d4</item>
+        <item name="colorOnPrimary">#151513</item>
+        <item name="android:colorAccent">#e6e0d4</item>
+    </style>
+
+    <style name="CtObsidyenMode">
+        <item name="primaryGrayBackground">#16141a</item>
+        <item name="primaryBlackBackground">#0b0a0d</item>
+        <item name="iconGrayBackground">#100e13</item>
+        <item name="boxItemBackground">#1d1a23</item>
+        <item name="textColor">#f2f1f3</item>
+        <item name="grayTextColor">#a9a4b1</item>
+        <item name="iconColor">#a9a4b1</item>
+        <item name="white">#f2f1f3</item>
+        <item name="black">#0b0a0d</item>
+        <item name="colorOnPrimary">#f2f1f3</item>
+    </style>
+    <style name="OverlayCtObsidyen">
+        <item name="colorPrimary">#e4c590</item>
+        <item name="android:colorPrimary">#e4c590</item>
+        <item name="colorPrimaryDark">#9a7a4a</item>
+        <item name="colorAccent">#e4c590</item>
+        <item name="colorOnPrimary">#141217</item>
+        <item name="android:colorAccent">#e4c590</item>
+    </style>
+
+    <style name="CtHasatMode">
+        <item name="primaryGrayBackground">#322f29</item>
+        <item name="primaryBlackBackground">#24221e</item>
+        <item name="iconGrayBackground">#2a2722</item>
+        <item name="boxItemBackground">#3e3a32</item>
+        <item name="textColor">#f3f2f1</item>
+        <item name="grayTextColor">#afaca6</item>
+        <item name="iconColor">#afaca6</item>
+        <item name="white">#f3f2f1</item>
+        <item name="black">#24221e</item>
+        <item name="colorOnPrimary">#f3f2f1</item>
+    </style>
+    <style name="OverlayCtHasat">
+        <item name="colorPrimary">#fabd2f</item>
+        <item name="android:colorPrimary">#fabd2f</item>
+        <item name="colorPrimaryDark">#fb4934</item>
+        <item name="colorAccent">#fabd2f</item>
+        <item name="colorOnPrimary">#161512</item>
+        <item name="android:colorAccent">#fabd2f</item>
+    </style>
+
+    <style name="CtGunesgolgesiMode">
+        <item name="primaryGrayBackground">#0a1e24</item>
+        <item name="primaryBlackBackground">#050f12</item>
+        <item name="iconGrayBackground">#07161a</item>
+        <item name="boxItemBackground">#0e282f</item>
+        <item name="textColor">#f0f3f4</item>
+        <item name="grayTextColor">#9fb1b6</item>
+        <item name="iconColor">#9fb1b6</item>
+        <item name="white">#f0f3f4</item>
+        <item name="black">#050f12</item>
+        <item name="colorOnPrimary">#f0f3f4</item>
+    </style>
+    <style name="OverlayCtGunesgolgesi">
+        <item name="colorPrimary">#d6a400</item>
+        <item name="android:colorPrimary">#d6a400</item>
+        <item name="colorPrimaryDark">#268bd2</item>
+        <item name="colorAccent">#d6a400</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#d6a400</item>
+    </style>
+
+    <style name="CtMokaMode">
+        <item name="primaryGrayBackground">#242438</item>
+        <item name="primaryBlackBackground">#1a1a28</item>
+        <item name="iconGrayBackground">#1e1e2e</item>
+        <item name="boxItemBackground">#2c2c44</item>
+        <item name="textColor">#f1f1f4</item>
+        <item name="grayTextColor">#a1a1b5</item>
+        <item name="iconColor">#a1a1b5</item>
+        <item name="white">#f1f1f4</item>
+        <item name="black">#1a1a28</item>
+        <item name="colorOnPrimary">#f1f1f4</item>
+    </style>
+    <style name="OverlayCtMoka">
+        <item name="colorPrimary">#cba6f7</item>
+        <item name="android:colorPrimary">#cba6f7</item>
+        <item name="colorPrimaryDark">#f5c2e7</item>
+        <item name="colorAccent">#cba6f7</item>
+        <item name="colorOnPrimary">#101019</item>
+        <item name="android:colorAccent">#cba6f7</item>
+    </style>
+
+    <style name="CtGulcamiMode">
+        <item name="primaryGrayBackground">#13111c</item>
+        <item name="primaryBlackBackground">#0a090e</item>
+        <item name="iconGrayBackground">#0e0d15</item>
+        <item name="boxItemBackground">#191726</item>
+        <item name="textColor">#f1f0f4</item>
+        <item name="grayTextColor">#a3a0b6</item>
+        <item name="iconColor">#a3a0b6</item>
+        <item name="white">#f1f0f4</item>
+        <item name="black">#0a090e</item>
+        <item name="colorOnPrimary">#f1f0f4</item>
+    </style>
+    <style name="OverlayCtGulcami">
+        <item name="colorPrimary">#ebbcba</item>
+        <item name="android:colorPrimary">#ebbcba</item>
+        <item name="colorPrimaryDark">#c4a7e7</item>
+        <item name="colorAccent">#ebbcba</item>
+        <item name="colorOnPrimary">#111019</item>
+        <item name="android:colorAccent">#ebbcba</item>
+    </style>
+
+    <style name="CtEbediormanMode">
+        <item name="primaryGrayBackground">#2a322e</item>
+        <item name="primaryBlackBackground">#1e2421</item>
+        <item name="iconGrayBackground">#232a26</item>
+        <item name="boxItemBackground">#333d38</item>
+        <item name="textColor">#f2f3f2</item>
+        <item name="grayTextColor">#a7afab</item>
+        <item name="iconColor">#a7afab</item>
+        <item name="white">#f2f3f2</item>
+        <item name="black">#1e2421</item>
+        <item name="colorOnPrimary">#f2f3f2</item>
+    </style>
+    <style name="OverlayCtEbediorman">
+        <item name="colorPrimary">#a7c080</item>
+        <item name="android:colorPrimary">#a7c080</item>
+        <item name="colorPrimaryDark">#dbbc7f</item>
+        <item name="colorAccent">#a7c080</item>
+        <item name="colorOnPrimary">#131614</item>
+        <item name="android:colorAccent">#a7c080</item>
+    </style>
+
+    <style name="CtDalgaMode">
+        <item name="primaryGrayBackground">#14141a</item>
+        <item name="primaryBlackBackground">#0a0a0d</item>
+        <item name="iconGrayBackground">#0e0e13</item>
+        <item name="boxItemBackground">#1a1a23</item>
+        <item name="textColor">#f1f1f3</item>
+        <item name="grayTextColor">#a4a4b1</item>
+        <item name="iconColor">#a4a4b1</item>
+        <item name="white">#f1f1f3</item>
+        <item name="black">#0a0a0d</item>
+        <item name="colorOnPrimary">#f1f1f3</item>
+    </style>
+    <style name="OverlayCtDalga">
+        <item name="colorPrimary">#7e9cd8</item>
+        <item name="android:colorPrimary">#7e9cd8</item>
+        <item name="colorPrimaryDark">#e6c384</item>
+        <item name="colorAccent">#7e9cd8</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#7e9cd8</item>
+    </style>
+
+    <style name="CtAtomMode">
+        <item name="primaryGrayBackground">#282c34</item>
+        <item name="primaryBlackBackground">#1d2025</item>
+        <item name="iconGrayBackground">#21252b</item>
+        <item name="boxItemBackground">#31363f</item>
+        <item name="textColor">#f1f2f3</item>
+        <item name="grayTextColor">#a5a9b1</item>
+        <item name="iconColor">#a5a9b1</item>
+        <item name="white">#f1f2f3</item>
+        <item name="black">#1d2025</item>
+        <item name="colorOnPrimary">#f1f2f3</item>
+    </style>
+    <style name="OverlayCtAtom">
+        <item name="colorPrimary">#61afef</item>
+        <item name="android:colorPrimary">#61afef</item>
+        <item name="colorPrimaryDark">#c678dd</item>
+        <item name="colorAccent">#61afef</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#61afef</item>
+    </style>
+
+    <style name="CtAyuMode">
+        <item name="primaryGrayBackground">#11171d</item>
+        <item name="primaryBlackBackground">#080b0e</item>
+        <item name="iconGrayBackground">#0c1015</item>
+        <item name="boxItemBackground">#171e27</item>
+        <item name="textColor">#f0f2f4</item>
+        <item name="grayTextColor">#9faab6</item>
+        <item name="iconColor">#9faab6</item>
+        <item name="white">#f0f2f4</item>
+        <item name="black">#080b0e</item>
+        <item name="colorOnPrimary">#f0f2f4</item>
+    </style>
+    <style name="OverlayCtAyu">
+        <item name="colorPrimary">#ffb454</item>
+        <item name="android:colorPrimary">#ffb454</item>
+        <item name="colorPrimaryDark">#59c2ff</item>
+        <item name="colorAccent">#ffb454</item>
+        <item name="colorOnPrimary">#0f141a</item>
+        <item name="android:colorAccent">#ffb454</item>
+    </style>
+
+    <style name="CtDevetuyuacikMode">
+        <item name="primaryGrayBackground">#fefefe</item>
+        <item name="primaryBlackBackground">#f8f4ef</item>
+        <item name="iconGrayBackground">#fbf9f7</item>
+        <item name="boxItemBackground">#ffffff</item>
+        <item name="textColor">#29221a</item>
+        <item name="grayTextColor">#746758</item>
+        <item name="iconColor">#746758</item>
+        <item name="white">#29221a</item>
+        <item name="black">#f8f4ef</item>
+        <item name="colorOnPrimary">#29221a</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+    <style name="OverlayCtDevetuyuacik">
+        <item name="colorPrimary">#a5774a</item>
+        <item name="android:colorPrimary">#a5774a</item>
+        <item name="colorPrimaryDark">#7a5530</item>
+        <item name="colorAccent">#a5774a</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#a5774a</item>
+    </style>
+
+    <style name="CtKetenMode">
+        <item name="primaryGrayBackground">#fefefe</item>
+        <item name="primaryBlackBackground">#f7f5f0</item>
+        <item name="iconGrayBackground">#faf9f7</item>
+        <item name="boxItemBackground">#ffffff</item>
+        <item name="textColor">#27241b</item>
+        <item name="grayTextColor">#746c58</item>
+        <item name="iconColor">#746c58</item>
+        <item name="white">#27241b</item>
+        <item name="black">#f7f5f0</item>
+        <item name="colorOnPrimary">#27241b</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+    <style name="OverlayCtKeten">
+        <item name="colorPrimary">#4f7a5a</item>
+        <item name="android:colorPrimary">#4f7a5a</item>
+        <item name="colorPrimaryDark">#2f5a3d</item>
+        <item name="colorAccent">#4f7a5a</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#4f7a5a</item>
+    </style>
+
+    <style name="CtFildisiMode">
+        <item name="primaryGrayBackground">#fefefe</item>
+        <item name="primaryBlackBackground">#f9f6ee</item>
+        <item name="iconGrayBackground">#fbfaf6</item>
+        <item name="boxItemBackground">#ffffff</item>
+        <item name="textColor">#292519</item>
+        <item name="grayTextColor">#746d58</item>
+        <item name="iconColor">#746d58</item>
+        <item name="white">#292519</item>
+        <item name="black">#f9f6ee</item>
+        <item name="colorOnPrimary">#292519</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+    <style name="OverlayCtFildisi">
+        <item name="colorPrimary">#1f4e79</item>
+        <item name="android:colorPrimary">#1f4e79</item>
+        <item name="colorPrimaryDark">#163a5c</item>
+        <item name="colorAccent">#1f4e79</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#1f4e79</item>
+    </style>
+
+    <style name="CtKagitMode">
+        <item name="primaryGrayBackground">#fefefe</item>
+        <item name="primaryBlackBackground">#f6f4f1</item>
+        <item name="iconGrayBackground">#faf9f8</item>
+        <item name="boxItemBackground">#ffffff</item>
+        <item name="textColor">#26231d</item>
+        <item name="grayTextColor">#70695c</item>
+        <item name="iconColor">#70695c</item>
+        <item name="white">#26231d</item>
+        <item name="black">#f6f4f1</item>
+        <item name="colorOnPrimary">#26231d</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+    <style name="OverlayCtKagit">
+        <item name="colorPrimary">#c0392b</item>
+        <item name="android:colorPrimary">#c0392b</item>
+        <item name="colorPrimaryDark">#8e2a1f</item>
+        <item name="colorAccent">#c0392b</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#c0392b</item>
+    </style>
+
+    <style name="CtGulkurusuacikMode">
+        <item name="primaryGrayBackground">#fefefe</item>
+        <item name="primaryBlackBackground">#f7f0f2</item>
+        <item name="iconGrayBackground">#faf7f8</item>
+        <item name="boxItemBackground">#ffffff</item>
+        <item name="textColor">#271b1e</item>
+        <item name="grayTextColor">#74585f</item>
+        <item name="iconColor">#74585f</item>
+        <item name="white">#271b1e</item>
+        <item name="black">#f7f0f2</item>
+        <item name="colorOnPrimary">#271b1e</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+    <style name="OverlayCtGulkurusuacik">
+        <item name="colorPrimary">#b5657a</item>
+        <item name="android:colorPrimary">#b5657a</item>
+        <item name="colorPrimaryDark">#8a4459</item>
+        <item name="colorAccent">#b5657a</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#b5657a</item>
+    </style>
+
+    <style name="CtAdacayiMode">
+        <item name="primaryGrayBackground">#fefefe</item>
+        <item name="primaryBlackBackground">#f2f5f2</item>
+        <item name="iconGrayBackground">#f8f9f8</item>
+        <item name="boxItemBackground">#ffffff</item>
+        <item name="textColor">#1e241f</item>
+        <item name="grayTextColor">#5f6d61</item>
+        <item name="iconColor">#5f6d61</item>
+        <item name="white">#1e241f</item>
+        <item name="black">#f2f5f2</item>
+        <item name="colorOnPrimary">#1e241f</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+    <style name="OverlayCtAdacayi">
+        <item name="colorPrimary">#5f8a6b</item>
+        <item name="android:colorPrimary">#5f8a6b</item>
+        <item name="colorPrimaryDark">#3f6a4c</item>
+        <item name="colorAccent">#5f8a6b</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#5f8a6b</item>
+    </style>
+
+    <style name="CtOkyanuskopuguMode">
+        <item name="primaryGrayBackground">#fefefe</item>
+        <item name="primaryBlackBackground">#f0f8f6</item>
+        <item name="iconGrayBackground">#f7fafa</item>
+        <item name="boxItemBackground">#ffffff</item>
+        <item name="textColor">#1a2826</item>
+        <item name="grayTextColor">#587470</item>
+        <item name="iconColor">#587470</item>
+        <item name="white">#1a2826</item>
+        <item name="black">#f0f8f6</item>
+        <item name="colorOnPrimary">#1a2826</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+    <style name="OverlayCtOkyanuskopugu">
+        <item name="colorPrimary">#0e8f8a</item>
+        <item name="android:colorPrimary">#0e8f8a</item>
+        <item name="colorPrimaryDark">#08605d</item>
+        <item name="colorAccent">#0e8f8a</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#0e8f8a</item>
+    </style>
+
+    <style name="CtBulutMode">
+        <item name="primaryGrayBackground">#fefefe</item>
+        <item name="primaryBlackBackground">#eff1f8</item>
+        <item name="iconGrayBackground">#f7f7fb</item>
+        <item name="boxItemBackground">#ffffff</item>
+        <item name="textColor">#191c29</item>
+        <item name="grayTextColor">#585e74</item>
+        <item name="iconColor">#585e74</item>
+        <item name="white">#191c29</item>
+        <item name="black">#eff1f8</item>
+        <item name="colorOnPrimary">#191c29</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+    <style name="OverlayCtBulut">
+        <item name="colorPrimary">#4f6bed</item>
+        <item name="android:colorPrimary">#4f6bed</item>
+        <item name="colorPrimaryDark">#3049c8</item>
+        <item name="colorAccent">#4f6bed</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#4f6bed</item>
+    </style>
+
+    <style name="CtKumtasiMode">
+        <item name="primaryGrayBackground">#fefefe</item>
+        <item name="primaryBlackBackground">#f8f3ef</item>
+        <item name="iconGrayBackground">#fbf8f7</item>
+        <item name="boxItemBackground">#ffffff</item>
+        <item name="textColor">#292119</item>
+        <item name="grayTextColor">#746558</item>
+        <item name="iconColor">#746558</item>
+        <item name="white">#292119</item>
+        <item name="black">#f8f3ef</item>
+        <item name="colorOnPrimary">#292119</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+    <style name="OverlayCtKumtasi">
+        <item name="colorPrimary">#c2703d</item>
+        <item name="android:colorPrimary">#c2703d</item>
+        <item name="colorPrimaryDark">#934d22</item>
+        <item name="colorAccent">#c2703d</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#c2703d</item>
+    </style>
+
+    <style name="CtLimonMode">
+        <item name="primaryGrayBackground">#fffefd</item>
+        <item name="primaryBlackBackground">#fcfaeb</item>
+        <item name="iconGrayBackground">#fcfbf5</item>
+        <item name="boxItemBackground">#ffffff</item>
+        <item name="textColor">#292819</item>
+        <item name="grayTextColor">#747158</item>
+        <item name="iconColor">#747158</item>
+        <item name="white">#292819</item>
+        <item name="black">#fcfaeb</item>
+        <item name="colorOnPrimary">#292819</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+    <style name="OverlayCtLimon">
+        <item name="colorPrimary">#a07c00</item>
+        <item name="android:colorPrimary">#a07c00</item>
+        <item name="colorPrimaryDark">#6e5500</item>
+        <item name="colorAccent">#a07c00</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#a07c00</item>
+    </style>
+
+    <style name="CtSomonMode">
+        <item name="primaryGrayBackground">#fefefd</item>
+        <item name="primaryBlackBackground">#faefed</item>
+        <item name="iconGrayBackground">#fcf7f6</item>
+        <item name="boxItemBackground">#ffffff</item>
+        <item name="textColor">#291c19</item>
+        <item name="grayTextColor">#745d58</item>
+        <item name="iconColor">#745d58</item>
+        <item name="white">#291c19</item>
+        <item name="black">#faefed</item>
+        <item name="colorOnPrimary">#291c19</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+    <style name="OverlayCtSomon">
+        <item name="colorPrimary">#e2574c</item>
+        <item name="android:colorPrimary">#e2574c</item>
+        <item name="colorPrimaryDark">#b0372e</item>
+        <item name="colorAccent">#e2574c</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#e2574c</item>
+    </style>
+
+    <style name="CtKarMode">
+        <item name="primaryGrayBackground">#fefefe</item>
+        <item name="primaryBlackBackground">#f0f3f7</item>
+        <item name="iconGrayBackground">#f7f8fa</item>
+        <item name="boxItemBackground">#ffffff</item>
+        <item name="textColor">#1c2027</item>
+        <item name="grayTextColor">#596473</item>
+        <item name="iconColor">#596473</item>
+        <item name="white">#1c2027</item>
+        <item name="black">#f0f3f7</item>
+        <item name="colorOnPrimary">#1c2027</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+    <style name="OverlayCtKar">
+        <item name="colorPrimary">#5e81ac</item>
+        <item name="android:colorPrimary">#5e81ac</item>
+        <item name="colorPrimaryDark">#3b5a85</item>
+        <item name="colorAccent">#5e81ac</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#5e81ac</item>
+    </style>
+
+    <style name="CtGunesisigiMode">
+        <item name="primaryGrayBackground">#fffefd</item>
+        <item name="primaryBlackBackground">#fcf7eb</item>
+        <item name="iconGrayBackground">#fcfaf5</item>
+        <item name="boxItemBackground">#ffffff</item>
+        <item name="textColor">#292519</item>
+        <item name="grayTextColor">#746c58</item>
+        <item name="iconColor">#746c58</item>
+        <item name="white">#292519</item>
+        <item name="black">#fcf7eb</item>
+        <item name="colorOnPrimary">#292519</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+    <style name="OverlayCtGunesisigi">
+        <item name="colorPrimary">#268bd2</item>
+        <item name="android:colorPrimary">#268bd2</item>
+        <item name="colorPrimaryDark">#b58900</item>
+        <item name="colorAccent">#268bd2</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#268bd2</item>
+    </style>
+
+    <style name="CtLatteMode">
+        <item name="primaryGrayBackground">#fefefe</item>
+        <item name="primaryBlackBackground">#f2f3f5</item>
+        <item name="iconGrayBackground">#f8f8f9</item>
+        <item name="boxItemBackground">#ffffff</item>
+        <item name="textColor">#1e2024</item>
+        <item name="grayTextColor">#5f636d</item>
+        <item name="iconColor">#5f636d</item>
+        <item name="white">#1e2024</item>
+        <item name="black">#f2f3f5</item>
+        <item name="colorOnPrimary">#1e2024</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+    <style name="OverlayCtLatte">
+        <item name="colorPrimary">#8839ef</item>
+        <item name="android:colorPrimary">#8839ef</item>
+        <item name="colorPrimaryDark">#1e66f5</item>
+        <item name="colorAccent">#8839ef</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#8839ef</item>
+    </style>
+
+    <style name="CtSafakMode">
+        <item name="primaryGrayBackground">#fefefe</item>
+        <item name="primaryBlackBackground">#faf4ed</item>
+        <item name="iconGrayBackground">#fbf9f6</item>
+        <item name="boxItemBackground">#ffffff</item>
+        <item name="textColor">#292219</item>
+        <item name="grayTextColor">#746758</item>
+        <item name="iconColor">#746758</item>
+        <item name="white">#292219</item>
+        <item name="black">#faf4ed</item>
+        <item name="colorOnPrimary">#292219</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+    <style name="OverlayCtSafak">
+        <item name="colorPrimary">#d7827e</item>
+        <item name="android:colorPrimary">#d7827e</item>
+        <item name="colorPrimaryDark">#907aa9</item>
+        <item name="colorAccent">#d7827e</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#d7827e</item>
+    </style>
+
+    <style name="CtZeytinacikMode">
+        <item name="primaryGrayBackground">#fefefe</item>
+        <item name="primaryBlackBackground">#f5f6f1</item>
+        <item name="iconGrayBackground">#f9faf7</item>
+        <item name="boxItemBackground">#ffffff</item>
+        <item name="textColor">#24261c</item>
+        <item name="grayTextColor">#6e715b</item>
+        <item name="iconColor">#6e715b</item>
+        <item name="white">#24261c</item>
+        <item name="black">#f5f6f1</item>
+        <item name="colorOnPrimary">#24261c</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+    <style name="OverlayCtZeytinacik">
+        <item name="colorPrimary">#6b7a2a</item>
+        <item name="android:colorPrimary">#6b7a2a</item>
+        <item name="colorPrimaryDark">#4a5518</item>
+        <item name="colorAccent">#6b7a2a</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#6b7a2a</item>
+    </style>
+
+    <style name="CtBalMode">
+        <item name="primaryGrayBackground">#fffefd</item>
+        <item name="primaryBlackBackground">#fcf6eb</item>
+        <item name="iconGrayBackground">#fcfaf5</item>
+        <item name="boxItemBackground">#ffffff</item>
+        <item name="textColor">#292419</item>
+        <item name="grayTextColor">#746b58</item>
+        <item name="iconColor">#746b58</item>
+        <item name="white">#292419</item>
+        <item name="black">#fcf6eb</item>
+        <item name="colorOnPrimary">#292419</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+    <style name="OverlayCtBal">
+        <item name="colorPrimary">#c98a00</item>
+        <item name="android:colorPrimary">#c98a00</item>
+        <item name="colorPrimaryDark">#8f6200</item>
+        <item name="colorAccent">#c98a00</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#c98a00</item>
+    </style>
+
+    <style name="CtYakutMode">
+        <item name="primaryGrayBackground">#fefefe</item>
+        <item name="primaryBlackBackground">#f6f1f1</item>
+        <item name="iconGrayBackground">#faf7f8</item>
+        <item name="boxItemBackground">#ffffff</item>
+        <item name="textColor">#261c1d</item>
+        <item name="grayTextColor">#715b5c</item>
+        <item name="iconColor">#715b5c</item>
+        <item name="white">#261c1d</item>
+        <item name="black">#f6f1f1</item>
+        <item name="colorOnPrimary">#261c1d</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+    <style name="OverlayCtYakut">
+        <item name="colorPrimary">#c41e3a</item>
+        <item name="android:colorPrimary">#c41e3a</item>
+        <item name="colorPrimaryDark">#8c1228</item>
+        <item name="colorAccent">#c41e3a</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#c41e3a</item>
+    </style>
+
+    <style name="CtLacivertacikMode">
+        <item name="primaryGrayBackground">#fefefe</item>
+        <item name="primaryBlackBackground">#f0f2f8</item>
+        <item name="iconGrayBackground">#f7f8fa</item>
+        <item name="boxItemBackground">#ffffff</item>
+        <item name="textColor">#1a1e28</item>
+        <item name="grayTextColor">#585f74</item>
+        <item name="iconColor">#585f74</item>
+        <item name="white">#1a1e28</item>
+        <item name="black">#f0f2f8</item>
+        <item name="colorOnPrimary">#1a1e28</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+    <style name="OverlayCtLacivertacik">
+        <item name="colorPrimary">#1e3a8a</item>
+        <item name="android:colorPrimary">#1e3a8a</item>
+        <item name="colorPrimaryDark">#2563eb</item>
+        <item name="colorAccent">#1e3a8a</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#1e3a8a</item>
+    </style>
+
+    <style name="CtSutlukahveMode">
+        <item name="primaryGrayBackground">#fefefe</item>
+        <item name="primaryBlackBackground">#f7f3f0</item>
+        <item name="iconGrayBackground">#faf9f7</item>
+        <item name="boxItemBackground">#ffffff</item>
+        <item name="textColor">#27211c</item>
+        <item name="grayTextColor">#736559</item>
+        <item name="iconColor">#736559</item>
+        <item name="white">#27211c</item>
+        <item name="black">#f7f3f0</item>
+        <item name="colorOnPrimary">#27211c</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+    <style name="OverlayCtSutlukahve">
+        <item name="colorPrimary">#6f4e37</item>
+        <item name="android:colorPrimary">#6f4e37</item>
+        <item name="colorPrimaryDark">#4b3424</item>
+        <item name="colorAccent">#6f4e37</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#6f4e37</item>
+    </style>
+
+    <style name="CtOrkideMode">
+        <item name="primaryGrayBackground">#fefefe</item>
+        <item name="primaryBlackBackground">#f7f0f6</item>
+        <item name="iconGrayBackground">#faf7fa</item>
+        <item name="boxItemBackground">#ffffff</item>
+        <item name="textColor">#271b26</item>
+        <item name="grayTextColor">#745871</item>
+        <item name="iconColor">#745871</item>
+        <item name="white">#271b26</item>
+        <item name="black">#f7f0f6</item>
+        <item name="colorOnPrimary">#271b26</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+    <style name="OverlayCtOrkide">
+        <item name="colorPrimary">#a23b9c</item>
+        <item name="android:colorPrimary">#a23b9c</item>
+        <item name="colorPrimaryDark">#6f2370</item>
+        <item name="colorAccent">#a23b9c</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#a23b9c</item>
+    </style>
+
+    <style name="CtCiniMode">
+        <item name="primaryGrayBackground">#fefefe</item>
+        <item name="primaryBlackBackground">#eef4f9</item>
+        <item name="iconGrayBackground">#f6f9fb</item>
+        <item name="boxItemBackground">#ffffff</item>
+        <item name="textColor">#192129</item>
+        <item name="grayTextColor">#586674</item>
+        <item name="iconColor">#586674</item>
+        <item name="white">#192129</item>
+        <item name="black">#eef4f9</item>
+        <item name="colorOnPrimary">#192129</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+    <style name="OverlayCtCini">
+        <item name="colorPrimary">#1565c0</item>
+        <item name="android:colorPrimary">#1565c0</item>
+        <item name="colorPrimaryDark">#c62828</item>
+        <item name="colorAccent">#1565c0</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#1565c0</item>
+    </style>
+
+    <style name="CtDarknesMode">
+        <item name="primaryGrayBackground">#12141d</item>
+        <item name="primaryBlackBackground">#090a0f</item>
+        <item name="iconGrayBackground">#0d0f16</item>
+        <item name="boxItemBackground">#161925</item>
+        <item name="textColor">#f4f5fa</item>
+        <item name="grayTextColor">#969caf</item>
+        <item name="iconColor">#969caf</item>
+        <item name="white">#f4f5fa</item>
+        <item name="black">#090a0f</item>
+        <item name="colorOnPrimary">#f4f5fa</item>
+    </style>
+    <style name="OverlayCtDarknes">
+        <item name="colorPrimary">#f04452</item>
+        <item name="android:colorPrimary">#f04452</item>
+        <item name="colorPrimaryDark">#a91e30</item>
+        <item name="colorAccent">#f04452</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#f04452</item>
+    </style>
+
+    <style name="CtMidnightMode">
+        <item name="primaryGrayBackground">#0f1626</item>
+        <item name="primaryBlackBackground">#070b14</item>
+        <item name="iconGrayBackground">#0a101d</item>
+        <item name="boxItemBackground">#131c2e</item>
+        <item name="textColor">#eef3ff</item>
+        <item name="grayTextColor">#8d9bb8</item>
+        <item name="iconColor">#8d9bb8</item>
+        <item name="white">#eef3ff</item>
+        <item name="black">#070b14</item>
+        <item name="colorOnPrimary">#eef3ff</item>
+    </style>
+    <style name="OverlayCtMidnight">
+        <item name="colorPrimary">#4f8cff</item>
+        <item name="android:colorPrimary">#4f8cff</item>
+        <item name="colorPrimaryDark">#2a5bd7</item>
+        <item name="colorAccent">#4f8cff</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#4f8cff</item>
+    </style>
+
+    <style name="CtEmeraldMode">
+        <item name="primaryGrayBackground">#0e1a15</item>
+        <item name="primaryBlackBackground">#06100c</item>
+        <item name="iconGrayBackground">#09130f</item>
+        <item name="boxItemBackground">#12221b</item>
+        <item name="textColor">#ecfbf4</item>
+        <item name="grayTextColor">#8bb3a2</item>
+        <item name="iconColor">#8bb3a2</item>
+        <item name="white">#ecfbf4</item>
+        <item name="black">#06100c</item>
+        <item name="colorOnPrimary">#ecfbf4</item>
+    </style>
+    <style name="OverlayCtEmerald">
+        <item name="colorPrimary">#10b981</item>
+        <item name="android:colorPrimary">#10b981</item>
+        <item name="colorPrimaryDark">#047857</item>
+        <item name="colorAccent">#10b981</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#10b981</item>
+    </style>
+
+    <style name="CtRoyalMode">
+        <item name="primaryGrayBackground">#150f24</item>
+        <item name="primaryBlackBackground">#0b0714</item>
+        <item name="iconGrayBackground">#0f0a1b</item>
+        <item name="boxItemBackground">#1b1430</item>
+        <item name="textColor">#f5f0ff</item>
+        <item name="grayTextColor">#a598c2</item>
+        <item name="iconColor">#a598c2</item>
+        <item name="white">#f5f0ff</item>
+        <item name="black">#0b0714</item>
+        <item name="colorOnPrimary">#f5f0ff</item>
+    </style>
+    <style name="OverlayCtRoyal">
+        <item name="colorPrimary">#9b5cff</item>
+        <item name="android:colorPrimary">#9b5cff</item>
+        <item name="colorPrimaryDark">#6427d6</item>
+        <item name="colorAccent">#9b5cff</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#9b5cff</item>
+    </style>
+
+    <style name="CtSunsetMode">
+        <item name="primaryGrayBackground">#1c120d</item>
+        <item name="primaryBlackBackground">#110a07</item>
+        <item name="iconGrayBackground">#140d09</item>
+        <item name="boxItemBackground">#241812</item>
+        <item name="textColor">#fff4ec</item>
+        <item name="grayTextColor">#c2a593</item>
+        <item name="iconColor">#c2a593</item>
+        <item name="white">#fff4ec</item>
+        <item name="black">#110a07</item>
+        <item name="colorOnPrimary">#fff4ec</item>
+    </style>
+    <style name="OverlayCtSunset">
+        <item name="colorPrimary">#ff7a3d</item>
+        <item name="android:colorPrimary">#ff7a3d</item>
+        <item name="colorPrimaryDark">#d1441a</item>
+        <item name="colorAccent">#ff7a3d</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#ff7a3d</item>
+    </style>
+
+    <style name="CtCyberpunkMode">
+        <item name="primaryGrayBackground">#140d22</item>
+        <item name="primaryBlackBackground">#0a0612</item>
+        <item name="iconGrayBackground">#0e0919</item>
+        <item name="boxItemBackground">#1c1230</item>
+        <item name="textColor">#fbf2ff</item>
+        <item name="grayTextColor">#a48fbf</item>
+        <item name="iconColor">#a48fbf</item>
+        <item name="white">#fbf2ff</item>
+        <item name="black">#0a0612</item>
+        <item name="colorOnPrimary">#fbf2ff</item>
+    </style>
+    <style name="OverlayCtCyberpunk">
+        <item name="colorPrimary">#ff2bd6</item>
+        <item name="android:colorPrimary">#ff2bd6</item>
+        <item name="colorPrimaryDark">#7a2bff</item>
+        <item name="colorAccent">#ff2bd6</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#ff2bd6</item>
+    </style>
+
+    <style name="CtOceanMode">
+        <item name="primaryGrayBackground">#0c1a27</item>
+        <item name="primaryBlackBackground">#05101a</item>
+        <item name="iconGrayBackground">#08131e</item>
+        <item name="boxItemBackground">#102233</item>
+        <item name="textColor">#eaf6ff</item>
+        <item name="grayTextColor">#89a7bd</item>
+        <item name="iconColor">#89a7bd</item>
+        <item name="white">#eaf6ff</item>
+        <item name="black">#05101a</item>
+        <item name="colorOnPrimary">#eaf6ff</item>
+    </style>
+    <style name="OverlayCtOcean">
+        <item name="colorPrimary">#14b8c4</item>
+        <item name="android:colorPrimary">#14b8c4</item>
+        <item name="colorPrimaryDark">#0e7490</item>
+        <item name="colorAccent">#14b8c4</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#14b8c4</item>
+    </style>
+
+    <style name="CtGoldMode">
+        <item name="primaryGrayBackground">#17130c</item>
+        <item name="primaryBlackBackground">#0c0a06</item>
+        <item name="iconGrayBackground">#100d08</item>
+        <item name="boxItemBackground">#1f1a10</item>
+        <item name="textColor">#fbf6ea</item>
+        <item name="grayTextColor">#b6a684</item>
+        <item name="iconColor">#b6a684</item>
+        <item name="white">#fbf6ea</item>
+        <item name="black">#0c0a06</item>
+        <item name="colorOnPrimary">#fbf6ea</item>
+    </style>
+    <style name="OverlayCtGold">
+        <item name="colorPrimary">#e8bd68</item>
+        <item name="android:colorPrimary">#e8bd68</item>
+        <item name="colorPrimaryDark">#a7782a</item>
+        <item name="colorAccent">#e8bd68</item>
+        <item name="colorOnPrimary">#1a1205</item>
+        <item name="android:colorAccent">#e8bd68</item>
+    </style>
+
+    <style name="CtNordMode">
+        <item name="primaryGrayBackground">#3b4252</item>
+        <item name="primaryBlackBackground">#2e3440</item>
+        <item name="iconGrayBackground">#323845</item>
+        <item name="boxItemBackground">#434c5e</item>
+        <item name="textColor">#eceff4</item>
+        <item name="grayTextColor">#b3bccb</item>
+        <item name="iconColor">#b3bccb</item>
+        <item name="white">#eceff4</item>
+        <item name="black">#2e3440</item>
+        <item name="colorOnPrimary">#eceff4</item>
+    </style>
+    <style name="OverlayCtNord">
+        <item name="colorPrimary">#88c0d0</item>
+        <item name="android:colorPrimary">#88c0d0</item>
+        <item name="colorPrimaryDark">#5e81ac</item>
+        <item name="colorAccent">#88c0d0</item>
+        <item name="colorOnPrimary">#1d232e</item>
+        <item name="android:colorAccent">#88c0d0</item>
+    </style>
+
+    <style name="CtDraculaMode">
+        <item name="primaryGrayBackground">#282a36</item>
+        <item name="primaryBlackBackground">#1e1f29</item>
+        <item name="iconGrayBackground">#21222c</item>
+        <item name="boxItemBackground">#313341</item>
+        <item name="textColor">#f8f8f2</item>
+        <item name="grayTextColor">#a4a8c4</item>
+        <item name="iconColor">#a4a8c4</item>
+        <item name="white">#f8f8f2</item>
+        <item name="black">#1e1f29</item>
+        <item name="colorOnPrimary">#f8f8f2</item>
+    </style>
+    <style name="OverlayCtDracula">
+        <item name="colorPrimary">#bd93f9</item>
+        <item name="android:colorPrimary">#bd93f9</item>
+        <item name="colorPrimaryDark">#ff79c6</item>
+        <item name="colorAccent">#bd93f9</item>
+        <item name="colorOnPrimary">#1e1f29</item>
+        <item name="android:colorAccent">#bd93f9</item>
+    </style>
+
+    <style name="CtMonokaiMode">
+        <item name="primaryGrayBackground">#272822</item>
+        <item name="primaryBlackBackground">#1b1c17</item>
+        <item name="iconGrayBackground">#1f201b</item>
+        <item name="boxItemBackground">#2f302a</item>
+        <item name="textColor">#f8f8f2</item>
+        <item name="grayTextColor">#a8a690</item>
+        <item name="iconColor">#a8a690</item>
+        <item name="white">#f8f8f2</item>
+        <item name="black">#1b1c17</item>
+        <item name="colorOnPrimary">#f8f8f2</item>
+    </style>
+    <style name="OverlayCtMonokai">
+        <item name="colorPrimary">#a6e22e</item>
+        <item name="android:colorPrimary">#a6e22e</item>
+        <item name="colorPrimaryDark">#66a10f</item>
+        <item name="colorAccent">#a6e22e</item>
+        <item name="colorOnPrimary">#1b1c17</item>
+        <item name="android:colorAccent">#a6e22e</item>
+    </style>
+
+    <style name="CtRoseMode">
+        <item name="primaryGrayBackground">#1e0f16</item>
+        <item name="primaryBlackBackground">#12080c</item>
+        <item name="iconGrayBackground">#160a10</item>
+        <item name="boxItemBackground">#26131c</item>
+        <item name="textColor">#fff0f5</item>
+        <item name="grayTextColor">#c69aab</item>
+        <item name="iconColor">#c69aab</item>
+        <item name="white">#fff0f5</item>
+        <item name="black">#12080c</item>
+        <item name="colorOnPrimary">#fff0f5</item>
+    </style>
+    <style name="OverlayCtRose">
+        <item name="colorPrimary">#ff5d8f</item>
+        <item name="android:colorPrimary">#ff5d8f</item>
+        <item name="colorPrimaryDark">#c2185b</item>
+        <item name="colorAccent">#ff5d8f</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#ff5d8f</item>
+    </style>
+
+    <style name="CtMatrixMode">
+        <item name="primaryGrayBackground">#07110a</item>
+        <item name="primaryBlackBackground">#020604</item>
+        <item name="iconGrayBackground">#040c07</item>
+        <item name="boxItemBackground">#0a1a0f</item>
+        <item name="textColor">#d6ffe0</item>
+        <item name="grayTextColor">#6fae80</item>
+        <item name="iconColor">#6fae80</item>
+        <item name="white">#d6ffe0</item>
+        <item name="black">#020604</item>
+        <item name="colorOnPrimary">#d6ffe0</item>
+    </style>
+    <style name="OverlayCtMatrix">
+        <item name="colorPrimary">#22ff66</item>
+        <item name="android:colorPrimary">#22ff66</item>
+        <item name="colorPrimaryDark">#0d9e3a</item>
+        <item name="colorAccent">#22ff66</item>
+        <item name="colorOnPrimary">#02140a</item>
+        <item name="android:colorAccent">#22ff66</item>
+    </style>
+
+    <style name="CtIceMode">
+        <item name="primaryGrayBackground">#0f1c29</item>
+        <item name="primaryBlackBackground">#071019</item>
+        <item name="iconGrayBackground">#0a1520</item>
+        <item name="boxItemBackground">#132536</item>
+        <item name="textColor">#effaff</item>
+        <item name="grayTextColor">#93b2c8</item>
+        <item name="iconColor">#93b2c8</item>
+        <item name="white">#effaff</item>
+        <item name="black">#071019</item>
+        <item name="colorOnPrimary">#effaff</item>
+    </style>
+    <style name="OverlayCtIce">
+        <item name="colorPrimary">#7dd3fc</item>
+        <item name="android:colorPrimary">#7dd3fc</item>
+        <item name="colorPrimaryDark">#0ea5e9</item>
+        <item name="colorAccent">#7dd3fc</item>
+        <item name="colorOnPrimary">#062030</item>
+        <item name="android:colorAccent">#7dd3fc</item>
+    </style>
+
+    <style name="CtCrimsonMode">
+        <item name="primaryGrayBackground">#1a0a0c</item>
+        <item name="primaryBlackBackground">#0d0405</item>
+        <item name="iconGrayBackground">#130607</item>
+        <item name="boxItemBackground">#240d10</item>
+        <item name="textColor">#fff0f0</item>
+        <item name="grayTextColor">#c08b90</item>
+        <item name="iconColor">#c08b90</item>
+        <item name="white">#fff0f0</item>
+        <item name="black">#0d0405</item>
+        <item name="colorOnPrimary">#fff0f0</item>
+    </style>
+    <style name="OverlayCtCrimson">
+        <item name="colorPrimary">#dc143c</item>
+        <item name="android:colorPrimary">#dc143c</item>
+        <item name="colorPrimaryDark">#7f0a1f</item>
+        <item name="colorAccent">#dc143c</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#dc143c</item>
+    </style>
+
+    <style name="CtAmoledMode">
+        <item name="primaryGrayBackground">#0a0a0a</item>
+        <item name="primaryBlackBackground">#000000</item>
+        <item name="iconGrayBackground">#050505</item>
+        <item name="boxItemBackground">#111111</item>
+        <item name="textColor">#ffffff</item>
+        <item name="grayTextColor">#8a8a8a</item>
+        <item name="iconColor">#8a8a8a</item>
+        <item name="white">#ffffff</item>
+        <item name="black">#000000</item>
+        <item name="colorOnPrimary">#ffffff</item>
+    </style>
+    <style name="OverlayCtAmoled">
+        <item name="colorPrimary">#ffffff</item>
+        <item name="android:colorPrimary">#ffffff</item>
+        <item name="colorPrimaryDark">#9a9a9a</item>
+        <item name="colorAccent">#ffffff</item>
+        <item name="colorOnPrimary">#000000</item>
+        <item name="android:colorAccent">#ffffff</item>
+    </style>
+
+    <style name="CtGraphiteMode">
+        <item name="primaryGrayBackground">#1b1d21</item>
+        <item name="primaryBlackBackground">#121316</item>
+        <item name="iconGrayBackground">#151619</item>
+        <item name="boxItemBackground">#22252a</item>
+        <item name="textColor">#f1f2f4</item>
+        <item name="grayTextColor">#9a9ea8</item>
+        <item name="iconColor">#9a9ea8</item>
+        <item name="white">#f1f2f4</item>
+        <item name="black">#121316</item>
+        <item name="colorOnPrimary">#f1f2f4</item>
+    </style>
+    <style name="OverlayCtGraphite">
+        <item name="colorPrimary">#f59e0b</item>
+        <item name="android:colorPrimary">#f59e0b</item>
+        <item name="colorPrimaryDark">#b45309</item>
+        <item name="colorAccent">#f59e0b</item>
+        <item name="colorOnPrimary">#1a1205</item>
+        <item name="android:colorAccent">#f59e0b</item>
+    </style>
+
+    <style name="CtLightMode">
+        <item name="primaryGrayBackground">#ffffff</item>
+        <item name="primaryBlackBackground">#f4f5f9</item>
+        <item name="iconGrayBackground">#f7f8fb</item>
+        <item name="boxItemBackground">#ffffff</item>
+        <item name="textColor">#151826</item>
+        <item name="grayTextColor">#646b80</item>
+        <item name="iconColor">#646b80</item>
+        <item name="white">#151826</item>
+        <item name="black">#f4f5f9</item>
+        <item name="colorOnPrimary">#151826</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+    <style name="OverlayCtLight">
+        <item name="colorPrimary">#e11d48</item>
+        <item name="android:colorPrimary">#e11d48</item>
+        <item name="colorPrimaryDark">#be123c</item>
+        <item name="colorAccent">#e11d48</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#e11d48</item>
+    </style>
+
+    <style name="CtSepiaMode">
+        <item name="primaryGrayBackground">#fbf5e8</item>
+        <item name="primaryBlackBackground">#f3ead8</item>
+        <item name="iconGrayBackground">#f5ecda</item>
+        <item name="boxItemBackground">#fffaf0</item>
+        <item name="textColor">#3b2f1e</item>
+        <item name="grayTextColor">#7c6a4f</item>
+        <item name="iconColor">#7c6a4f</item>
+        <item name="white">#3b2f1e</item>
+        <item name="black">#f3ead8</item>
+        <item name="colorOnPrimary">#3b2f1e</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+    <style name="OverlayCtSepia">
+        <item name="colorPrimary">#a0522d</item>
+        <item name="android:colorPrimary">#a0522d</item>
+        <item name="colorPrimaryDark">#7a3b1d</item>
+        <item name="colorAccent">#a0522d</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#a0522d</item>
+    </style>
+
+    <style name="CtLavenderMode">
+        <item name="primaryGrayBackground">#ffffff</item>
+        <item name="primaryBlackBackground">#f3f1fb</item>
+        <item name="iconGrayBackground">#f7f5fd</item>
+        <item name="boxItemBackground">#ffffff</item>
+        <item name="textColor">#1f1838</item>
+        <item name="grayTextColor">#6b6388</item>
+        <item name="iconColor">#6b6388</item>
+        <item name="white">#1f1838</item>
+        <item name="black">#f3f1fb</item>
+        <item name="colorOnPrimary">#1f1838</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+    <style name="OverlayCtLavender">
+        <item name="colorPrimary">#7c3aed</item>
+        <item name="android:colorPrimary">#7c3aed</item>
+        <item name="colorPrimaryDark">#5b21b6</item>
+        <item name="colorAccent">#7c3aed</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#7c3aed</item>
+    </style>
+
+    <style name="CtForestMode">
+        <item name="primaryGrayBackground">#121d14</item>
+        <item name="primaryBlackBackground">#0a120b</item>
+        <item name="iconGrayBackground">#0d160f</item>
+        <item name="boxItemBackground">#172619</item>
+        <item name="textColor">#eef8ef</item>
+        <item name="grayTextColor">#94b39a</item>
+        <item name="iconColor">#94b39a</item>
+        <item name="white">#eef8ef</item>
+        <item name="black">#0a120b</item>
+        <item name="colorOnPrimary">#eef8ef</item>
+    </style>
+    <style name="OverlayCtForest">
+        <item name="colorPrimary">#6abf69</item>
+        <item name="android:colorPrimary">#6abf69</item>
+        <item name="colorPrimaryDark">#2e7d32</item>
+        <item name="colorAccent">#6abf69</item>
+        <item name="colorOnPrimary">#08140a</item>
+        <item name="android:colorAccent">#6abf69</item>
+    </style>
+
+    <style name="CtVolcanoMode">
+        <item name="primaryGrayBackground">#1f0e0b</item>
+        <item name="primaryBlackBackground">#120706</item>
+        <item name="iconGrayBackground">#170a08</item>
+        <item name="boxItemBackground">#29130f</item>
+        <item name="textColor">#fff1ec</item>
+        <item name="grayTextColor">#c79a8c</item>
+        <item name="iconColor">#c79a8c</item>
+        <item name="white">#fff1ec</item>
+        <item name="black">#120706</item>
+        <item name="colorOnPrimary">#fff1ec</item>
+    </style>
+    <style name="OverlayCtVolcano">
+        <item name="colorPrimary">#ff4d1a</item>
+        <item name="android:colorPrimary">#ff4d1a</item>
+        <item name="colorPrimaryDark">#b3260a</item>
+        <item name="colorAccent">#ff4d1a</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#ff4d1a</item>
+    </style>
+
+    <style name="CtAuroraMode">
+        <item name="primaryGrayBackground">#0e1626</item>
+        <item name="primaryBlackBackground">#060b14</item>
+        <item name="iconGrayBackground">#09111e</item>
+        <item name="boxItemBackground">#121e33</item>
+        <item name="textColor">#eef6ff</item>
+        <item name="grayTextColor">#8ea5c4</item>
+        <item name="iconColor">#8ea5c4</item>
+        <item name="white">#eef6ff</item>
+        <item name="black">#060b14</item>
+        <item name="colorOnPrimary">#eef6ff</item>
+    </style>
+    <style name="OverlayCtAurora">
+        <item name="colorPrimary">#34e5c4</item>
+        <item name="android:colorPrimary">#34e5c4</item>
+        <item name="colorPrimaryDark">#7c4dff</item>
+        <item name="colorAccent">#34e5c4</item>
+        <item name="colorOnPrimary">#06131a</item>
+        <item name="android:colorAccent">#34e5c4</item>
+    </style>
+
+    <style name="CtNeonblueMode">
+        <item name="primaryGrayBackground">#0a0f22</item>
+        <item name="primaryBlackBackground">#03050f</item>
+        <item name="iconGrayBackground">#060a19</item>
+        <item name="boxItemBackground">#0e1530</item>
+        <item name="textColor">#eaf0ff</item>
+        <item name="grayTextColor">#8796c8</item>
+        <item name="iconColor">#8796c8</item>
+        <item name="white">#eaf0ff</item>
+        <item name="black">#03050f</item>
+        <item name="colorOnPrimary">#eaf0ff</item>
+    </style>
+    <style name="OverlayCtNeonblue">
+        <item name="colorPrimary">#2f6bff</item>
+        <item name="android:colorPrimary">#2f6bff</item>
+        <item name="colorPrimaryDark">#00c2ff</item>
+        <item name="colorAccent">#2f6bff</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#2f6bff</item>
+    </style>
+
+    <style name="CtToxicMode">
+        <item name="primaryGrayBackground">#141a07</item>
+        <item name="primaryBlackBackground">#0a0d03</item>
+        <item name="iconGrayBackground">#0e1305</item>
+        <item name="boxItemBackground">#1b230a</item>
+        <item name="textColor">#f5ffe0</item>
+        <item name="grayTextColor">#a7b77a</item>
+        <item name="iconColor">#a7b77a</item>
+        <item name="white">#f5ffe0</item>
+        <item name="black">#0a0d03</item>
+        <item name="colorOnPrimary">#f5ffe0</item>
+    </style>
+    <style name="OverlayCtToxic">
+        <item name="colorPrimary">#c6ff00</item>
+        <item name="android:colorPrimary">#c6ff00</item>
+        <item name="colorPrimaryDark">#7cb300</item>
+        <item name="colorAccent">#c6ff00</item>
+        <item name="colorOnPrimary">#141a07</item>
+        <item name="android:colorAccent">#c6ff00</item>
+    </style>
+
+    <style name="CtBloodmoonMode">
+        <item name="primaryGrayBackground">#170b10</item>
+        <item name="primaryBlackBackground">#0a0507</item>
+        <item name="iconGrayBackground">#10070b</item>
+        <item name="boxItemBackground">#201016</item>
+        <item name="textColor">#fde9ee</item>
+        <item name="grayTextColor">#b98896</item>
+        <item name="iconColor">#b98896</item>
+        <item name="white">#fde9ee</item>
+        <item name="black">#0a0507</item>
+        <item name="colorOnPrimary">#fde9ee</item>
+    </style>
+    <style name="OverlayCtBloodmoon">
+        <item name="colorPrimary">#ff3366</item>
+        <item name="android:colorPrimary">#ff3366</item>
+        <item name="colorPrimaryDark">#990033</item>
+        <item name="colorAccent">#ff3366</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#ff3366</item>
+    </style>
+
+    <style name="CtCoffeeMode">
+        <item name="primaryGrayBackground">#1d1612</item>
+        <item name="primaryBlackBackground">#120d0a</item>
+        <item name="iconGrayBackground">#16100d</item>
+        <item name="boxItemBackground">#261d18</item>
+        <item name="textColor">#f6ede6</item>
+        <item name="grayTextColor">#b8a598</item>
+        <item name="iconColor">#b8a598</item>
+        <item name="white">#f6ede6</item>
+        <item name="black">#120d0a</item>
+        <item name="colorOnPrimary">#f6ede6</item>
+    </style>
+    <style name="OverlayCtCoffee">
+        <item name="colorPrimary">#c08a5b</item>
+        <item name="android:colorPrimary">#c08a5b</item>
+        <item name="colorPrimaryDark">#8a5a35</item>
+        <item name="colorAccent">#c08a5b</item>
+        <item name="colorOnPrimary">#1d1612</item>
+        <item name="android:colorAccent">#c08a5b</item>
+    </style>
+
+    <style name="CtMintMode">
+        <item name="primaryGrayBackground">#0f1f1c</item>
+        <item name="primaryBlackBackground">#071311</item>
+        <item name="iconGrayBackground">#0a1816</item>
+        <item name="boxItemBackground">#132925</item>
+        <item name="textColor">#e8fff9</item>
+        <item name="grayTextColor">#8dbab0</item>
+        <item name="iconColor">#8dbab0</item>
+        <item name="white">#e8fff9</item>
+        <item name="black">#071311</item>
+        <item name="colorOnPrimary">#e8fff9</item>
+    </style>
+    <style name="OverlayCtMint">
+        <item name="colorPrimary">#3eeac0</item>
+        <item name="android:colorPrimary">#3eeac0</item>
+        <item name="colorPrimaryDark">#14a37f</item>
+        <item name="colorAccent">#3eeac0</item>
+        <item name="colorOnPrimary">#062019</item>
+        <item name="android:colorAccent">#3eeac0</item>
+    </style>
+
+    <style name="CtSynthwaveMode">
+        <item name="primaryGrayBackground">#1f1030</item>
+        <item name="primaryBlackBackground">#140a1f</item>
+        <item name="iconGrayBackground">#170b25</item>
+        <item name="boxItemBackground">#28153d</item>
+        <item name="textColor">#fff0fb</item>
+        <item name="grayTextColor">#b896c8</item>
+        <item name="iconColor">#b896c8</item>
+        <item name="white">#fff0fb</item>
+        <item name="black">#140a1f</item>
+        <item name="colorOnPrimary">#fff0fb</item>
+    </style>
+    <style name="OverlayCtSynthwave">
+        <item name="colorPrimary">#ff6ad5</item>
+        <item name="android:colorPrimary">#ff6ad5</item>
+        <item name="colorPrimaryDark">#ff9e44</item>
+        <item name="colorAccent">#ff6ad5</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#ff6ad5</item>
+    </style>
+
+    <style name="CtSteelMode">
+        <item name="primaryGrayBackground">#171b21</item>
+        <item name="primaryBlackBackground">#0e1115</item>
+        <item name="iconGrayBackground">#12151a</item>
+        <item name="boxItemBackground">#1e232b</item>
+        <item name="textColor">#eef2f6</item>
+        <item name="grayTextColor">#98a3b1</item>
+        <item name="iconColor">#98a3b1</item>
+        <item name="white">#eef2f6</item>
+        <item name="black">#0e1115</item>
+        <item name="colorOnPrimary">#eef2f6</item>
+    </style>
+    <style name="OverlayCtSteel">
+        <item name="colorPrimary">#94a3b8</item>
+        <item name="android:colorPrimary">#94a3b8</item>
+        <item name="colorPrimaryDark">#64748b</item>
+        <item name="colorAccent">#94a3b8</item>
+        <item name="colorOnPrimary">#0e1115</item>
+        <item name="android:colorAccent">#94a3b8</item>
+    </style>
+
+    <style name="CtOceandeepMode">
+        <item name="primaryGrayBackground">#061620</item>
+        <item name="primaryBlackBackground">#020b12</item>
+        <item name="iconGrayBackground">#04111a</item>
+        <item name="boxItemBackground">#0a1e2c</item>
+        <item name="textColor">#e5f6ff</item>
+        <item name="grayTextColor">#7fa3b8</item>
+        <item name="iconColor">#7fa3b8</item>
+        <item name="white">#e5f6ff</item>
+        <item name="black">#020b12</item>
+        <item name="colorOnPrimary">#e5f6ff</item>
+    </style>
+    <style name="OverlayCtOceandeep">
+        <item name="colorPrimary">#0ea5e9</item>
+        <item name="android:colorPrimary">#0ea5e9</item>
+        <item name="colorPrimaryDark">#1e3a8a</item>
+        <item name="colorAccent">#0ea5e9</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#0ea5e9</item>
+    </style>
+
+    <style name="CtSandduneMode">
+        <item name="primaryGrayBackground">#1f1a12</item>
+        <item name="primaryBlackBackground">#14110b</item>
+        <item name="iconGrayBackground">#18140d</item>
+        <item name="boxItemBackground">#29221a</item>
+        <item name="textColor">#f8f1e3</item>
+        <item name="grayTextColor">#bba98a</item>
+        <item name="iconColor">#bba98a</item>
+        <item name="white">#f8f1e3</item>
+        <item name="black">#14110b</item>
+        <item name="colorOnPrimary">#f8f1e3</item>
+    </style>
+    <style name="OverlayCtSanddune">
+        <item name="colorPrimary">#e9c46a</item>
+        <item name="android:colorPrimary">#e9c46a</item>
+        <item name="colorPrimaryDark">#d48b3a</item>
+        <item name="colorAccent">#e9c46a</item>
+        <item name="colorOnPrimary">#1f1a12</item>
+        <item name="android:colorAccent">#e9c46a</item>
+    </style>
+
+    <style name="CtGalaxyMode">
+        <item name="primaryGrayBackground">#100c2a</item>
+        <item name="primaryBlackBackground">#07051a</item>
+        <item name="iconGrayBackground">#0b0820</item>
+        <item name="boxItemBackground">#171236</item>
+        <item name="textColor">#f1edff</item>
+        <item name="grayTextColor">#9d93cf</item>
+        <item name="iconColor">#9d93cf</item>
+        <item name="white">#f1edff</item>
+        <item name="black">#07051a</item>
+        <item name="colorOnPrimary">#f1edff</item>
+    </style>
+    <style name="OverlayCtGalaxy">
+        <item name="colorPrimary">#8b5cf6</item>
+        <item name="android:colorPrimary">#8b5cf6</item>
+        <item name="colorPrimaryDark">#ec4899</item>
+        <item name="colorAccent">#8b5cf6</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#8b5cf6</item>
+    </style>
+
+    <style name="CtJadeMode">
+        <item name="primaryGrayBackground">#0b1d18</item>
+        <item name="primaryBlackBackground">#04100d</item>
+        <item name="iconGrayBackground">#071612</item>
+        <item name="boxItemBackground">#102822</item>
+        <item name="textColor">#e6fff6</item>
+        <item name="grayTextColor">#84b5a5</item>
+        <item name="iconColor">#84b5a5</item>
+        <item name="white">#e6fff6</item>
+        <item name="black">#04100d</item>
+        <item name="colorOnPrimary">#e6fff6</item>
+    </style>
+    <style name="OverlayCtJade">
+        <item name="colorPrimary">#00a86b</item>
+        <item name="android:colorPrimary">#00a86b</item>
+        <item name="colorPrimaryDark">#006b45</item>
+        <item name="colorAccent">#00a86b</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#00a86b</item>
+    </style>
+
+    <style name="CtMidgoldMode">
+        <item name="primaryGrayBackground">#13151d</item>
+        <item name="primaryBlackBackground">#0a0b10</item>
+        <item name="iconGrayBackground">#0e1016</item>
+        <item name="boxItemBackground">#1a1d27</item>
+        <item name="textColor">#f5f3ec</item>
+        <item name="grayTextColor">#a29f95</item>
+        <item name="iconColor">#a29f95</item>
+        <item name="white">#f5f3ec</item>
+        <item name="black">#0a0b10</item>
+        <item name="colorOnPrimary">#f5f3ec</item>
+    </style>
+    <style name="OverlayCtMidgold">
+        <item name="colorPrimary">#d4af37</item>
+        <item name="android:colorPrimary">#d4af37</item>
+        <item name="colorPrimaryDark">#8c6d1f</item>
+        <item name="colorAccent">#d4af37</item>
+        <item name="colorOnPrimary">#14110a</item>
+        <item name="android:colorAccent">#d4af37</item>
+    </style>
+
+    <style name="CtSakuraMode">
+        <item name="primaryGrayBackground">#ffffff</item>
+        <item name="primaryBlackBackground">#fdf2f5</item>
+        <item name="iconGrayBackground">#fdf6f8</item>
+        <item name="boxItemBackground">#ffffff</item>
+        <item name="textColor">#3a1d27</item>
+        <item name="grayTextColor">#8a6371</item>
+        <item name="iconColor">#8a6371</item>
+        <item name="white">#3a1d27</item>
+        <item name="black">#fdf2f5</item>
+        <item name="colorOnPrimary">#3a1d27</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+    <style name="OverlayCtSakura">
+        <item name="colorPrimary">#e75480</item>
+        <item name="android:colorPrimary">#e75480</item>
+        <item name="colorPrimaryDark">#c2185b</item>
+        <item name="colorAccent">#e75480</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#e75480</item>
+    </style>
+
+    <style name="CtSkyMode">
+        <item name="primaryGrayBackground">#ffffff</item>
+        <item name="primaryBlackBackground">#eef6fd</item>
+        <item name="iconGrayBackground">#f5f9fe</item>
+        <item name="boxItemBackground">#ffffff</item>
+        <item name="textColor">#0f2238</item>
+        <item name="grayTextColor">#5a7290</item>
+        <item name="iconColor">#5a7290</item>
+        <item name="white">#0f2238</item>
+        <item name="black">#eef6fd</item>
+        <item name="colorOnPrimary">#0f2238</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+    <style name="OverlayCtSky">
+        <item name="colorPrimary">#0284c7</item>
+        <item name="android:colorPrimary">#0284c7</item>
+        <item name="colorPrimaryDark">#0369a1</item>
+        <item name="colorAccent">#0284c7</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#0284c7</item>
+    </style>
+
+    <style name="CtMintlightMode">
+        <item name="primaryGrayBackground">#ffffff</item>
+        <item name="primaryBlackBackground">#effaf6</item>
+        <item name="iconGrayBackground">#f5fcf9</item>
+        <item name="boxItemBackground">#ffffff</item>
+        <item name="textColor">#10291f</item>
+        <item name="grayTextColor">#5a7f70</item>
+        <item name="iconColor">#5a7f70</item>
+        <item name="white">#10291f</item>
+        <item name="black">#effaf6</item>
+        <item name="colorOnPrimary">#10291f</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+    <style name="OverlayCtMintlight">
+        <item name="colorPrimary">#059669</item>
+        <item name="android:colorPrimary">#059669</item>
+        <item name="colorPrimaryDark">#047857</item>
+        <item name="colorAccent">#059669</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#059669</item>
+    </style>
+
+    <style name="CtPeachMode">
+        <item name="primaryGrayBackground">#ffffff</item>
+        <item name="primaryBlackBackground">#fff4ec</item>
+        <item name="iconGrayBackground">#fff8f3</item>
+        <item name="boxItemBackground">#ffffff</item>
+        <item name="textColor">#3a2214</item>
+        <item name="grayTextColor">#8d6650</item>
+        <item name="iconColor">#8d6650</item>
+        <item name="white">#3a2214</item>
+        <item name="black">#fff4ec</item>
+        <item name="colorOnPrimary">#3a2214</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+    <style name="OverlayCtPeach">
+        <item name="colorPrimary">#f97316</item>
+        <item name="android:colorPrimary">#f97316</item>
+        <item name="colorPrimaryDark">#c2410c</item>
+        <item name="colorAccent">#f97316</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#f97316</item>
+    </style>
+
+    <style name="CtSlatelightMode">
+        <item name="primaryGrayBackground">#ffffff</item>
+        <item name="primaryBlackBackground">#f1f5f9</item>
+        <item name="iconGrayBackground">#f8fafc</item>
+        <item name="boxItemBackground">#ffffff</item>
+        <item name="textColor">#0f172a</item>
+        <item name="grayTextColor">#64748b</item>
+        <item name="iconColor">#64748b</item>
+        <item name="white">#0f172a</item>
+        <item name="black">#f1f5f9</item>
+        <item name="colorOnPrimary">#0f172a</item>
+        <item name="isLightTheme">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+    </style>
+    <style name="OverlayCtSlatelight">
+        <item name="colorPrimary">#334155</item>
+        <item name="android:colorPrimary">#334155</item>
+        <item name="colorPrimaryDark">#0f172a</item>
+        <item name="colorAccent">#334155</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#334155</item>
+    </style>
+</resources>

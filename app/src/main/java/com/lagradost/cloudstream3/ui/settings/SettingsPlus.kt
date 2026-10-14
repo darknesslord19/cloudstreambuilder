@@ -49,6 +49,12 @@ class SettingsPlus : BasePreferenceFragmentCompat() {
         findPreference<Preference>("fork_plus_sheet_extensions")?.isVisible =
             ForkFeatures.isOn(RemoteRules.Feature.REPOLIST, context)
         findPreference<Preference>("fork_plus_sheet_tmdb")?.isVisible = TmdbPosters.available(context)
+        findPreference<Preference>("fork_plus_sheet_themes")?.isVisible =
+            com.lagradost.cloudstream3.fork.ThemePack.available(context)
+        findPreference<Preference>("fork_plus_sheet_themes")?.setOnPreferenceClickListener {
+            activity?.let { com.lagradost.cloudstream3.fork.ThemePack.show(it) }
+            true
+        }
         findPreference<Preference>("fork_plus_sheet_tmdb")?.setOnPreferenceClickListener {
             activity?.let { showTmdb(it) }
             true
@@ -80,6 +86,9 @@ class SettingsPlus : BasePreferenceFragmentCompat() {
         findPreference<Preference>("fork_plus_sheet_home")?.summary =
             if (prefs.getBoolean(HomeTweaks.PREF_ON, true)) getString(R.string.plus_home_des)
             else getString(R.string.plus_home_off)
+        com.lagradost.cloudstream3.fork.ThemePack.nameOf(
+            prefs.getString(getString(R.string.app_theme_key), null)
+        )?.let { findPreference<Preference>("fork_plus_sheet_themes")?.summary = getString(R.string.tp_current, it) }
         findPreference<Preference>("fork_plus_sheet_tmdb")?.summary = when {
             !prefs.getBoolean(TmdbPosters.PREF_ON, true) -> getString(R.string.tmdb_off)
             TmdbPosters.key(context) == null -> getString(R.string.tmdb_no_key)
