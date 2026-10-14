@@ -310,6 +310,12 @@ object AssetPage {
                 }
             }
 
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+                // A remote moves between the buttons of the page with the arrows
+                view?.evaluateJavascript(REMOTE_JS, null)
+            }
+
             override fun shouldOverrideUrlLoading(
                 view: WebView?,
                 request: WebResourceRequest?
@@ -354,15 +360,64 @@ object AssetPage {
             }
         }
 
+        webView.isFocusable = true
+        webView.isFocusableInTouchMode = true
         return try {
             dialog.show()
             webView.loadUrl("https://$HOST/$page")
+            webView.requestFocus()
             Handle(dialog, webView)
         } catch (t: Throwable) {
             logError(t)
             null
         }
     }
+
+    /**
+     * Arrow keys move to the nearest button in that direction, OK presses it. Pages that handle
+     * the arrows themselves keep doing so (their keys are not touched).
+     */
+    private const val REMOTE_JS = """
+(function(){
+ if (window.__remoteNav) return; window.__remoteNav = true;
+ var st = document.createElement('style');
+ st.textContent = '.rn-focus,:focus-visible{outline:3px solid #fff !important;outline-offset:2px !important;border-radius:10px}';
+ document.head.appendChild(st);
+ function items(){
+  var all = document.querySelectorAll('a[href],button,input,select,textarea,[tabindex],[onclick],[role=button],.chip,.cv,.poster,.card,.btn');
+  var out = [];
+  for (var i=0;i<all.length;i++){ var e=all[i];
+   if (e.disabled || e.getAttribute('tabindex')==='-1') continue;
+   var r=e.getBoundingClientRect(); if (r.width<4||r.height<4) continue;
+   var cs=getComputedStyle(e); if (cs.visibility==='hidden'||cs.display==='none') continue;
+   out.push(e); }
+  return out;
+ }
+ function center(r){return {x:r.left+r.width/2,y:r.top+r.height/2};}
+ function move(dir){
+  var list=items(); if(!list.length) return false;
+  var cur=document.activeElement;
+  if(!cur||cur===document.body||list.indexOf(cur)<0){ var f=list[0]; if(!f.hasAttribute('tabindex')&&!/^(A|BUTTON|INPUT|SELECT|TEXTAREA)$/.test(f.tagName)) f.tabIndex=0; f.focus(); f.scrollIntoView({block:'nearest',inline:'nearest'}); return true; }
+  var a=center(cur.getBoundingClientRect()), best=null, bd=1e12;
+  for(var i=0;i<list.length;i++){ var e=list[i]; if(e===cur||cur.contains(e)) continue;
+   var b=center(e.getBoundingClientRect()), dx=b.x-a.x, dy=b.y-a.y, d;
+   if(dir==='ArrowRight'){ if(dx<=2) continue; d=dx+Math.abs(dy)*3; }
+   else if(dir==='ArrowLeft'){ if(dx>=-2) continue; d=-dx+Math.abs(dy)*3; }
+   else if(dir==='ArrowDown'){ if(dy<=2) continue; d=dy+Math.abs(dx)*2; }
+   else { if(dy>=-2) continue; d=-dy+Math.abs(dx)*2; }
+   if(d<bd){bd=d;best=e;} }
+  if(!best) return false;
+  if(!best.hasAttribute('tabindex')&&!/^(A|BUTTON|INPUT|SELECT|TEXTAREA)$/.test(best.tagName)) best.tabIndex=0;
+  best.focus(); best.scrollIntoView({block:'nearest',inline:'nearest'}); return true;
+ }
+ window.addEventListener('keydown',function(e){
+  if(e.defaultPrevented) return;
+  var t=document.activeElement, typing=t&&(/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName));
+  if(/^Arrow/.test(e.key)){ if(typing&&(e.key==='ArrowLeft'||e.key==='ArrowRight')) return; if(move(e.key)) e.preventDefault(); }
+  else if((e.key==='Enter'||e.keyCode===23)&&t&&t!==document.body&&!typing){ e.preventDefault(); t.click(); }
+ });
+})();
+"""
 
     private fun mimeTypeOf(path: String): String {
         return when (val extension = path.substringAfterLast('.', "").lowercase()) {

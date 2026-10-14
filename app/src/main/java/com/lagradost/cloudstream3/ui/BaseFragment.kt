@@ -162,6 +162,8 @@ abstract class BaseFragment<T : ViewBinding>(
     final override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         onViewReady(view, savedInstanceState)
+        // Theme pack: the glow of the corners behind the cards
+        com.lagradost.cloudstream3.fork.ThemePack.glowBehind(view)
     }
 
     /**
@@ -273,6 +275,7 @@ abstract class BasePreferenceFragmentCompat() : PreferenceFragmentCompat() {
         try {
             setDivider(null)
             com.lagradost.cloudstream3.fork.SettingsLook.decorate(listView)
+            com.lagradost.cloudstream3.fork.ThemePack.glowBehind(view)
         } catch (t: Throwable) {
             com.lagradost.cloudstream3.mvvm.logError(t)
         }

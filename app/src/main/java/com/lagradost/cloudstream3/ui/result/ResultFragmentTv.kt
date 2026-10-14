@@ -692,7 +692,13 @@ class ResultFragmentTv : BaseFragment<FragmentResultTvBinding>(
                     resultPlayMovie.isVisible = !comingSoon && resultResumeSeries.isGone
                     if (comingSoon) {
                         resultBookmarkButton.requestFocus()
-                    } else resultPlayMovieButton.requestFocus()
+                    } else {
+                        resultPlayMovieButton.requestFocus()
+                        // Once more after the page is drawn, so the remote starts on it
+                        resultPlayMovieButton.postDelayed({
+                            if (resultPlayMovie.isVisible && view?.findFocus() == null) resultPlayMovieButton.requestFocus()
+                        }, 400)
+                    }
 
                     // Stops last button right focus
                     resultSearchButton.nextFocusRightId = R.id.result_search_Button

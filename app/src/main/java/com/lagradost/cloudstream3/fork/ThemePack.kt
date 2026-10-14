@@ -195,7 +195,7 @@ object ThemePack {
         override fun draw(canvas: Canvas) {
             val w = bounds.width().toFloat()
             val h = bounds.height().toFloat()
-            val alpha = if (light) 0xB0 else 0x99
+            val alpha = if (light) 0xFF else 0xFF
             val ca = (a and 0x00FFFFFF) or (alpha shl 24)
             val cb = (b and 0x00FFFFFF) or (alpha shl 24)
             paint.shader = RadialGradient(0f, 0f, maxOf(w, h) * 0.55f, ca, ca and 0x00FFFFFF, Shader.TileMode.CLAMP)
@@ -209,15 +209,41 @@ object ThemePack {
         override fun getOpacity() = android.graphics.PixelFormat.TRANSLUCENT
     }
 
-    /** Puts the glow of the chosen theme over the app, or takes it away (player, other themes). */
+    private fun chosen(context: Context): T? {
+        if (!available(context)) return null
+        val key = PreferenceManager.getDefaultSharedPreferences(context)
+            .getString(context.getString(R.string.app_theme_key), null)
+        return all.firstOrNull { it.key == key }
+    }
+
+    /** The glow behind everything: the window and the pages that are of the background colour. */
     fun glow(activity: Activity, show: Boolean = true) {
-        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M) return
         try {
             val decor = activity.window?.decorView ?: return
-            val key = PreferenceManager.getDefaultSharedPreferences(activity)
-                .getString(activity.getString(R.string.app_theme_key), null)
-            val t = all.firstOrNull { it.key == key }
-            decor.foreground = if (show && t != null && available(activity)) Glow(t.glow, t.glow2, t.light) else null
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) decor.foreground = null
+            val t = chosen(activity) ?: return
+            if (!show) return
+            activity.window?.setBackgroundDrawable(
+                android.graphics.drawable.LayerDrawable(
+                    arrayOf(android.graphics.drawable.ColorDrawable(t.bg), Glow(t.glow, t.glow2, t.light))
+                )
+            )
+        } catch (e: Throwable) {
+            // nothing
+        }
+    }
+
+    /** A page of the plain background colour gets the glow behind its cards. */
+    fun glowBehind(root: View?) {
+        try {
+            root ?: return
+            val t = chosen(root.context) ?: return
+            val bg = root.background
+            if (bg is android.graphics.drawable.ColorDrawable && bg.color == t.bg) {
+                root.background = android.graphics.drawable.LayerDrawable(
+                    arrayOf(android.graphics.drawable.ColorDrawable(t.bg), Glow(t.glow, t.glow2, t.light))
+                )
+            }
         } catch (e: Throwable) {
             // nothing
         }

@@ -88,7 +88,12 @@ object AutoSubtitles {
     fun isMade(sub: SubtitleData): Boolean = sub.originalName == NAME
 
     /** Is the subtitle the decoder got the made one: its name is in the language field. */
-    fun isMadeTrack(formatLanguage: String?): Boolean = formatLanguage?.contains(NAME) == true
+    fun isMadeTrack(formatLanguage: String?, formatId: String? = null): Boolean {
+        // The player writes the language in small letters, so the name is looked for that way
+        val name = NAME.lowercase()
+        return formatLanguage?.lowercase()?.contains(name) == true ||
+                formatId?.lowercase()?.contains("|$name") == true
+    }
 
     /** The English subtitle address from the id of the made track ("url|name"). */
     fun urlFromTrackId(id: String?): String? = id?.substringBeforeLast("|")?.ifBlank { null }

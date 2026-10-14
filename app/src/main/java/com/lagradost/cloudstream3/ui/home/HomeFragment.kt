@@ -777,6 +777,20 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
                 button.setOnClickListener { activity?.let { Categories.show(it) } }
             }
 
+            // TV: the buttons next to the source choice lead to each other, only the shown ones
+            root.findViewById<android.widget.LinearLayout>(R.id.home_api_holder)?.let { holder ->
+                fun chain() {
+                    val shown = (0 until holder.childCount).map { holder.getChildAt(it) }
+                        .filter { it.isVisible && it.isFocusable }
+                    shown.forEachIndexed { index, view ->
+                        view.nextFocusLeftId = if (index == 0) R.id.navigation_home else shown[index - 1].id
+                        view.nextFocusRightId = if (index == shown.lastIndex) view.id else shown[index + 1].id
+                    }
+                }
+                chain()
+                holder.viewTreeObserver.addOnGlobalLayoutListener { chain() }
+            }
+
             // Load value for toggling Tv layout real time clock. Hide by default at startup
             // set visibility first, to apply a scroll effect later
             context?.let {

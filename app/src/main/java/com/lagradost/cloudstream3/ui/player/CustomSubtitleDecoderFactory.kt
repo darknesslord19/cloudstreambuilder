@@ -317,7 +317,7 @@ class CustomDecoder(private val fallbackFormat: Format?) : SubtitleParser {
         Log.i(TAG, "Parse subtitle, current parser: $realDecoder")
         try {
             val inputString = getStr(data).first
-            Log.i(TAG, "Subtitle preview: ${inputString.substring(0, 30)}")
+            Log.i(TAG, "Subtitle preview: ${inputString.take(30)}")
             if (inputString.isNotBlank()) {
                 var str: String = trimStr(inputString)
                 realDecoder = realDecoder ?: getSubtitleParser(inputString)
@@ -338,7 +338,7 @@ class CustomDecoder(private val fallbackFormat: Format?) : SubtitleParser {
                 }
                 val array = str.toByteArray()
                 val auto = com.lagradost.cloudstream3.fork.AutoSubtitles
-                if (auto.isMadeTrack(fallbackFormat?.language)) {
+                if (auto.isMadeTrack(fallbackFormat?.language, fallbackFormat?.id)) {
                     // The Turkish made from the English: read all lines, translate, then show
                     val parsed = ArrayList<CuesWithTiming>()
                     realDecoder?.parse(
