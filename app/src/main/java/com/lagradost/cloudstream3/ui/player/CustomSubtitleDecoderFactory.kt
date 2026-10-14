@@ -337,13 +337,38 @@ class CustomDecoder(private val fallbackFormat: Format?) : SubtitleParser {
                     }
                 }
                 val array = str.toByteArray()
-                realDecoder?.parse(
-                    array,
-                    minOf(array.size, offset),
-                    minOf(array.size, length),
-                    outputOptions,
-                    customOutput
-                )
+                val auto = com.lagradost.cloudstream3.fork.AutoSubtitles
+                if (auto.isMadeTrack(fallbackFormat?.language)) {
+                    // The Turkish made from the English: read all lines, translate, then show
+                    val parsed = ArrayList<CuesWithTiming>()
+                    realDecoder?.parse(
+                        array,
+                        minOf(array.size, offset),
+                        minOf(array.size, length),
+                        outputOptions
+                    ) { parsed.add(it) }
+                    val lines = parsed.flatMap { group -> group.cues.mapNotNull { it.text?.toString() } }
+                    val ready = auto.forDecoder(auto.urlFromTrackId(fallbackFormat?.id), lines) {
+                        com.lagradost.cloudstream3.CommonActivity.showToast(R.string.autosub_preparing)
+                    }
+                    parsed.forEach { group ->
+                        val cues = if (!ready) group.cues else group.cues.map { cue ->
+                            val text = cue.text?.toString()
+                            val turkish = text?.let { auto.cached(it) }
+                            if (turkish == null) cue else cue.buildUpon().setText(turkish).build()
+                        }
+                        customOutput.accept(CuesWithTiming(cues, group.startTimeUs, group.durationUs))
+                    }
+                } else {
+                    auto.liveActive = false
+                    realDecoder?.parse(
+                        array,
+                        minOf(array.size, offset),
+                        minOf(array.size, length),
+                        outputOptions,
+                        customOutput
+                    )
+                }
             }
         } catch (e: Exception) {
             logError(e)

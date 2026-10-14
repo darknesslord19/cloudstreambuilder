@@ -44,6 +44,9 @@ class SettingsPlus : BasePreferenceFragmentCompat() {
             activity?.let { Categories.show(it, effects = true) }
             true
         }
+        // The Turkish made from English subtitles, can be switched off from outside
+        findPreference<Preference>("fork_plus_subtitles")?.isVisible =
+            ForkFeatures.isOn(RemoteRules.Feature.AUTO_SUBS, context)
         findPreference<Preference>(ForkFeatures.PREF_REPOLIST)?.isVisible =
             ForkFeatures.isOn(RemoteRules.Feature.REPOLIST, context)
 

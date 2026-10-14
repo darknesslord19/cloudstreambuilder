@@ -1168,7 +1168,8 @@ class CS3IPlayer : IPlayer {
                                 buffer.append(text.trim())
                             }
 
-                            val combinedCueText = buffer.toString()
+                            // Lines of the made Turkish subtitle turn Turkish as soon as they are translated
+                            val combinedCueText = com.lagradost.cloudstream3.fork.AutoSubtitles.forScreen(buffer.toString())
 
                             // Use the style of the first entry as the base
                             entries

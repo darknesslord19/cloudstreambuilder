@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Plus: what this build adds, each part can be switched on and off here -->
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory android:title="@string/categories">
         <Preference
@@ -50,6 +51,26 @@
             android:key="fork_plus_remote_categories"
             android:selectable="false"
             android:title="@string/plus_remote_categories" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="fork_plus_subtitles"
+        android:title="@string/player_subtitles_settings">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_baseline_subtitles_24"
+            android:key="fork_autosub"
+            android:summary="@string/autosub_des"
+            android:title="@string/autosub_settings" />
+        <ListPreference
+            android:defaultValue="before"
+            android:dependency="fork_autosub"
+            android:entries="@array/autosub_mode_names"
+            android:entryValues="@array/autosub_mode_values"
+            android:icon="@drawable/ic_baseline_tune_24"
+            android:key="fork_autosub_mode"
+            android:title="@string/autosub_mode"
+            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/extensions">

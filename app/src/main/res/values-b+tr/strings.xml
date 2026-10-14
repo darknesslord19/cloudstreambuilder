@@ -400,6 +400,13 @@
     <string name="batch_download_start_format" formatted="true">%1$d %2$s indirilmeye başlandı…</string>
     <string name="batch_download_finish_format" formatted="true">%1$d %2$s indirildi</string>
     <string name="batch_download_nothing_to_download_format" formatted="true">%s\'nin tamamı zaten indirildi</string>
+    <!-- automatic Turkish subtitles -->
+    <string name="autosub_settings">Otomatik Türkçe altyazı</string>
+    <string name="autosub_des">Türkçe altyazı yoksa İngilizce altyazı Türkçeye çevrilir ve \"Türkçe (otomatik çeviri)\" olarak eklenir. İnternet gerekir</string>
+    <string name="autosub_mode">Çeviri zamanı</string>
+    <string name="autosub_mode_before">Film başlamadan önce (önerilen)</string>
+    <string name="autosub_mode_live">İzlerken</string>
+    <string name="autosub_preparing">Türkçe altyazı hazırlanıyor…</string>
     <!-- install all on the plugin list -->
     <string name="plugins_install_all">Hepsini yükle</string>
     <string name="plugins_installed_count" formatted="true">%1$d / %2$d eklenti yüklü</string>

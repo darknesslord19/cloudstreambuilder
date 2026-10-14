@@ -543,4 +543,13 @@
         <item>VISCII</item>
         <item>Windows-1258</item>
     </string-array>
+    <!-- when the Turkish made from English subtitles is translated -->
+    <string-array name="autosub_mode_names">
+        <item>@string/autosub_mode_before</item>
+        <item>@string/autosub_mode_live</item>
+    </string-array>
+    <string-array name="autosub_mode_values" translatable="false">
+        <item>before</item>
+        <item>live</item>
+    </string-array>
 </resources>

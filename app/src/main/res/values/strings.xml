@@ -512,6 +512,13 @@
     <string name="batch_download_nothing_to_download_format" formatted="true">All %s already downloaded</string>
     <string name="no_plugins_found_error">No plugins found in repository</string>
     <string name="no_repository_found_error">Repository not found, check the URL and try VPN</string>
+    <!-- automatic Turkish subtitles -->
+    <string name="autosub_settings">Automatic Turkish subtitles</string>
+    <string name="autosub_des">Without Turkish subtitles the English ones are translated and added as \"Türkçe (otomatik çeviri)\". Needs internet</string>
+    <string name="autosub_mode">When to translate</string>
+    <string name="autosub_mode_before">Before the film starts (recommended)</string>
+    <string name="autosub_mode_live">While watching</string>
+    <string name="autosub_preparing">Preparing Turkish subtitles…</string>
     <!-- install all on the plugin list -->
     <string name="plugins_install_all">Install all</string>
     <string name="plugins_installed_count" formatted="true">%1$d / %2$d plugins installed</string>

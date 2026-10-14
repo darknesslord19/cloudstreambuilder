@@ -44,6 +44,13 @@ data class GeneratorState(
 /** Immutable state of all current links relevant to displaying the video */
 // @MustUseReturnValues
 // @Immutable
+/** The subtitles with the Turkish made from the English added when there is no Turkish one */
+private fun madeSubs(subs: PersistentSet<SubtitleData>): PersistentSet<SubtitleData> = try {
+    com.lagradost.cloudstream3.fork.AutoSubtitles.withMade(subs).toPersistentSet()
+} catch (t: Throwable) {
+    subs
+}
+
 data class VideoState(
     val subtitles: PersistentSet<SubtitleData> = persistentSetOf(),
     val links: PersistentSet<VideoLink> = persistentSetOf(),
@@ -74,7 +81,7 @@ data class VideoState(
     }
 
     @Contract(pure = true)
-    fun add(item: SubtitleData): VideoState = copy(subtitles = subtitles.add(item))
+    fun add(item: SubtitleData): VideoState = copy(subtitles = madeSubs(subtitles.add(item)))
 
     @Contract(pure = true)
     fun add(item: VideoLink): VideoState = copy(links = links.add(item))
@@ -84,7 +91,7 @@ data class VideoState(
 
     @JvmName("addSubtitleData")
     @Contract(pure = true)
-    fun add(items: Collection<SubtitleData>): VideoState = copy(subtitles = subtitles.addAll(items))
+    fun add(items: Collection<SubtitleData>): VideoState = copy(subtitles = madeSubs(subtitles.addAll(items)))
 
     @JvmName("addVideoLink")
     @Contract(pure = true)
@@ -95,7 +102,7 @@ data class VideoState(
     fun add(items: Collection<VideoSkipStamp>): VideoState = copy(stamps = stamps.addAll(items))
 
     @Contract(pure = true)
-    fun set(item: SubtitleData): VideoState = copy(subtitles = persistentSetOf(item))
+    fun set(item: SubtitleData): VideoState = copy(subtitles = madeSubs(persistentSetOf(item)))
 
     @Contract(pure = true)
     fun set(item: VideoLink): VideoState = copy(links = persistentSetOf(item))
@@ -105,7 +112,7 @@ data class VideoState(
 
     @JvmName("setSubtitleData")
     @Contract(pure = true)
-    fun set(items: Collection<SubtitleData>): VideoState = copy(subtitles = items.toPersistentSet())
+    fun set(items: Collection<SubtitleData>): VideoState = copy(subtitles = madeSubs(items.toPersistentSet()))
 
     @JvmName("setVideoLink")
     @Contract(pure = true)
