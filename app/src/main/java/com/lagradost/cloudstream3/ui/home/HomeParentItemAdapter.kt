@@ -107,12 +107,14 @@ open class ParentItemAdapter(
                 ).apply {
                     isHorizontal = info.isHorizontalImages
                     hasNext = item.hasNext
+                    rowName = info.name
                     submitList(item.list.list)
                 }
             } else {
                 currentAdapter.apply {
                     isHorizontal = info.isHorizontalImages
                     hasNext = item.hasNext
+                    rowName = info.name
                     this.clickCallback = this@ParentItemAdapter.clickCallback
                     nextFocusUp = homeChildRecyclerview.nextFocusUpId
                     nextFocusDown = homeChildRecyclerview.nextFocusDownId
@@ -126,6 +128,12 @@ open class ParentItemAdapter(
                 nextRight = endFocus,
             )
             homeChildMoreInfo.text = info.name
+            // Home screen settings: "All ›" and how many instead of the arrow
+            if (isLayout(PHONE)) {
+                com.lagradost.cloudstream3.fork.HomeTweaks.styleRowHeader(
+                    homeChildMoreInfo, info.name, item.list.list.size, item.hasNext
+                )
+            }
 
             homeChildRecyclerview.addOnScrollListener(object :
                 RecyclerView.OnScrollListener() {

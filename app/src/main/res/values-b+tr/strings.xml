@@ -400,6 +400,51 @@
     <string name="batch_download_start_format" formatted="true">%1$d %2$s indirilmeye başlandı…</string>
     <string name="batch_download_finish_format" formatted="true">%1$d %2$s indirildi</string>
     <string name="batch_download_nothing_to_download_format" formatted="true">%s\'nin tamamı zaten indirildi</string>
+    <!-- home screen settings and the Plus menus -->
+    <string name="plus_home">Ana ekran ayarları</string>
+    <string name="plus_home_des">Vitrin, isimler, puan, filtre düğmesi, hızlı menü ve dahası</string>
+    <string name="plus_home_off">Kapalı, CloudStream\'in normal ana ekranı</string>
+    <string name="plus_home_main">Ana ekran ayarları</string>
+    <string name="plus_home_main_des">Kapatınca CloudStream\'in normal ana ekranına döner</string>
+    <string name="plus_home_parts">Değişiklikler</string>
+    <string name="plus_home_sheet_des">Her birini ayrı açıp kapatabilirsin</string>
+    <string name="plus_categories_des">Hareketli kategoriler, efektler, rozetler</string>
+    <string name="plus_subtitles_des">Otomatik Türkçe altyazı</string>
+    <string name="plus_extensions_des">Depo listesi düğmesi</string>
+    <string name="ht_hero">Vitrin</string>
+    <string name="ht_hero_des">Büyük afiş kendiliğinden değişir, noktalar, puan, yıl, süre, \"Yok\" yerine \"Listem\", yuvarlak düğmeler</string>
+    <string name="ht_progress">İzleme çubuğu</string>
+    <string name="ht_progress_des">İzlemeye devam et kartlarında ilerleme çubuğu ve kalan süre</string>
+    <string name="ht_titles">Temiz isimler</string>
+    <string name="ht_titles_des">Afiş altında tek satır isim, altında yıl ve tür</string>
+    <string name="ht_rating">Renkli puan</string>
+    <string name="ht_rating_des">7 ve üstü yeşil, 6 ile 7 arası sarı, altı kırmızı</string>
+    <string name="ht_filter">Filtre düğmesi</string>
+    <string name="ht_filter_des">Aşağı kaydırınca saklanır, yukarı kaydırınca geri gelir</string>
+    <string name="ht_nav">Alt menü yazıları</string>
+    <string name="ht_nav_des">Alttaki simgelerin altında isimleri görünür</string>
+    <string name="ht_headers">Bölüm başlıkları</string>
+    <string name="ht_headers_des">Ok yerine \"Tümü\" ve kaç içerik olduğu</string>
+    <string name="ht_new">Yeni rozetleri</string>
+    <string name="ht_new_des">Yeni eklenenler satırlarında \"Yeni\" ve \"Yeni bölüm\"</string>
+    <string name="ht_quick">Hızlı menü</string>
+    <string name="ht_quick_des">Afişe basılı tutunca İzle, Listeme ekle, İzledim, Bilgi</string>
+    <string name="ht_type_movie">Film</string>
+    <string name="ht_type_series">Dizi</string>
+    <string name="ht_type_anime">Anime</string>
+    <string name="ht_type_live">Canlı</string>
+    <string name="ht_left_hours" formatted="true">%1$d sa %2$d dk kaldı</string>
+    <string name="ht_left_minutes" formatted="true">%d dk kaldı</string>
+    <string name="ht_new_badge">Yeni</string>
+    <string name="ht_new_episode">Yeni bölüm</string>
+    <string name="ht_my_list">Listem</string>
+    <string name="ht_all">Tümü ›</string>
+    <string name="ht_quick_play">İzle</string>
+    <string name="ht_quick_list">Listeme ekle</string>
+    <string name="ht_quick_watched">İzledim</string>
+    <string name="ht_quick_info">Bilgi</string>
+    <string name="ht_added_list">Listene eklendi</string>
+    <string name="ht_marked_watched">İzlendi olarak işaretlendi</string>
     <!-- automatic Turkish subtitles -->
     <string name="autosub_settings">Otomatik Türkçe altyazı</string>
     <string name="autosub_des">Türkçe altyazı yoksa İngilizce altyazı Türkçeye çevrilir ve \"Türkçe (otomatik çeviri)\" olarak eklenir. İnternet gerekir</string>

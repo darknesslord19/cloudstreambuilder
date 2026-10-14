@@ -62,6 +62,7 @@ import com.lagradost.cloudstream3.utils.SingleSelectionHelper.showOptionSelectSt
 import com.lagradost.cloudstream3.utils.UIHelper.fixPaddingStatusbarMargin
 import com.lagradost.cloudstream3.utils.UIHelper.fixPaddingStatusbarView
 import com.lagradost.cloudstream3.utils.UIHelper.populateChips
+import com.lagradost.cloudstream3.utils.UIHelper.toPx
 import androidx.core.graphics.toColorInt
 import com.lagradost.cloudstream3.ui.setRecycledViewPool
 
@@ -455,6 +456,9 @@ class HomeParentItemAdapterPreview(
                     null,
                     null
                 )
+                com.lagradost.cloudstream3.fork.HomeTweaks.styleHeroButtons(
+                    homePreviewBookmark, homePreviewInfo, homePreviewPlay, watchType
+                )
 
                 homePreviewBookmark.setOnClickListener { fab ->
                     fab.context.getActivity()?.showBottomDialog(
@@ -484,6 +488,9 @@ class HomeParentItemAdapterPreview(
                                 null
                             )
                             homePreviewBookmark.setText(newValue.stringRes)
+                            com.lagradost.cloudstream3.fork.HomeTweaks.styleHeroButtons(
+                                homePreviewBookmark, homePreviewInfo, homePreviewPlay, newValue
+                            )
                         }
                     }
                 }
@@ -494,6 +501,12 @@ class HomeParentItemAdapterPreview(
             object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
                     motionPageSelected(position)
+                    if (isLayout(PHONE)) {
+                        com.lagradost.cloudstream3.fork.HomeTweaks.heroDots(
+                            itemView.findViewById(R.id.home_preview_viewpager_text),
+                            previewAdapter.itemCount, position, 104.toPx
+                        )
+                    }
                     previewAdapter.apply {
                         if (position >= itemCount - 1 && hasMoreItems) {
                             hasMoreItems = false // don't make two requests
@@ -540,7 +553,9 @@ class HomeParentItemAdapterPreview(
 
         private fun scheduleAuto() {
             previewViewpager.removeCallbacks(autoAdvance)
-            if (isLayout(PHONE) && PosterMotion.isOn(previewViewpager.context, PosterMotion.Effect.AUTO)) {
+            if (isLayout(PHONE) && (PosterMotion.isOn(previewViewpager.context, PosterMotion.Effect.AUTO) ||
+                    com.lagradost.cloudstream3.fork.HomeTweaks.on(previewViewpager.context, com.lagradost.cloudstream3.fork.HomeTweaks.Tweak.HERO))
+            ) {
                 previewViewpager.postDelayed(autoAdvance, PosterMotion.AUTO_DELAY_MS)
             }
         }

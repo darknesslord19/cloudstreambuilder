@@ -817,6 +817,26 @@
         <item name="android:textColor">?attr/textColor</item>
     </style>
 
+    <!-- A button of the quick menu of a poster -->
+    <style name="ForkQuickButton">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginStart">4dp</item>
+        <item name="android:layout_marginEnd">4dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:drawablePadding">6dp</item>
+        <item name="android:background">@drawable/fork_quick_button</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:textColor">?attr/textColor</item>
+        <item name="android:textSize">12.5sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="drawableTint">?attr/textColor</item>
+    </style>
+
     <!-- The rounded icon of a source in the list of home page sources -->
     <style name="ProviderIconShape" parent="">
         <item name="cornerFamily">rounded</item>

@@ -649,6 +649,15 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
     override fun onResume() {
         super.onResume()
         afterPluginsLoadedEvent += ::onAllPluginsLoaded
+        // Home screen settings: names under the icons of the bottom bar
+        try {
+            binding?.navView?.labelVisibilityMode =
+                if (com.lagradost.cloudstream3.fork.HomeTweaks.on(this, com.lagradost.cloudstream3.fork.HomeTweaks.Tweak.NAV))
+                    com.google.android.material.navigation.NavigationBarView.LABEL_VISIBILITY_LABELED
+                else com.google.android.material.navigation.NavigationBarView.LABEL_VISIBILITY_UNLABELED
+        } catch (t: Throwable) {
+            logError(t)
+        }
         setActivityInstance(this)
         AccessGate.onResume(this)
         try {

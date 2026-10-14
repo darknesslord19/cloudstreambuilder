@@ -63,9 +63,11 @@ class HomeScrollAdapter(
             is HomeScrollViewBinding -> {
                 binding.homeScrollPreview.loadImage(posterUrl, item.posterHeaders)
                 binding.homeScrollPreviewTags.apply {
-                    text = item.tags?.joinToString(" • ") ?: ""
-                    isGone = item.tags.isNullOrEmpty()
-                    maxLines = 2
+                    // Home screen settings: year, duration and score above the kinds
+                    val rich = com.lagradost.cloudstream3.fork.HomeTweaks.heroTags(context, item)
+                    text = rich ?: item.tags?.joinToString(" • ") ?: ""
+                    isGone = rich == null && item.tags.isNullOrEmpty()
+                    maxLines = if (rich != null) 3 else 2
                 }
                 binding.homeScrollPreviewTitle.text = item.name.html()
 

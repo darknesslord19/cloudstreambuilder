@@ -799,11 +799,17 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
                     if (isLayout(PHONE)) {
                         PosterMotion.parallax(recyclerView)
                         // Fab is only relevant to Phone
+                        // Home screen settings: the filter button goes away while reading down
+                        val hideFab = com.lagradost.cloudstream3.fork.HomeTweaks.on(
+                            recyclerView.context, com.lagradost.cloudstream3.fork.HomeTweaks.Tweak.FILTER
+                        )
                         if (dy > 0) { //check for scroll down
                             homeApiFab.shrink() // hide
                             homeRandom.shrink()
+                            if (hideFab && dy > 4) homeApiFab.hide()
                         } else if (dy < -5) {
                             if (isLayout(PHONE)) {
+                                if (hideFab) homeApiFab.show()
                                 homeApiFab.extend() // show
                                 homeRandom.extend()
                             }

@@ -56,6 +56,9 @@ object SearchHelper {
             }
 
             SEARCH_ACTION_SHOW_METADATA -> {
+                // Home screen settings: the quick menu instead of the popup
+                val act = activity
+                if (act != null && com.lagradost.cloudstream3.fork.HomeTweaks.quickMenu(act, callback.card)) return
                 (activity as? MainActivity?)?.apply {
                     loadPopup(callback.card)
                 } ?: kotlin.run {

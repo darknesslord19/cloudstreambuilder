@@ -1,84 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Plus: what this build adds, each part can be switched on and off here -->
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<!-- Plus: what this build adds. Each part opens its settings in a menu from the bottom -->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory android:title="@string/categories">
-        <Preference
-            android:icon="@drawable/categories_24px"
-            android:key="fork_plus_open_categories"
-            android:summary="@string/plus_open_categories_des"
-            android:title="@string/plus_open_categories" />
-        <SwitchPreference
-            android:defaultValue="true"
-            android:icon="@drawable/categories_24px"
-            android:key="fork_categories_icon"
-            android:summary="@string/categories_icon_des"
-            android:title="@string/categories_icon_settings" />
-        <SwitchPreference
-            android:defaultValue="true"
-            android:icon="@drawable/animation_24px"
-            android:key="fork_categories_anim"
-            android:summary="@string/categories_anim_des"
-            android:title="@string/categories_anim_settings" />
-        <SwitchPreference
-            android:defaultValue="false"
-            android:dependency="fork_categories_anim"
-            android:icon="@drawable/plus_sparkle_24px"
-            android:key="fork_categories_rich"
-            android:summary="@string/categories_rich_des"
-            android:title="@string/categories_rich_settings" />
-        <SwitchPreference
-            android:defaultValue="true"
-            android:icon="@drawable/plus_sparkle_24px"
-            android:key="fork_categories_fx"
-            android:summary="@string/categories_fx_des"
-            android:title="@string/categories_fx_settings" />
-        <Preference
-            android:dependency="fork_categories_fx"
-            android:icon="@drawable/animation_24px"
-            android:key="fork_plus_category_fx_styles"
-            android:summary="@string/categories_fx_styles_des"
-            android:title="@string/categories_fx_styles" />
-        <SwitchPreference
-            android:defaultValue="true"
-            android:icon="@drawable/title_24px"
-            android:key="fork_categories_badges"
-            android:summary="@string/categories_badges_des"
-            android:title="@string/categories_badges_settings" />
-        <Preference
-            android:icon="@drawable/mobile_arrow_down_24px"
-            android:key="fork_plus_remote_categories"
-            android:selectable="false"
-            android:title="@string/plus_remote_categories" />
-    </PreferenceCategory>
+    <Preference
+        android:icon="@drawable/home_alt"
+        android:key="fork_plus_sheet_home"
+        android:summary="@string/plus_home_des"
+        android:title="@string/plus_home" />
 
-    <PreferenceCategory
-        android:key="fork_plus_subtitles"
-        android:title="@string/player_subtitles_settings">
-        <SwitchPreference
-            android:defaultValue="true"
-            android:icon="@drawable/ic_baseline_subtitles_24"
-            android:key="fork_autosub"
-            android:summary="@string/autosub_des"
-            android:title="@string/autosub_settings" />
-        <ListPreference
-            android:defaultValue="before"
-            android:dependency="fork_autosub"
-            android:entries="@array/autosub_mode_names"
-            android:entryValues="@array/autosub_mode_values"
-            android:icon="@drawable/ic_baseline_tune_24"
-            android:key="fork_autosub_mode"
-            android:title="@string/autosub_mode"
-            app:useSimpleSummaryProvider="true" />
-    </PreferenceCategory>
+    <Preference
+        android:icon="@drawable/categories_24px"
+        android:key="fork_plus_sheet_categories"
+        android:summary="@string/plus_categories_des"
+        android:title="@string/categories" />
 
-    <PreferenceCategory android:title="@string/extensions">
-        <SwitchPreference
-            android:defaultValue="true"
-            android:icon="@drawable/extension_24px"
-            android:key="fork_repolist"
-            android:summary="@string/repolist_switch_des"
-            android:title="@string/repository_list" />
-    </PreferenceCategory>
+    <Preference
+        android:icon="@drawable/ic_baseline_subtitles_24"
+        android:key="fork_plus_sheet_subtitles"
+        android:summary="@string/plus_subtitles_des"
+        android:title="@string/player_subtitles_settings" />
+
+    <Preference
+        android:icon="@drawable/extension_24px"
+        android:key="fork_plus_sheet_extensions"
+        android:summary="@string/plus_extensions_des"
+        android:title="@string/extensions" />
 </PreferenceScreen>

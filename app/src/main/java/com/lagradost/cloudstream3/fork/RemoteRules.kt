@@ -115,6 +115,7 @@ object RemoteRules {
         REPOLIST("repolist"),
         CATEGORY_EFFECTS("category_effects"),
         AUTO_SUBS("auto_subtitles"),
+        HOME_TWEAKS("home_tweaks"),
     }
 
     /**

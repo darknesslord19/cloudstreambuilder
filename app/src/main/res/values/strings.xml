@@ -512,6 +512,51 @@
     <string name="batch_download_nothing_to_download_format" formatted="true">All %s already downloaded</string>
     <string name="no_plugins_found_error">No plugins found in repository</string>
     <string name="no_repository_found_error">Repository not found, check the URL and try VPN</string>
+    <!-- home screen settings and the Plus menus -->
+    <string name="plus_home">Home screen settings</string>
+    <string name="plus_home_des">Big poster, names, ratings, filter button, quick menu and more</string>
+    <string name="plus_home_off">Off, the normal home screen of CloudStream</string>
+    <string name="plus_home_main">Home screen settings</string>
+    <string name="plus_home_main_des">Off brings back the normal home screen of CloudStream</string>
+    <string name="plus_home_parts">Changes</string>
+    <string name="plus_home_sheet_des">Each one can be switched on and off</string>
+    <string name="plus_categories_des">Moving categories, effects, badges</string>
+    <string name="plus_subtitles_des">Automatic Turkish subtitles</string>
+    <string name="plus_extensions_des">Repository list button</string>
+    <string name="ht_hero">Big poster</string>
+    <string name="ht_hero_des">Changes by itself, dots, score, year, length, \"My list\" instead of \"None\", round buttons</string>
+    <string name="ht_progress">Watch bar</string>
+    <string name="ht_progress_des">A progress bar and the time left on continue watching</string>
+    <string name="ht_titles">Clean names</string>
+    <string name="ht_titles_des">One line name under the poster, year and kind under it</string>
+    <string name="ht_rating">Coloured rating</string>
+    <string name="ht_rating_des">7 and up green, 6 to 7 yellow, below red</string>
+    <string name="ht_filter">Filter button</string>
+    <string name="ht_filter_des">Hides while scrolling down, comes back scrolling up</string>
+    <string name="ht_nav">Bottom bar names</string>
+    <string name="ht_nav_des">Names under the icons of the bottom bar</string>
+    <string name="ht_headers">Row headers</string>
+    <string name="ht_headers_des">\"All\" and how many instead of the arrow</string>
+    <string name="ht_new">New labels</string>
+    <string name="ht_new_des">\"New\" and \"New episode\" on rows of new things</string>
+    <string name="ht_quick">Quick menu</string>
+    <string name="ht_quick_des">Holding a poster: Watch, Add to list, Watched, Details</string>
+    <string name="ht_type_movie">Movie</string>
+    <string name="ht_type_series">Series</string>
+    <string name="ht_type_anime">Anime</string>
+    <string name="ht_type_live">Live</string>
+    <string name="ht_left_hours" formatted="true">%1$d h %2$d min left</string>
+    <string name="ht_left_minutes" formatted="true">%d min left</string>
+    <string name="ht_new_badge">New</string>
+    <string name="ht_new_episode">New episode</string>
+    <string name="ht_my_list">My list</string>
+    <string name="ht_all">All ›</string>
+    <string name="ht_quick_play">Watch</string>
+    <string name="ht_quick_list">Add to list</string>
+    <string name="ht_quick_watched">Watched</string>
+    <string name="ht_quick_info">Details</string>
+    <string name="ht_added_list">Added to your list</string>
+    <string name="ht_marked_watched">Marked as watched</string>
     <!-- automatic Turkish subtitles -->
     <string name="autosub_settings">Automatic Turkish subtitles</string>
     <string name="autosub_des">Without Turkish subtitles the English ones are translated and added as \"Türkçe (otomatik çeviri)\". Needs internet</string>

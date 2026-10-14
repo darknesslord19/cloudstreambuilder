@@ -122,6 +122,9 @@ open class HomeChildItemAdapter(
             })
     ) {
     var hasNext: Boolean = false
+
+    /** The name of the row, for the home screen settings ("new" labels) */
+    var rowName: String? = null
     var isHorizontal: Boolean = false
         set(value) {
             field = value
@@ -229,6 +232,7 @@ open class HomeChildItemAdapter(
             nextFocusUp,
             nextFocusDown
         )
+        com.lagradost.cloudstream3.fork.HomeTweaks.decoratePoster(holder.itemView, item, position, rowName, setWidth)
 
         holder.itemView.tag = position
     }
