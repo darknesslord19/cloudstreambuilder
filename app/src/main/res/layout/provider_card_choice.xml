@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One source in the list of home page sources, as a slim card -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="12dp"
+    android:paddingTop="4dp"
+    android:paddingEnd="12dp"
+    android:paddingBottom="4dp">
+
+    <LinearLayout
+        android:id="@+id/provider_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/provider_card"
+        android:gravity="center_vertical"
+        android:minHeight="62dp"
+        android:orientation="horizontal"
+        android:paddingStart="10dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="8dp">
+
+        <FrameLayout
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginEnd="12dp">
+
+            <TextView
+                android:id="@+id/provider_letters"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/provider_letters_bg"
+                android:gravity="center"
+                android:textColor="#FFFFFFFF"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                tools:text="Di" />
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/provider_icon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                app:shapeAppearanceOverlay="@style/ProviderIconShape" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/text1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:textColor="?attr/textColor"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                tools:text="HDFilmCehennemi" />
+
+            <LinearLayout
+                android:id="@+id/provider_chips"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="horizontal" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/pinicon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="4dp"
+            android:src="@drawable/pin_ic"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <!-- Opens the settings of the plugin or add-on the provider comes from -->
+        <ImageView
+            android:id="@+id/provider_settings"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/title_settings"
+            android:focusable="false"
+            android:padding="11dp"
+            android:visibility="gone"
+            app:srcCompat="@drawable/ic_baseline_tune_24"
+            app:tint="?attr/textColor"
+            tools:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/provider_check"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/provider_check_bg"
+            android:importantForAccessibility="no"
+            android:padding="5dp"
+            android:visibility="gone"
+            app:srcCompat="@drawable/ic_baseline_check_24"
+            app:tint="?attr/primaryBlackBackground"
+            tools:visibility="visible" />
+    </LinearLayout>
+</FrameLayout>

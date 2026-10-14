@@ -83,6 +83,9 @@ import com.lagradost.cloudstream3.utils.UIHelper.getSpanCount
 import com.lagradost.cloudstream3.utils.UIHelper.navigate
 import com.lagradost.cloudstream3.utils.UIHelper.popupMenuNoIconsAndNoStringRes
 import com.lagradost.cloudstream3.utils.UIHelper.toPx
+import com.lagradost.cloudstream3.utils.SubtitleHelper.getNameNextToFlagEmoji
+import com.lagradost.cloudstream3.utils.UIHelper.colorFromAttribute
+import com.lagradost.cloudstream3.utils.ImageLoader.loadImage
 
 private const val TAG = "HomeFragment"
 
@@ -369,6 +372,68 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
             }
         }
 
+        /** Fills one card of the list of home page sources. */
+        private fun Context.bindProviderCard(
+            view: View,
+            api: MainAPI?,
+            fallbackName: String,
+            pluginUrls: Map<String, String>,
+            listView: ListView?,
+            position: Int,
+        ) {
+            val icons = com.lagradost.cloudstream3.fork.ProviderIcons
+            val title = view.findViewById<TextView>(R.id.text1)
+            val letters = view.findViewById<TextView>(R.id.provider_letters)
+            val icon = view.findViewById<ImageView>(R.id.provider_icon)
+            val chips = view.findViewById<android.widget.LinearLayout>(R.id.provider_chips)
+            val check = view.findViewById<ImageView>(R.id.provider_check)
+            val special = api === noneApi || api === randomApi
+
+            title?.text = if (special || api == null) fallbackName else icons.displayName(api.name)
+            check?.visibility = if (listView?.isItemChecked(position) == true) View.VISIBLE else View.GONE
+
+            com.lagradost.cloudstream3.ui.BaseAdapter.clearImage(icon)
+            icon?.setImageDrawable(null)
+            letters?.text = ""
+            letters?.background?.mutate()?.setTint(colorFromAttribute(R.attr.iconGrayBackground))
+            when {
+                api === noneApi -> {
+                    icon?.setImageResource(R.drawable.ic_fork_none_24)
+                    icon?.scaleType = ImageView.ScaleType.CENTER
+                }
+                api === randomApi -> {
+                    icon?.setImageResource(R.drawable.ic_fork_dice_24)
+                    icon?.scaleType = ImageView.ScaleType.CENTER
+                }
+                api != null -> {
+                    icon?.scaleType = ImageView.ScaleType.CENTER_CROP
+                    letters?.text = icons.letters(api.name)
+                    letters?.background?.mutate()?.setTint(icons.colorFor(api.name))
+                    icons.iconFor(this, api, pluginUrls)?.let { url -> icon?.loadImage(url) }
+                }
+            }
+
+            chips?.removeAllViews()
+            chips?.visibility = if (special || api == null) View.GONE else View.VISIBLE
+            if (!special && api != null) {
+                val labels = ArrayList<String>()
+                getNameNextToFlagEmoji(api.lang)?.let { labels.add(it) }
+                labels.addAll(icons.typeLabels(api))
+                labels.forEach { label ->
+                    chips?.addView(TextView(this).apply {
+                        text = label
+                        textSize = 11f
+                        setTextColor(colorFromAttribute(R.attr.grayTextColor))
+                        background = androidx.core.content.ContextCompat.getDrawable(this@bindProviderCard, R.drawable.plugin_chip)
+                        setPadding(6.toPx, 1.toPx, 6.toPx, 1.toPx)
+                        layoutParams = android.widget.LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
+                        ).apply { marginEnd = 4.toPx }
+                    })
+                }
+            }
+        }
+
         fun Context.selectHomepage(selectedApiName: String?, callback: (String) -> Unit) {
             val validAPIs = filterProviderByPreferredMedia().toMutableList()
 
@@ -414,8 +479,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
 
                 val listView = dialog.findViewById<ListView>(R.id.listview1)
 
+                // Every source is a slim card with the icon of its plugin and what it offers
+                val pluginUrls = com.lagradost.cloudstream3.fork.ProviderIcons.pluginUrls()
                 val arrayAdapter = object : ArrayAdapter<String>(
-                    this, R.layout.sort_bottom_single_provider_choice,
+                    this, R.layout.provider_card_choice,
                     mutableListOf()
                 ) {
                     override fun getView(
@@ -424,14 +491,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
                         parent: ViewGroup
                     ): View {
                         val view = convertView ?: LayoutInflater.from(context)
-                            .inflate(R.layout.sort_bottom_single_provider_choice, parent, false)
+                            .inflate(R.layout.provider_card_choice, parent, false)
                         val titleText = view.findViewById<TextView>(R.id.text1)
                         val pinIcon = view.findViewById<ImageView>(R.id.pinicon)
-                        val name = getItem(position)
-                        titleText?.text = name
-                        val isPinned =
-                            pinnedphashset.contains(currentValidApis[position].name)
+                        val api = currentValidApis.getOrNull(position)
+                        val isPinned = api != null && pinnedphashset.contains(api.name)
                         pinIcon.visibility = if (isPinned) View.VISIBLE else View.GONE
+                        bindProviderCard(view, api, getItem(position) ?: "", pluginUrls, parent as? ListView, position)
 
                         // The same settings icon the list of plugins has
                         val settingsIcon = view.findViewById<ImageView>(R.id.provider_settings)
@@ -447,6 +513,18 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
                 }
                 listView?.adapter = arrayAdapter
                 listView?.choiceMode = AbsListView.CHOICE_MODE_SINGLE
+                listView?.divider = null
+                listView?.dividerHeight = 0
+                listView?.selector = android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT)
+                // The icons come from the repositories, read them again now and then
+                if (com.lagradost.cloudstream3.fork.ProviderIcons.needsRefresh()) {
+                    val appContext = applicationContext
+                    ioSafe {
+                        if (com.lagradost.cloudstream3.fork.ProviderIcons.refresh(appContext)) {
+                            listView?.post { arrayAdapter.notifyDataSetChanged() }
+                        }
+                    }
+                }
 
                 listView?.setOnItemClickListener { _, _, i, _ ->
                     if (currentValidApis.isNotEmpty()) {

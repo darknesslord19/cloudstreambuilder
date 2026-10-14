@@ -817,6 +817,12 @@
         <item name="android:textColor">?attr/textColor</item>
     </style>
 
+    <!-- The rounded icon of a source in the list of home page sources -->
+    <style name="ProviderIconShape" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">12dp</item>
+    </style>
+
     <style name="CheckLabel" parent="@style/NoCheckLabel">
 
         <!--        <item name="drawableTint">@color/check_selection_color</item>-->
