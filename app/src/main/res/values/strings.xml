@@ -984,4 +984,5 @@
     <string name="tp_new">NEW</string>
     <string name="tp_active">Active</string>
     <string name="tp_reset">Back to the default theme</string>
+    <string name="announcement_title">Announcement !</string>
 </resources>

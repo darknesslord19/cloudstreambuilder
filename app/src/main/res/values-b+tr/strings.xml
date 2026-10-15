@@ -948,4 +948,5 @@
     <string name="tp_new">YENİ</string>
     <string name="tp_active">Aktif</string>
     <string name="tp_reset">Varsayılan temaya dön</string>
+    <string name="announcement_title">Duyuru !</string>
 </resources>

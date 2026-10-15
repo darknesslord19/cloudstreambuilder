@@ -79,6 +79,12 @@ object RemoteRules {
         val once: Boolean,
         /** A picture shown above the message */
         val image: String? = null,
+        /** The text of the closing button */
+        val okText: String? = null,
+        /** A colour of its own for the card ("#RRGGBB"), otherwise the colour of the theme */
+        val color: String? = null,
+        /** The closing button is not shown, only the link button */
+        val hideOk: Boolean = false,
     )
 
     /**
@@ -103,6 +109,9 @@ object RemoteRules {
             once = json.flag(true, "once"),
             image = json.string("image", "image_url", "imageUrl", "resim")
                 ?.takeIf { it.startsWith("https://") || it.startsWith("http://") },
+            okText = json.string("ok_text", "okText", "close_text"),
+            color = json.string("color", "renk")?.takeIf { Regex("^#?[0-9a-fA-F]{6}$").matches(it) },
+            hideOk = !json.flag(true, "show_ok", "ok"),
         )
     }
 
