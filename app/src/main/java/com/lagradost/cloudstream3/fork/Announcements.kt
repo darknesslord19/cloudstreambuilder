@@ -263,7 +263,7 @@ object Announcements {
         column.addView(android.widget.ImageView(activity).apply {
             setImageResource(R.drawable.ic_fork_campaign_24)
             setColorFilter(mix(text, lower, 0.75f))
-        }, android.widget.LinearLayout.LayoutParams(dp(30), dp(30)).apply { topMargin = dp(44); bottomMargin = dp(46) })
+        }, android.widget.LinearLayout.LayoutParams(dp(30), dp(30)).apply { topMargin = dp(62); bottomMargin = dp(46) })
 
         shell.addView(column, android.widget.FrameLayout.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT))
         dialog.setContentView(shell, android.view.ViewGroup.LayoutParams(width, android.view.ViewGroup.LayoutParams.WRAP_CONTENT))
