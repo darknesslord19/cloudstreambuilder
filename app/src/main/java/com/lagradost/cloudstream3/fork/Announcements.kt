@@ -158,9 +158,19 @@ object Announcements {
         dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE)
 
         val width = minOf(dp(300), activity.resources.displayMetrics.widthPixels - dp(40))
-        val shell = android.widget.FrameLayout(activity)
-        shell.addView(PointView(activity, lower, 0x10FFFFFF, accent, accentLight),
-            android.widget.FrameLayout.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.MATCH_PARENT))
+        val point = PointView(activity, lower, 0x10FFFFFF, accent, accentLight)
+        // As high as its content: the point is drawn behind it in exactly that size
+        val shell = object : android.widget.FrameLayout(activity) {
+            override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+                val content = getChildAt(1) ?: return super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+                val w = android.view.View.MeasureSpec.makeMeasureSpec(width, android.view.View.MeasureSpec.EXACTLY)
+                content.measure(w, android.view.View.MeasureSpec.makeMeasureSpec(0, android.view.View.MeasureSpec.UNSPECIFIED))
+                val h = content.measuredHeight
+                point.measure(w, android.view.View.MeasureSpec.makeMeasureSpec(h, android.view.View.MeasureSpec.EXACTLY))
+                setMeasuredDimension(width, h)
+            }
+        }
+        shell.addView(point, android.widget.FrameLayout.LayoutParams(width, android.view.ViewGroup.LayoutParams.WRAP_CONTENT))
 
         val column = android.widget.LinearLayout(activity).apply {
             orientation = android.widget.LinearLayout.VERTICAL
@@ -200,7 +210,13 @@ object Announcements {
             setTextColor(text)
             letterSpacing = -0.02f
         })
-        upper.addView(android.widget.ScrollView(activity).apply {
+        upper.addView(object : android.widget.ScrollView(activity) {
+            // The text scrolls instead of making the card higher than a third of the screen
+            override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+                val max = activity.resources.displayMetrics.heightPixels / 3
+                super.onMeasure(widthMeasureSpec, android.view.View.MeasureSpec.makeMeasureSpec(max, android.view.View.MeasureSpec.AT_MOST))
+            }
+        }.apply {
             isVerticalScrollBarEnabled = false
             addView(android.widget.TextView(activity).apply {
                 this.text = a.message
@@ -210,11 +226,6 @@ object Announcements {
                 setPadding(0, dp(8), 0, 0)
             })
         }, android.widget.LinearLayout.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT))
-        // the upper card is not higher than half of the screen
-        upper.post {
-            val max = (activity.resources.displayMetrics.heightPixels * 0.55f).toInt()
-            if (upper.height > max) upper.layoutParams = upper.layoutParams.apply { height = max }
-        }
         column.addView(upper, android.widget.LinearLayout.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT).apply {
             leftMargin = (width * 14 / 300f).toInt(); rightMargin = leftMargin
         })
@@ -270,6 +281,7 @@ object Announcements {
         dialog.window?.apply {
             setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT))
             setLayout(width, android.view.ViewGroup.LayoutParams.WRAP_CONTENT)
+            setGravity(android.view.Gravity.CENTER)
             setDimAmount(0.7f)
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
                 addFlags(android.view.WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
