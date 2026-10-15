@@ -157,20 +157,20 @@ object Announcements {
         val dialog = android.app.Dialog(activity)
         dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE)
 
-        val width = minOf(dp(300), activity.resources.displayMetrics.widthPixels - dp(40))
+        val cardWidth = minOf(dp(300), activity.resources.displayMetrics.widthPixels - dp(40))
         val point = PointView(activity, lower, 0x10FFFFFF, accent, accentLight)
         // As high as its content: the point is drawn behind it in exactly that size
         val shell = object : android.widget.FrameLayout(activity) {
             override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
                 val content = getChildAt(1) ?: return super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-                val w = android.view.View.MeasureSpec.makeMeasureSpec(width, android.view.View.MeasureSpec.EXACTLY)
+                val w = android.view.View.MeasureSpec.makeMeasureSpec(cardWidth, android.view.View.MeasureSpec.EXACTLY)
                 content.measure(w, android.view.View.MeasureSpec.makeMeasureSpec(0, android.view.View.MeasureSpec.UNSPECIFIED))
                 val h = content.measuredHeight
                 point.measure(w, android.view.View.MeasureSpec.makeMeasureSpec(h, android.view.View.MeasureSpec.EXACTLY))
-                setMeasuredDimension(width, h)
+                setMeasuredDimension(cardWidth, h)
             }
         }
-        shell.addView(point, android.widget.FrameLayout.LayoutParams(width, android.view.ViewGroup.LayoutParams.WRAP_CONTENT))
+        shell.addView(point, android.widget.FrameLayout.LayoutParams(cardWidth, android.view.ViewGroup.LayoutParams.WRAP_CONTENT))
 
         val column = android.widget.LinearLayout(activity).apply {
             orientation = android.widget.LinearLayout.VERTICAL
@@ -227,7 +227,7 @@ object Announcements {
             })
         }, android.widget.LinearLayout.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT))
         column.addView(upper, android.widget.LinearLayout.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT).apply {
-            leftMargin = (width * 14 / 300f).toInt(); rightMargin = leftMargin
+            leftMargin = (cardWidth * 14 / 300f).toInt(); rightMargin = leftMargin
         })
 
         // buttons
@@ -269,7 +269,7 @@ object Announcements {
             ok = button(a.okText ?: activity.getString(R.string.ok), true) { dialog.dismiss() }
             buttons.addView(ok, bp())
         }
-        column.addView(buttons, android.widget.LinearLayout.LayoutParams((width * 246 / 300f).toInt(), android.view.ViewGroup.LayoutParams.WRAP_CONTENT).apply { topMargin = dp(20) })
+        column.addView(buttons, android.widget.LinearLayout.LayoutParams((cardWidth * 246 / 300f).toInt(), android.view.ViewGroup.LayoutParams.WRAP_CONTENT).apply { topMargin = dp(20) })
         // the loudspeaker at the point
         column.addView(android.widget.ImageView(activity).apply {
             setImageResource(R.drawable.ic_fork_campaign_24)
@@ -277,10 +277,10 @@ object Announcements {
         }, android.widget.LinearLayout.LayoutParams(dp(30), dp(30)).apply { topMargin = dp(62); bottomMargin = dp(46) })
 
         shell.addView(column, android.widget.FrameLayout.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT))
-        dialog.setContentView(shell, android.view.ViewGroup.LayoutParams(width, android.view.ViewGroup.LayoutParams.WRAP_CONTENT))
+        dialog.setContentView(shell, android.view.ViewGroup.LayoutParams(cardWidth, android.view.ViewGroup.LayoutParams.WRAP_CONTENT))
         dialog.window?.apply {
             setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT))
-            setLayout(width, android.view.ViewGroup.LayoutParams.WRAP_CONTENT)
+            setLayout(cardWidth, android.view.ViewGroup.LayoutParams.WRAP_CONTENT)
             setGravity(android.view.Gravity.CENTER)
             setDimAmount(0.7f)
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
