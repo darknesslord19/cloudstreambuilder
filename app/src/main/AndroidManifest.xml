@@ -391,6 +391,126 @@
             </intent-filter>
         </activity-alias>
 
+        <activity-alias
+            android:name=".IconN1"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_fork_n1"
+            android:roundIcon="@mipmap/ic_fork_n1"
+            android:targetActivity=".ui.account.AccountSelectActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".IconN2"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_fork_n2"
+            android:roundIcon="@mipmap/ic_fork_n2"
+            android:targetActivity=".ui.account.AccountSelectActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".IconN3"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_fork_n3"
+            android:roundIcon="@mipmap/ic_fork_n3"
+            android:targetActivity=".ui.account.AccountSelectActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".IconN4"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_fork_n4"
+            android:roundIcon="@mipmap/ic_fork_n4"
+            android:targetActivity=".ui.account.AccountSelectActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".IconN5"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_fork_n5"
+            android:roundIcon="@mipmap/ic_fork_n5"
+            android:targetActivity=".ui.account.AccountSelectActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".IconN6"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_fork_n6"
+            android:roundIcon="@mipmap/ic_fork_n6"
+            android:targetActivity=".ui.account.AccountSelectActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".IconN7"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_fork_n7"
+            android:roundIcon="@mipmap/ic_fork_n7"
+            android:targetActivity=".ui.account.AccountSelectActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".IconN8"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_fork_n8"
+            android:roundIcon="@mipmap/ic_fork_n8"
+            android:targetActivity=".ui.account.AccountSelectActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
         <receiver
             android:name=".receivers.VideoDownloadRestartReceiver"
             android:enabled="false"

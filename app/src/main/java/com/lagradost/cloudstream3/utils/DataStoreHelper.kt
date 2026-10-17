@@ -82,7 +82,28 @@ object DataStoreHelper {
         R.drawable.profile_bg_pink,
         R.drawable.profile_bg_purple,
         R.drawable.profile_bg_red,
-        R.drawable.profile_bg_teal
+        R.drawable.profile_bg_teal,
+        // The profile icons of this build, after the original ones so saved indices stay
+        R.drawable.profile_fork_01,
+        R.drawable.profile_fork_02,
+        R.drawable.profile_fork_03,
+        R.drawable.profile_fork_04,
+        R.drawable.profile_fork_05,
+        R.drawable.profile_fork_06,
+        R.drawable.profile_fork_07,
+        R.drawable.profile_fork_08,
+        R.drawable.profile_fork_09,
+        R.drawable.profile_fork_10,
+        R.drawable.profile_fork_11,
+        R.drawable.profile_fork_12,
+        R.drawable.profile_fork_13,
+        R.drawable.profile_fork_14,
+        R.drawable.profile_fork_15,
+        R.drawable.profile_fork_16,
+        R.drawable.profile_fork_17,
+        R.drawable.profile_fork_18,
+        R.drawable.profile_fork_19,
+        R.drawable.profile_fork_20,
     )
 
     private var searchPreferenceProvidersStrings: List<String> by UserPreferenceDelegate(

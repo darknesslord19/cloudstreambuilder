@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Backgrounds of the eight new app icons -->
+    <color name="fork_icon_bg_n1">#11131A</color>
+    <color name="fork_icon_bg_n2">#1D1D21</color>
+    <color name="fork_icon_bg_n3">#110C26</color>
+    <color name="fork_icon_bg_n4">#070A14</color>
+    <color name="fork_icon_bg_n5">#17181B</color>
+    <color name="fork_icon_bg_n6">#181920</color>
+    <color name="fork_icon_bg_n7">#1B1D21</color>
+    <color name="fork_icon_bg_n8">#1B1A20</color>
+</resources>

@@ -116,6 +116,14 @@ object Looks {
         AppIcon("purple", R.string.icon_purple, "IconPurple", R.mipmap.ic_fork_purple),
         AppIcon("pink", R.string.icon_pink, "IconPink", R.mipmap.ic_fork_pink),
         AppIcon("silver", R.string.icon_silver, "IconSilver", R.mipmap.ic_fork_silver),
+        AppIcon("n1", R.string.icon_n1, "IconN1", R.mipmap.ic_fork_n1),
+        AppIcon("n2", R.string.icon_n2, "IconN2", R.mipmap.ic_fork_n2),
+        AppIcon("n3", R.string.icon_n3, "IconN3", R.mipmap.ic_fork_n3),
+        AppIcon("n4", R.string.icon_n4, "IconN4", R.mipmap.ic_fork_n4),
+        AppIcon("n5", R.string.icon_n5, "IconN5", R.mipmap.ic_fork_n5),
+        AppIcon("n6", R.string.icon_n6, "IconN6", R.mipmap.ic_fork_n6),
+        AppIcon("n7", R.string.icon_n7, "IconN7", R.mipmap.ic_fork_n7),
+        AppIcon("n8", R.string.icon_n8, "IconN8", R.mipmap.ic_fork_n8),
     )
 
     fun currentIcon(context: Context): AppIcon {

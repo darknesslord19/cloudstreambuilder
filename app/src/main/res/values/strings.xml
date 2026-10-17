@@ -985,4 +985,16 @@
     <string name="tp_active">Active</string>
     <string name="tp_reset">Back to the default theme</string>
     <string name="announcement_title">Announcement !</string>
+    <string name="icon_n1">Neon Plus</string>
+    <string name="icon_n2">Wave Plus</string>
+    <string name="icon_n3">Infinity Neon</string>
+    <string name="icon_n4">Infinity Ice</string>
+    <string name="icon_n5">Infinity Colour</string>
+    <string name="icon_n6">Flow</string>
+    <string name="icon_n7">Wave</string>
+    <string name="icon_n8">Cloud Flow</string>
+    <string name="plus_looks">Looks</string>
+    <string name="plus_looks_des">Themes, moving posters, font, app icon</string>
+    <string name="profile_pick">Profile picture</string>
+    <string name="profile_pick_des">Choose an icon</string>
 </resources>

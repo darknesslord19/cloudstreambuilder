@@ -85,7 +85,8 @@ class SettingsUI : BasePreferenceFragmentCompat() {
 
         // The moving posters, only there while they are switched on from outside
         findPreference<Preference>(PosterMotion.PREF_KEY)?.let { pref ->
-            pref.isVisible = PosterMotion.available(requireContext())
+            // Moved to Plus > Görünüm
+            pref.isVisible = false
             pref.summary = PosterMotion.summary(requireContext())
             pref.setOnPreferenceClickListener {
                 val act = activity ?: return@setOnPreferenceClickListener true
@@ -258,10 +259,9 @@ class SettingsUI : BasePreferenceFragmentCompat() {
         }
 
         // The font and icon choices are only there while they are switched on
-        findPreference<Preference>(Looks.FONT_KEY)?.isVisible =
-            ForkFeatures.isOn(RemoteRules.Feature.FONTS, requireContext())
-        findPreference<Preference>(Looks.ICON_KEY)?.isVisible =
-            ForkFeatures.isOn(RemoteRules.Feature.ICONS, requireContext())
+        // Moved to Plus > Görünüm
+        findPreference<Preference>(Looks.FONT_KEY)?.isVisible = false
+        findPreference<Preference>(Looks.ICON_KEY)?.isVisible = false
 
         findPreference<Preference>(Looks.FONT_KEY)?.let { pref ->
             pref.summary = context?.let { Looks.currentFont(it).label }

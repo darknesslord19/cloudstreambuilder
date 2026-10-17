@@ -51,6 +51,10 @@ class SettingsPlus : BasePreferenceFragmentCompat() {
         findPreference<Preference>("fork_plus_sheet_tmdb")?.isVisible = TmdbPosters.available(context)
         findPreference<Preference>("fork_plus_sheet_themes")?.isVisible =
             com.lagradost.cloudstream3.fork.ThemePack.available(context)
+        findPreference<Preference>("fork_plus_sheet_looks")?.setOnPreferenceClickListener {
+            activity?.let { showLooks(it) }
+            true
+        }
         findPreference<Preference>("fork_plus_sheet_themes")?.setOnPreferenceClickListener {
             activity?.let { com.lagradost.cloudstream3.fork.ThemePack.show(it) }
             true
@@ -94,6 +98,52 @@ class SettingsPlus : BasePreferenceFragmentCompat() {
             TmdbPosters.key(context) == null -> getString(R.string.tmdb_no_key)
             else -> getString(R.string.tmdb_des)
         }
+    }
+
+    /** What was under Düzen: moving posters, font and app icon, with the themes. */
+    private fun showLooks(activity: android.app.Activity) {
+        val context = activity
+        val items = ArrayList<PlusSheet.Item>()
+        if (com.lagradost.cloudstream3.fork.ThemePack.available(context)) {
+            items.add(PlusSheet.Item.Action(getString(R.string.tp_title), getString(R.string.tp_summary), R.drawable.format_paint_24px) {
+                com.lagradost.cloudstream3.fork.ThemePack.show(activity)
+            })
+        }
+        if (com.lagradost.cloudstream3.fork.PosterMotion.available(context)) {
+            items.add(PlusSheet.Item.Action(getString(R.string.animated_posters), com.lagradost.cloudstream3.fork.PosterMotion.summary(context), R.drawable.animation_24px) {
+                com.lagradost.cloudstream3.fork.PosterMotion.pick(activity) {
+                    com.lagradost.cloudstream3.ui.home.HomeChildItemAdapter.sharedPool.clear()
+                    com.lagradost.cloudstream3.ui.home.ParentItemAdapter.sharedPool.clear()
+                }
+            })
+        }
+        val looks = com.lagradost.cloudstream3.fork.Looks
+        if (ForkFeatures.isOn(RemoteRules.Feature.FONTS, context)) {
+            items.add(PlusSheet.Item.Action(getString(R.string.app_font_settings), looks.currentFont(context).label, R.drawable.title_24px) {
+                val current = looks.fonts.indexOf(looks.currentFont(activity))
+                looks.pick(activity, getString(R.string.app_font_settings), looks.fontOptions(activity), current) { picked ->
+                    androidx.preference.PreferenceManager.getDefaultSharedPreferences(activity).edit()
+                        .putString(looks.FONT_KEY, looks.fonts[picked].key).apply()
+                    activity.recreate()
+                }
+            })
+        }
+        if (ForkFeatures.isOn(RemoteRules.Feature.ICONS, context)) {
+            items.add(PlusSheet.Item.Action(getString(R.string.app_icon_settings), getString(looks.currentIcon(context).label), R.drawable.extension_24px) {
+                val current = looks.icons.indexOf(looks.currentIcon(activity))
+                looks.pick(activity, getString(R.string.app_icon_settings), looks.iconOptions(activity), current) { picked ->
+                    if (picked == current) return@pick
+                    val chosen = looks.icons[picked]
+                    androidx.appcompat.app.AlertDialog.Builder(activity, R.style.AlertDialogCustom)
+                        .setTitle(R.string.app_icon_settings)
+                        .setMessage(R.string.app_icon_restart_note)
+                        .setPositiveButton(R.string.ok) { _, _ -> looks.applyIcon(activity, chosen) }
+                        .setNegativeButton(R.string.cancel) { _, _ -> }
+                        .show()
+                }
+            })
+        }
+        PlusSheet.show(activity, getString(R.string.plus_looks), getString(R.string.plus_looks_des), items)
     }
 
     private fun showTmdb(activity: android.app.Activity) {

@@ -101,11 +101,11 @@ object AccountHelper {
         // Handle the profile picture and its interactions
         binding.accountImage.loadImage(account.image)
         binding.accountImage.setOnClickListener {
-            // Roll the image forwards once
-            currentEditAccount = currentEditAccount.copy(customImage = null)
-            currentEditAccount =
-                currentEditAccount.copy(defaultImageIndex = (currentEditAccount.defaultImageIndex + 1) % DataStoreHelper.profileImages.size)
-            binding.accountImage.loadImage(currentEditAccount.image)
+            // The pictures are chosen from a grid
+            com.lagradost.cloudstream3.fork.ProfileIcons.pick(context, currentEditAccount.defaultImageIndex) { picked ->
+                currentEditAccount = currentEditAccount.copy(customImage = null, defaultImageIndex = picked)
+                binding.accountImage.loadImage(currentEditAccount.image)
+            }
         }
 
         // Handle applying changes

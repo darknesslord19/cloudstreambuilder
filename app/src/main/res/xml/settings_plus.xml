@@ -9,6 +9,12 @@
         android:title="@string/tp_title" />
 
     <Preference
+        android:icon="@drawable/animation_24px"
+        android:key="fork_plus_sheet_looks"
+        android:summary="@string/plus_looks_des"
+        android:title="@string/plus_looks" />
+
+    <Preference
         android:icon="@drawable/home_alt"
         android:key="fork_plus_sheet_home"
         android:summary="@string/plus_home_des"

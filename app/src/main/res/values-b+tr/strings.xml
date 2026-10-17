@@ -949,4 +949,16 @@
     <string name="tp_active">Aktif</string>
     <string name="tp_reset">Varsayılan temaya dön</string>
     <string name="announcement_title">Duyuru !</string>
+    <string name="icon_n1">Neon Plus</string>
+    <string name="icon_n2">Dalga Plus</string>
+    <string name="icon_n3">Sonsuz Neon</string>
+    <string name="icon_n4">Sonsuz Buz</string>
+    <string name="icon_n5">Sonsuz Renk</string>
+    <string name="icon_n6">Akış</string>
+    <string name="icon_n7">Dalga</string>
+    <string name="icon_n8">Bulut Akış</string>
+    <string name="plus_looks">Görünüm</string>
+    <string name="plus_looks_des">Temalar, hareketli afişler, yazı tipi, uygulama ikonu</string>
+    <string name="profile_pick">Profil resmi</string>
+    <string name="profile_pick_des">Bir ikon seç</string>
 </resources>
