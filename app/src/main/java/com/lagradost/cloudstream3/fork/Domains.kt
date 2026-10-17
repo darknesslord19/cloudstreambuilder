@@ -102,22 +102,40 @@ object Domains {
         apply(context)
     }
 
-    /** "domain_list": { "Provider name" or "old.host": "https://new.host" } */
-    fun adminOf(context: Context, name: String, default: String?): String? {
-        val node = ForkFeatures.general(context)?.get("domain_list") ?: return null
-        if (!node.isObject) return null
-        node.get(name)?.asText()?.let { clean(it) }?.let { return it }
-        val host = hostOf(default) ?: return null
-        val it = node.fields()
-        while (it.hasNext()) {
-            val (k, v) = it.next()
-            if (hostOf(k) == host) return clean(v.asText())
+    /**
+     * "domain_list": [ { "from": "Provider name" or "old.host", "to": "https://new.host" } ]
+     * (Firebase does not take dots in keys, so the list is an array; the old { "name": "url" } form works too.)
+     */
+    private fun adminPairs(context: Context): List<Pair<String, String>> {
+        val node = ForkFeatures.general(context)?.get("domain_list") ?: return emptyList()
+        val out = ArrayList<Pair<String, String>>()
+        if (node.isArray) {
+            node.forEach { e ->
+                val from = (e.get("from") ?: e.get("site") ?: e.get("name") ?: e.get("old"))?.asText()?.trim().orEmpty()
+                val to = (e.get("to") ?: e.get("url") ?: e.get("new") ?: e.get("domain"))?.asText()?.trim().orEmpty()
+                if (from.isNotEmpty() && to.isNotEmpty()) out.add(from to to)
+            }
+        } else if (node.isObject) {
+            val it = node.fields()
+            while (it.hasNext()) {
+                val (k, v) = it.next()
+                val to = if (v.isObject) (v.get("to") ?: v.get("url"))?.asText() else v.asText()
+                val from = if (v.isObject) (v.get("from") ?: v.get("site"))?.asText() ?: k else k
+                if (!to.isNullOrBlank()) out.add(from.trim() to to.trim())
+            }
         }
-        return null
+        return out
     }
 
-    private fun adminCount(context: Context): Int =
-        ForkFeatures.general(context)?.get("domain_list")?.takeIf { it.isObject }?.size() ?: 0
+    fun adminOf(context: Context, name: String, default: String?): String? {
+        val pairs = adminPairs(context)
+        if (pairs.isEmpty()) return null
+        pairs.firstOrNull { it.first.equals(name, true) }?.let { return clean(it.second) }
+        val host = hostOf(default) ?: return null
+        return pairs.firstOrNull { hostOf(it.first) == host }?.let { clean(it.second) }
+    }
+
+    private fun adminCount(context: Context): Int = adminPairs(context).size
 
     private fun sites(): List<MainAPI> = try {
         APIHolder.allProviders.withLock {
