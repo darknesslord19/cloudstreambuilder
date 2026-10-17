@@ -997,6 +997,11 @@
     <string name="plus_looks_des">Themes, moving posters, font, app icon</string>
     <string name="profile_pick">Profile picture</string>
     <string name="profile_pick_des">Choose an icon</string>
+    <string name="domains_title">Domain</string>
+    <string name="domains_des">When a site moves: change the domain or just its ending</string>
+    <string name="domains_local">Local</string>
+    <string name="domains_found">New domain found for %d site(s) · Plus › Domain</string>
+    <string name="domains_auto_applied">%d site(s) moved to their new domain</string>
     <string name="iptv_title">IPTV</string>
     <string name="iptv_des">M3U / M3U8 lists, as sources on the home page</string>
     <string name="iptv_section">IPTV LISTS</string>

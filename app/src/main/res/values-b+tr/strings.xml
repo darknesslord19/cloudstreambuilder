@@ -961,6 +961,11 @@
     <string name="plus_looks_des">Temalar, hareketli afişler, yazı tipi, uygulama ikonu</string>
     <string name="profile_pick">Profil resmi</string>
     <string name="profile_pick_des">Bir ikon seç</string>
+    <string name="domains_title">Domain</string>
+    <string name="domains_des">Site taşınınca: domaini ya da sadece uzantısını değiştir</string>
+    <string name="domains_local">Yerel</string>
+    <string name="domains_found">%d sitede yeni domain bulundu · Plus › Domain</string>
+    <string name="domains_auto_applied">%d site yeni domainine geçirildi</string>
     <string name="iptv_title">IPTV</string>
     <string name="iptv_des">M3U / M3U8 listeleri, ana sayfada kaynak olarak</string>
     <string name="iptv_section">IPTV LİSTELERİ</string>

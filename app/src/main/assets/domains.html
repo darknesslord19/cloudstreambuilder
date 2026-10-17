@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Domain</title>
+<!--
+  Domains of the plugin sites (Plus > Domain). The app does the work:
+  Domains.data(), Domains.save(name, url), Domains.reset(name), Domains.set(key, on),
+  Domains.check(token, url) -> window.onDomainResult(token, json),
+  Domains.checkAll() -> window.onDomainProgress(done, total, name, json), window.onDomainDone().
+-->
+<style>
+:root{--bg:#0f0d12;--ink:#f3eef6;--card:#1c1920;--field:#262229;--line:rgba(255,255,255,.1);--muted:#a49cab;--accent:#cdb0ff;--accent-2:#e4d6ff;--ok:#5fd394;--bad:#ff7d7d;--warn:#f3b45a}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{padding:10px 0 40px}
+.hdr{display:flex;align-items:center;gap:12px;padding:8px 16px 12px}
+.hdr h1{font-size:24px;font-weight:750;flex:1}
+.back{background:none;border:0;color:var(--accent);font-size:24px;line-height:1;padding:4px 8px;border-radius:10px}
+.wrap{padding:0 14px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px 4px;text-align:center}
+.stat b{display:block;font-size:20px}.stat span{font-size:11px;color:var(--muted)}
+.stat.ok b{color:var(--ok)}.stat.bad b{color:var(--bad)}.stat.warn b{color:var(--warn)}
+.btn{border:1px solid var(--line);border-radius:14px;padding:12px;font-weight:800;font-size:14px;color:var(--ink);background:var(--field);width:100%;font-family:inherit}
+.btn.p{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.btn:disabled{opacity:.55}
+.btn:focus-visible,.back:focus-visible,.sw:focus-visible,.tld:focus-visible,.site:focus-visible,.repo-h:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.bar{height:6px;border-radius:6px;background:var(--line);overflow:hidden;margin:10px 0 4px;display:none}.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+.ptext{font-size:12px;color:var(--muted);display:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px;margin-top:12px}
+.card h3{font-size:15px;margin-bottom:4px}.card p{font-size:12.5px;color:var(--muted);line-height:1.45}
+.remote{display:flex;gap:12px;align-items:center}
+.remote .ic{width:38px;height:38px;border-radius:12px;background:var(--field);display:grid;place-items:center;font-size:18px;flex:0 0 38px}
+.grow{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.grow:first-child{border-top:0;padding-top:0}.grow:last-child{padding-bottom:0}
+.grow .tx{flex:1;min-width:0}.grow b{font-size:14px;display:block}.grow small{font-size:12px;color:var(--muted);line-height:1.35;display:block}
+.sw{width:42px;height:24px;border-radius:24px;background:var(--line);position:relative;flex:0 0 42px;border:0}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--muted);transition:.2s}
+.sw.on{background:var(--accent)}.sw.on::after{left:21px;background:var(--bg)}
+.found{border-color:rgba(243,180,90,.45)}
+.found .row{display:flex;align-items:center;gap:8px;margin-top:8px}
+.found code{flex:1;min-width:0;font-size:12px;background:var(--field);padding:9px 10px;border-radius:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:ui-monospace,monospace}
+.found .btn{width:auto;padding:9px 13px;font-size:13px}
+.sect{font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin:20px 4px 8px}
+.search{width:100%;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;color:var(--ink);font-size:14px;outline:none;font-family:inherit}
+.search:focus{border-color:var(--accent)}
+.repo{background:var(--card);border:1px solid var(--line);border-radius:20px;margin-top:10px;overflow:hidden}
+.repo-h{display:flex;align-items:center;gap:12px;padding:13px 14px;width:100%;background:none;border:0;color:var(--ink);text-align:left;font-family:inherit}
+.av{width:40px;height:40px;border-radius:12px;background:linear-gradient(145deg,var(--accent-2),var(--accent));color:var(--bg);display:grid;place-items:center;font-weight:900;font-size:16px;flex:0 0 40px}
+.repo-h .tx{flex:1;min-width:0}.repo-h b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.repo-h small{font-size:12px;color:var(--muted)}
+.dots{display:flex;flex-wrap:wrap;gap:3px;max-width:70px;justify-content:flex-end}.dots i{width:7px;height:7px;border-radius:50%;background:var(--line)}
+.dots i.ok{background:var(--ok)}.dots i.bad{background:var(--bad)}.dots i.warn{background:var(--warn)}
+.arrow{color:var(--muted);transition:transform .2s;font-size:18px}.repo.open .arrow{transform:rotate(90deg)}
+.sites{display:none;border-top:1px solid var(--line)}.repo.open .sites{display:block}
+.site{display:flex;align-items:center;gap:10px;padding:11px 14px;border:0;border-top:1px solid var(--line);width:100%;background:none;color:var(--ink);text-align:left;font-family:inherit}
+.site:first-child{border-top:0}
+.fav{width:32px;height:32px;border-radius:10px;background:var(--field);color:var(--accent);display:grid;place-items:center;font-weight:800;font-size:13px;flex:0 0 32px}
+.site .tx{flex:1;min-width:0}.site b{font-size:14px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.site small{font-size:12px;color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tag{font-size:10px;padding:2px 6px;border-radius:7px;margin-left:6px;font-weight:800;vertical-align:1px;background:var(--field);color:var(--accent)}
+.tag.own{color:var(--ok)}
+.pill{font-size:10.5px;font-weight:800;padding:3px 8px;border-radius:8px;white-space:nowrap;flex:none;background:var(--line);color:var(--muted)}
+.pill.ok{background:rgba(95,211,148,.15);color:var(--ok)}.pill.bad{background:rgba(255,125,125,.15);color:var(--bad)}.pill.warn{background:rgba(243,180,90,.15);color:var(--warn)}
+.empty{font-size:13px;color:var(--muted);padding:14px 4px;text-align:center;line-height:1.5}
+.shade{position:fixed;inset:0;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:opacity .2s;z-index:20}
+.shade.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;transform:translateY(105%);background:var(--card);border-top:1px solid var(--line);border-radius:22px 22px 0 0;padding:10px 16px 22px;z-index:21;transition:transform .25s ease;max-height:92vh;overflow:auto;max-width:620px;margin:0 auto}
+.sheet.on{transform:translateY(0)}
+.grab{width:40px;height:4px;border-radius:9px;background:var(--line);margin:0 auto 12px}
+.sh-top{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.sh-top .av{width:44px;height:44px;flex:0 0 44px;font-size:18px}
+.sh-top .tx{flex:1;min-width:0}.sh-top b{font-size:17px;display:block}.sh-top small{color:var(--muted);font-size:12px}
+label.l{font-size:12px;color:var(--muted);display:block;margin:12px 2px 6px}
+.inp{display:flex;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.inp:focus-within{border-color:var(--accent)}
+.inp span{padding-left:12px;color:var(--muted);font-size:14px}
+.inp input{flex:1;background:none;border:0;outline:none;color:var(--ink);font-size:15px;padding:13px 12px 13px 2px;min-width:0;font-family:inherit}
+.tlds{display:flex;flex-wrap:wrap;gap:7px}
+.tld{padding:8px 11px;border-radius:11px;background:var(--field);border:1px solid var(--line);font-size:13px;font-weight:700;color:var(--ink);font-family:inherit}
+.tld.on{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.tld.add{color:var(--muted);border-style:dashed}
+.src{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.src div{background:var(--field);border-radius:12px;padding:9px 8px;font-size:11.5px;color:var(--muted);border:1px solid transparent;min-width:0}
+.src div b{display:block;font-size:12px;color:var(--ink);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.src div.act{border-color:var(--accent)}
+.result{margin-top:12px;padding:12px;border-radius:14px;background:var(--field);font-size:13px;display:none;line-height:1.5;border-left:3px solid var(--muted)}
+.result.ok{display:block;border-left-color:var(--ok)}.result.bad{display:block;border-left-color:var(--bad)}.result.warn{display:block;border-left-color:var(--warn)}.result.wait{display:block}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.hint{font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.45}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,40px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:13px;font-weight:700;opacity:0;transition:.25s;z-index:30;pointer-events:none;max-width:90%;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div class="hdr"><button class="back" id="back" aria-label="Geri">←</button><h1>Domain</h1></div>
+
+<div class="wrap">
+  <div class="stats">
+    <div class="stat"><b id="sTotal">0</b><span>Site</span></div>
+    <div class="stat ok"><b id="sOk">–</b><span>Çalışıyor</span></div>
+    <div class="stat warn"><b id="sWarn">–</b><span>Yönlendi</span></div>
+    <div class="stat bad"><b id="sBad">–</b><span>Bozuk</span></div>
+  </div>
+
+  <button class="btn p" id="checkAll">Tümünü kontrol et</button>
+  <div class="bar" id="bar"><i id="pbar"></i></div>
+  <div class="ptext" id="ptext"></div>
+
+  <div id="foundBox"></div>
+
+  <div class="card remote" id="remote">
+    <div class="ic">☁️</div>
+    <div><h3 id="rTitle"></h3><p id="rText"></p></div>
+  </div>
+
+  <div class="card">
+    <div class="grow"><div class="tx"><b>Açılışta otomatik kontrol</b><small>12 saatte bir sessizce tarar, yeni domain bulursa haber verir</small></div><button class="sw" data-k="auto" aria-label="Açılışta otomatik kontrol"></button></div>
+    <div class="grow"><div class="tx"><b>Gömülü linkleri de yönlendir</b><small>Eklentinin içine sabit yazılmış eski domainler de yenisine gider</small></div><button class="sw" data-k="rewrite" aria-label="Gömülü linkleri de yönlendir"></button></div>
+    <div class="grow"><div class="tx"><b>Yeni domain bulunursa otomatik uygula</b><small>Kapalıyken önce sana sorar</small></div><button class="sw" data-k="autoapply" aria-label="Otomatik uygula"></button></div>
+  </div>
+
+  <div class="sect">Repolar</div>
+  <input class="search" id="q" placeholder="Site ara…">
+  <div id="repos"></div>
+</div>
+
+<div class="shade" id="shade"></div>
+<div class="sheet" id="sheet">
+  <div class="grab"></div>
+  <div class="sh-top"><div class="av" id="shFav"></div><div class="tx"><b id="shName"></b><small id="shRepo"></small></div><span class="pill" id="shPill">–</span></div>
+
+  <label class="l">Kaynaklar · kullanılan çerçeveli</label>
+  <div class="src">
+    <div id="srcDef"><b></b>Eklenti</div>
+    <div id="srcAdm"><b></b>Admin</div>
+    <div id="srcOwn"><b></b>Senin</div>
+  </div>
+
+  <label class="l" for="dom">Domain</label>
+  <div class="inp"><span>https://</span><input id="dom" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="url"></div>
+
+  <label class="l">Sadece uzantıyı değiştir</label>
+  <div class="tlds" id="tlds"></div>
+  <div class="inp" id="customBox" style="display:none;margin-top:8px"><span>.</span><input id="custom" placeholder="app" autocapitalize="off" spellcheck="false"></div>
+
+  <div class="result" id="res"></div>
+
+  <div class="grid2">
+    <button class="btn" id="test">Test et</button>
+    <button class="btn p" id="save">Kaydet</button>
+  </div>
+  <button class="btn" id="reset" style="margin-top:8px">Varsayılana dön</button>
+  <p class="hint">Domain doğru olduğu hâlde içerik gelmiyorsa site yapısını değiştirmiştir; o zaman eklentinin güncellenmesi gerekir.</p>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="theme.js"></script>
+<script>
+var app = window.CloudStream, D = window.Domains;
+try { if (window.applyTheme && app && app.theme) applyTheme(app); } catch (e) {}
+function $(id) { return document.getElementById(id); }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function bare(u) { return String(u || '').replace(/^https?:\/\//, '').replace(/\/+$/, ''); }
+var TLDS = ['.com','.net','.org','.tv','.co','.io','.xyz','.to','.la','.nl','.de','.sh','.pw','.so','.me','.cc','.site','.live','.cx','.lol','.top','.club','.biz','.ws'];
+var data = { repos: [], settings: {}, admin: 0 };
+var open = null, token = 0, waiting = {}, checking = false;
+
+function load() {
+  try { data = JSON.parse(D.data()); } catch (e) { data = { repos: [], settings: {}, admin: 0 }; }
+  draw();
+}
+function all() { var a = []; data.repos.forEach(function (r) { r.sites.forEach(function (s) { s.repo = r.name; a.push(s); }); }); return a; }
+function find(n) { return all().filter(function (s) { return s.n === n; })[0]; }
+
+function toast(t) { var e = $('toast'); e.textContent = t; e.classList.add('on'); clearTimeout(e._t); e._t = setTimeout(function () { e.classList.remove('on'); }, 2200); }
+var LABEL = { ok: 'Çalışıyor', bad: 'Bozuk', warn: 'Yönlendi', wait: 'Bakılıyor' };
+function pill(st) { return '<span class="pill ' + (st || '') + '">' + (LABEL[st] || '–') + '</span>'; }
+
+function stats() {
+  var a = all(); $('sTotal').textContent = a.length;
+  var any = a.some(function (s) { return s.st && s.st !== 'wait'; });
+  function c(k) { return a.filter(function (s) { return s.st === k; }).length; }
+  $('sOk').textContent = any ? c('ok') : '–'; $('sWarn').textContent = any ? c('warn') : '–'; $('sBad').textContent = any ? c('bad') : '–';
+}
+
+var opened = {};
+function draw() {
+  var q = $('q').value.trim().toLowerCase();
+  var html = data.repos.map(function (r, ri) {
+    var sites = r.sites.filter(function (s) { return !q || s.n.toLowerCase().indexOf(q) >= 0 || bare(s.cur).indexOf(q) >= 0; });
+    if (!sites.length) return '';
+    var isOpen = opened[r.name] || (q && sites.length);
+    return '<div class="repo ' + (isOpen ? 'open' : '') + '"><button class="repo-h" data-r="' + esc(r.name) + '">' +
+      '<div class="av">' + esc(r.name.charAt(0).toUpperCase()) + '</div><div class="tx"><b>' + esc(r.name) + '</b><small>' + r.sites.length + ' site</small></div>' +
+      '<div class="dots">' + r.sites.map(function (s) { return '<i class="' + (s.st || '') + '"></i>'; }).join('') + '</div><span class="arrow">›</span></button>' +
+      '<div class="sites">' + sites.map(function (s) {
+        return '<button class="site" data-n="' + esc(s.n) + '"><div class="fav">' + esc(s.n.charAt(0).toUpperCase()) + '</div>' +
+          '<div class="tx"><b>' + esc(s.n) + (s.own ? '<span class="tag own">Senin</span>' : s.adm ? '<span class="tag">Admin</span>' : '') + '</b><small>' + esc(bare(s.cur)) + '</small></div>' + pill(s.st) + '</button>';
+      }).join('') + '</div></div>';
+  }).join('');
+  $('repos').innerHTML = html || '<div class="empty">' + (data.repos.length ? 'Aramaya uyan site yok.' : 'Yüklü eklentide site bulunamadı.<br>Depolardan eklenti yükleyince burada listelenir.') + '</div>';
+  Array.prototype.forEach.call(document.querySelectorAll('.repo-h'), function (h) {
+    h.onclick = function () { var n = h.getAttribute('data-r'); opened[n] = !opened[n]; h.parentNode.classList.toggle('open'); };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('.site'), function (e) { e.onclick = function () { openSheet(find(e.getAttribute('data-n'))); }; });
+  stats(); drawFound(); drawSettings();
+}
+
+function drawSettings() {
+  Array.prototype.forEach.call(document.querySelectorAll('.sw'), function (t) { t.classList.toggle('on', !!data.settings[t.getAttribute('data-k')]); });
+  var n = data.admin || 0;
+  $('rTitle').textContent = n ? 'Uzaktan liste aktif' : 'Uzaktan liste';
+  $('rText').textContent = n ? 'Admin ' + n + ' sitenin domainini veriyor. Senin girdiğin domain her zaman önce gelir.'
+    : 'Admin şu an domain vermiyor. Burada değiştirdiklerin sadece sende geçerli.';
+}
+
+function drawFound() {
+  var f = all().filter(function (s) { return s.next; });
+  if (!f.length) { $('foundBox').innerHTML = ''; return; }
+  $('foundBox').innerHTML = '<div class="card found"><h3>⚡ Yeni domain bulundu (' + f.length + ')</h3><p>Eski adresler yeni domaine yönlendiriyor.</p>' +
+    f.map(function (s) { return '<div class="row"><code>' + esc(s.n) + ': ' + esc(bare(s.cur)) + ' → ' + esc(bare(s.next)) + '</code><button class="btn p" data-a="' + esc(s.n) + '">Uygula</button></div>'; }).join('') +
+    (f.length > 1 ? '<button class="btn" id="applyAll" style="margin-top:10px">Hepsini uygula</button>' : '') + '</div>';
+  Array.prototype.forEach.call(document.querySelectorAll('[data-a]'), function (b) { b.onclick = function () { applyFound(find(b.getAttribute('data-a'))); toast('Uygulandı'); draw(); }; });
+  var aa = $('applyAll'); if (aa) aa.onclick = function () { f.forEach(applyFound); toast(f.length + ' site güncellendi'); draw(); };
+}
+function applyFound(s) { if (!s || !s.next) return; D.save(s.n, s.next); s.own = s.next; s.cur = s.next; s.next = null; s.st = 'ok'; }
+
+// ---- checking every site
+$('checkAll').onclick = function () {
+  if (checking) return;
+  var a = all(); if (!a.length) return;
+  checking = true; var b = $('checkAll'); b.disabled = true; b.textContent = 'Kontrol ediliyor…';
+  $('bar').style.display = 'block'; $('ptext').style.display = 'block'; $('pbar').style.width = '0';
+  a.forEach(function (s) { s.st = 'wait'; s.next = null; }); draw();
+  D.checkAll();
+};
+window.onDomainProgress = function (done, total, name, json) {
+  var r = {}; try { r = JSON.parse(json); } catch (e) {}
+  var s = find(name); if (s) { s.st = r.st; s.next = r.next || null; }
+  $('pbar').style.width = (done / total * 100) + '%';
+  $('ptext').textContent = done + ' / ' + total + ' · ' + name;
+  draw();
+};
+window.onDomainDone = function () {
+  checking = false; var b = $('checkAll'); b.disabled = false; b.textContent = 'Tekrar kontrol et';
+  setTimeout(function () { $('bar').style.display = 'none'; $('ptext').style.display = 'none'; }, 900);
+  var f = all().filter(function (s) { return s.next; }).length;
+  toast(f ? f + ' sitede yeni domain bulundu' : 'Kontrol bitti');
+};
+
+// ---- one site
+function openSheet(s) {
+  if (!s) return;
+  open = s;
+  $('shFav').textContent = s.n.charAt(0).toUpperCase(); $('shName').textContent = s.n; $('shRepo').textContent = s.repo;
+  $('shPill').outerHTML = pill(s.st).replace('class="pill', 'id="shPill" class="pill');
+  $('dom').value = bare(s.cur); $('res').className = 'result'; $('customBox').style.display = 'none';
+  srcs(); tlds();
+  $('shade').classList.add('on'); $('sheet').classList.add('on');
+  history.pushState({ sheet: 1 }, '');
+  setTimeout(function () { $('dom').focus(); }, 260);
+}
+function srcs() {
+  var s = open, u = bare(s.cur);
+  [['srcDef', s.d], ['srcAdm', s.adm], ['srcOwn', s.own]].forEach(function (x) {
+    var e = $(x[0]); e.querySelector('b').textContent = x[1] ? bare(x[1]) : 'yok'; e.classList.toggle('act', !!x[1] && bare(x[1]) === u);
+  });
+}
+function tldOf(v) { var m = String(v).replace(/\/.*$/, '').match(/(\.[a-z0-9-]+)$/i); return m ? m[1].toLowerCase() : ''; }
+function withTld(t) {
+  var v = $('dom').value.trim(), host = v.replace(/\/.*$/, ''), rest = v.slice(host.length);
+  $('dom').value = host.replace(/\.[a-z0-9-]+$/i, '') + t + rest; tlds(); $('res').className = 'result';
+}
+function tlds() {
+  var now = tldOf($('dom').value.trim());
+  var list = TLDS.slice(); if (now && list.indexOf(now) < 0) list.unshift(now);
+  $('tlds').innerHTML = list.map(function (t) { return '<button class="tld ' + (t === now ? 'on' : '') + '" data-t="' + t + '">' + t + '</button>'; }).join('') + '<button class="tld add" id="addTld">+ diğer</button>';
+  Array.prototype.forEach.call(document.querySelectorAll('.tld[data-t]'), function (e) { e.onclick = function () { withTld(e.getAttribute('data-t')); }; });
+  $('addTld').onclick = function () { $('customBox').style.display = 'flex'; $('custom').focus(); };
+}
+$('custom').onkeydown = function (e) { if (e.key === 'Enter') { var t = $('custom').value.trim().replace(/^\.+/, '').toLowerCase(); if (t) { withTld('.' + t); $('customBox').style.display = 'none'; $('custom').value = ''; } } };
+$('custom').onblur = function () { var t = $('custom').value.trim().replace(/^\.+/, '').toLowerCase(); if (t) { withTld('.' + t); $('custom').value = ''; } };
+$('dom').oninput = function () { tlds(); $('res').className = 'result'; };
+
+function closeSheet(fromPop) {
+  if (!open) return;
+  $('shade').classList.remove('on'); $('sheet').classList.remove('on'); open = null;
+  if (!fromPop) history.back();
+}
+$('shade').onclick = function () { closeSheet(false); };
+window.onpopstate = function () { if (open) closeSheet(true); };
+
+$('test').onclick = function () {
+  var v = $('dom').value.trim(); if (!v) return;
+  var r = $('res'); r.className = 'result wait'; r.innerHTML = 'Bakılıyor…';
+  var t = ++token; waiting[t] = v; D.check(t, v);
+};
+window.onDomainResult = function (t, json) {
+  var v = waiting[t]; delete waiting[t];
+  if (t !== token || !open) return;
+  var x = {}; try { x = JSON.parse(json); } catch (e) {}
+  var r = $('res');
+  if (x.st === 'ok') { r.className = 'result ok'; r.innerHTML = '<b>✓ ' + esc(x.msg) + '</b><br>https://' + esc(v) + ' · ' + x.code + ' · ' + x.ms + ' ms'; }
+  else if (x.st === 'warn') {
+    r.className = 'result warn';
+    r.innerHTML = '<b>↪ ' + esc(x.msg) + '</b><br>' + esc(v) + ' → <b>' + esc(bare(x.next)) + '</b><br><button class="tld" id="useNext" style="margin-top:8px">Bunu kullan</button>';
+    $('useNext').onclick = function () { $('dom').value = bare(x.next); tlds(); r.className = 'result ok'; r.innerHTML = '<b>✓ Yeni domain yazıldı</b><br>Kaydet\'e bas.'; $('save').focus(); };
+  } else { r.className = 'result bad'; r.innerHTML = '<b>✕ Ulaşılamıyor</b><br>' + esc(x.msg) + (x.code ? ' · HTTP ' + x.code : '') + '. Uzantıyı değiştirip tekrar dene.'; }
+};
+
+$('save').onclick = function () {
+  var v = bare($('dom').value.trim()); if (!v || !open) return;
+  var s = open; D.save(s.n, 'https://' + v);
+  var base = bare(s.adm || s.d);
+  s.own = v === base ? null : 'https://' + v; s.cur = 'https://' + v; s.next = null; s.st = null;
+  toast(s.n + ' kaydedildi · ' + v); closeSheet(false); draw();
+};
+$('reset').onclick = function () {
+  if (!open) return; var s = open; D.reset(s.n);
+  s.own = null; s.cur = s.adm || s.d; s.next = null; s.st = null;
+  toast(s.n + ' varsayılana döndü'); closeSheet(false); draw();
+};
+
+Array.prototype.forEach.call(document.querySelectorAll('.sw'), function (t) {
+  t.onclick = function () { var k = t.getAttribute('data-k'); data.settings[k] = !data.settings[k]; D.set(k, data.settings[k]); drawSettings(); };
+});
+$('q').oninput = draw;
+$('back').onclick = function () { if (open) { closeSheet(false); return; } try { app.close(); } catch (e) { history.back(); } };
+load();
+</script>
+</body>
+</html>

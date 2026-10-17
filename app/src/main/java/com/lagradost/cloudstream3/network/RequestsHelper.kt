@@ -43,6 +43,8 @@ fun buildDefaultClient(context: Context, ignoreSSL: Boolean = false): OkHttpClie
     val baseClient = OkHttpClient.Builder()
         .followRedirects(true)
         .followSslRedirects(true)
+        // sites that moved to a new domain (Plus > Domain)
+        .addInterceptor(com.lagradost.cloudstream3.fork.Domains.interceptor)
         .apply {
             if (ignoreSSL) {
                 ignoreAllSSLErrors()

@@ -137,6 +137,7 @@ object RemoteRules {
         IPTV("iptv"),
         TRAKT_RECS("trakt_recs"),
         AD_BLOCK("ad_block"),
+        DOMAINS("domains"),
     }
 
     /**

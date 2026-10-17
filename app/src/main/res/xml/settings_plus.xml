@@ -21,6 +21,12 @@
         android:title="@string/iptv_title" />
 
     <Preference
+        android:icon="@drawable/ic_baseline_public_24"
+        android:key="fork_plus_domains"
+        android:summary="@string/domains_des"
+        android:title="@string/domains_title" />
+
+    <Preference
         android:icon="@drawable/plus_sparkle_24px"
         android:key="fork_plus_trakt"
         android:summary="@string/trakt_des"
