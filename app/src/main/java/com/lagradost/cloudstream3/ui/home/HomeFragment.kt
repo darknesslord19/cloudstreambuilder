@@ -388,20 +388,28 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
             val chips = view.findViewById<android.widget.LinearLayout>(R.id.provider_chips)
             val check = view.findViewById<ImageView>(R.id.provider_check)
             val special = api === noneApi || api === randomApi
+            val groups = com.lagradost.cloudstream3.fork.SourceGroups
             val iptv = com.lagradost.cloudstream3.fork.Iptv.isIptv(api)
+            val nuvio = !special && groups.isNuvio(api)
 
-            // IPTV lists right under "Random", in cards of their own with a title above the group
+            // Nuvio and the IPTV lists right under "Random", in cards of their own with a title above each group
             val section = view.findViewById<TextView>(R.id.provider_section)
             val prevApi = com.lagradost.cloudstream3.fork.Iptv.pickerApis.getOrNull(position - 1)
-            val sectionTitle = when {
-                iptv && !com.lagradost.cloudstream3.fork.Iptv.isIptv(prevApi) -> getString(R.string.iptv_section)
-                !iptv && !special && api != null && com.lagradost.cloudstream3.fork.Iptv.isIptv(prevApi) -> getString(R.string.iptv_section_plugins)
-                else -> null
-            }
+            val group = if (special) 0 else groups.groupOf(api)
+            val prevGroup = if (prevApi == null || prevApi === noneApi || prevApi === randomApi) 0 else groups.groupOf(prevApi)
+            val sectionTitle = if (group != 0 && group != prevGroup && (group != groups.PLUGINS || prevGroup != 0)) when (group) {
+                groups.NUVIO -> getString(R.string.nuvio_section)
+                groups.IPTV -> getString(R.string.iptv_section)
+                else -> getString(R.string.iptv_section_plugins)
+            } else null
             section?.text = sectionTitle
             section?.visibility = if (sectionTitle != null) View.VISIBLE else View.GONE
             view.findViewById<View>(R.id.provider_card)?.setBackgroundResource(
-                if (iptv) R.drawable.provider_card_iptv else R.drawable.provider_card
+                when {
+                    iptv -> R.drawable.provider_card_iptv
+                    nuvio -> R.drawable.provider_card_nuvio
+                    else -> R.drawable.provider_card
+                }
             )
 
             title?.text = when {
@@ -427,6 +435,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
                 iptv -> {
                     icon?.scaleType = ImageView.ScaleType.CENTER_CROP
                     icon?.setImageResource(R.drawable.fork_iptv_icon)
+                }
+                nuvio -> {
+                    icon?.scaleType = ImageView.ScaleType.CENTER_CROP
+                    icon?.setImageResource(R.drawable.fork_nuvio_icon)
                 }
                 api != null -> {
                     icon?.scaleType = ImageView.ScaleType.CENTER_CROP
@@ -564,11 +576,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
                     val pinnedp = DataStoreHelper.pinnedProviders.toList()
                     pinnedphashset = pinnedp.toHashSet()
                     arrayAdapter.clear()
+                    val nuvioApis = validAPIs.drop(2).filter { it.hasMainPage && com.lagradost.cloudstream3.fork.SourceGroups.isNuvio(it) }
+                        .sortedBy { it.name.lowercase() }
                     val iptvApis = validAPIs.filter { com.lagradost.cloudstream3.fork.Iptv.isIptv(it) }
                         .sortedBy { it.name.lowercase() }
                     val sortedApis = validAPIs
                         .filter {
-                            !com.lagradost.cloudstream3.fork.Iptv.isIptv(it) &&
+                            !com.lagradost.cloudstream3.fork.Iptv.isIptv(it) && it !in nuvioApis &&
                             it.hasMainPage && (pinnedphashset.contains(it.name) || it.supportedTypes.any(
                                 preSelectedTypes::contains
                             ))
@@ -587,6 +601,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
 
                     currentValidApis = mutableListOf<MainAPI>().apply {
                         addAll(validAPIs.take(2))
+                        addAll(nuvioApis)
                         addAll(iptvApis)
                         addAll(pinnedApis)
                         addAll(remainingApis)
@@ -939,12 +954,20 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
                                     list = it.list.copy(list = it.list.list.toMutableList())
                                 )
                             }
+                            // the order chosen for this source (Plus or a long press on a row title)
+                            val order = com.lagradost.cloudstream3.fork.RowOrder
+                            order.lastApi = homeViewModel.apiName.value
+                            order.lastRows = rows.map { it.list.name }
+                            val ordered = context?.let { ctx -> order.apply(ctx, order.lastApi, rows) { it.list.name } } ?: rows
                             val trakt = context?.let { com.lagradost.cloudstream3.fork.TraktRecs.row(it) }
                             (homeMasterRecycler.adapter as? ParentItemAdapter)?.submitList(
-                                if (trakt != null) listOf(HomeViewModel.ExpandableHomepageList(trakt, 1, false)) + rows else rows
+                                if (trakt != null) listOf(HomeViewModel.ExpandableHomepageList(trakt, 1, false)) + ordered else ordered
                             )
                         }
                         submitRows()
+                        com.lagradost.cloudstream3.fork.RowOrder.onChanged = {
+                            if (isAdded && homeViewModel.page.value === data) submitRows()
+                        }
                         com.lagradost.cloudstream3.fork.TraktRecs.onReady = {
                             if (isAdded && homeViewModel.page.value === data) submitRows()
                         }

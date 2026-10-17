@@ -279,6 +279,32 @@ object Iptv {
         return Result(true, "\"$title\" eklendi · $count kanal")
     }
 
+    /** A new name, and a new address that is read at once. */
+    suspend fun edit(context: Context, id: String, name: String?, src: String?): Result {
+        val old = lists(context).firstOrNull { it.id == id } ?: return Result(false, "Liste bulunamadı")
+        val newName = name?.trim()?.ifEmpty { null } ?: old.name
+        val newSrc = src?.trim()?.ifEmpty { null } ?: old.src
+        if (newSrc != old.src && newSrc.startsWith("http", true)) {
+            val text = try {
+                val r = app.get(newSrc, allowRedirects = true)
+                if (r.code in 200..299) r.text else null
+            } catch (t: Throwable) {
+                null
+            } ?: return Result(false, "Yeni link yüklenemedi")
+            val body = if (isHlsStream(text)) "#EXTM3U\n#EXTINF:-1 group-title=\"Kanallar\",$newName\n$newSrc\n" else text
+            val count = parse(body).size
+            if (count == 0) return Result(false, "Yeni linkte kanal bulunamadı")
+            fileOf(context, id).writeText(body)
+            parsed.remove(id)
+            saveLists(context, lists(context).map { if (it.id == id) Playlist(id, newName, newSrc, it.on, System.currentTimeMillis()) else it })
+            register(context)
+            return Result(true, "Kaydedildi · $count kanal")
+        }
+        saveLists(context, lists(context).map { if (it.id == id) Playlist(id, newName, newSrc, it.on, it.updated) else it })
+        register(context)
+        return Result(true, "Kaydedildi")
+    }
+
     fun setOn(context: Context, id: String, on: Boolean) {
         saveLists(context, lists(context).map { if (it.id == id) Playlist(it.id, it.name, it.src, on, it.updated) else it })
         register(context)
@@ -449,6 +475,12 @@ object Iptv {
         }
 
         @JavascriptInterface
+        fun edit(token: Int, id: String?, name: String?, src: String?) {
+            id ?: return
+            scope.launch { answer(token, Iptv.edit(activity, id, name, src)) }
+        }
+
+        @JavascriptInterface
         fun setOn(id: String?, on: Boolean) {
             id ?: return
             scope.launch { Iptv.setOn(activity, id, on) }
@@ -472,7 +504,8 @@ object Iptv {
                 )
             }
             val name = Iptv.lists(activity).firstOrNull { it.id == id }?.name ?: ""
-            return JSONObject().put("name", name).put("total", all.size).put("dead", dead.size)
+            val src = Iptv.lists(activity).firstOrNull { it.id == id }?.src ?: ""
+            return JSONObject().put("name", name).put("src", src).put("total", all.size).put("dead", dead.size)
                 .put("tested", tested(activity, id)).put("hideDead", hideDead(activity)).put("groups", groups).toString()
         }
 

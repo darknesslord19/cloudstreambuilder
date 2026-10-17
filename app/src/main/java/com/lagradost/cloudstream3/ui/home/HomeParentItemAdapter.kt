@@ -128,6 +128,12 @@ open class ParentItemAdapter(
                 nextRight = endFocus,
             )
             homeChildMoreInfo.text = info.name
+            // A long press on the title: the order of the rows
+            homeChildMoreInfo.setOnLongClickListener { v ->
+                (v.context as? android.app.Activity ?: com.lagradost.cloudstream3.CommonActivity.activity)
+                    ?.let { com.lagradost.cloudstream3.fork.RowOrder.show(it) }
+                true
+            }
             // Home screen settings: "All ›" and how many instead of the arrow
             if (isLayout(PHONE)) {
                 com.lagradost.cloudstream3.fork.HomeTweaks.styleRowHeader(

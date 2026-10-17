@@ -78,6 +78,12 @@ textarea{min-height:78px;resize:vertical;font-family:ui-monospace,monospace;font
     <button class="btn" id="pasteBtn">Metin yapıştır</button>
   </div>
   <input type="file" id="file" accept=".m3u,.m3u8,.txt,audio/x-mpegurl,application/x-mpegurl,application/vnd.apple.mpegurl,text/plain,*/*" multiple hidden>
+  <div id="fileBox" hidden>
+    <label for="fileName">Dosyadan eklenecek listenin adı</label>
+    <input id="fileName">
+    <div class="hint" id="fileInfo" style="margin-top:4px"></div>
+    <div class="btns" style="grid-template-columns:2fr 1fr"><button class="btn p" id="fileAdd">Listeyi ekle</button><button class="btn" id="fileCancel">Vazgeç</button></div>
+  </div>
   <div id="pasteBox" hidden>
     <label for="paste">M3U içeriği</label>
     <textarea id="paste" placeholder="#EXTM3U&#10;#EXTINF:-1 tvg-logo=&quot;...&quot; group-title=&quot;Haber&quot;,Kanal Adı&#10;https://.../index.m3u8"></textarea>
@@ -95,6 +101,15 @@ textarea{min-height:78px;resize:vertical;font-family:ui-monospace,monospace;font
 </div>
 
 <div class="view" id="vList" hidden>
+  <div class="card">
+    <h3>Liste bilgileri</h3>
+    <label for="eName">Ad</label>
+    <input id="eName">
+    <label for="eSrc">Link (dosya ya da metinle eklendiyse boş kalabilir)</label>
+    <input id="eSrc" placeholder="https://.../liste.m3u">
+    <div class="btns" style="grid-template-columns:1fr"><button class="btn p" id="eSave">Kaydet</button></div>
+    <div class="msg" id="eMsg"></div>
+  </div>
   <div class="card">
     <h3>Kanal testi</h3>
     <div class="hint" style="margin:0">Her kanal kısa bir süre denenir; açılmayanlar işaretlenir ve kategorilere girmez.</div>
@@ -128,6 +143,7 @@ function msg(t, ok) { var m = $('msg'); m.textContent = t; m.className = 'msg ' 
 var token = 0, waiting = {};
 window.onIptvResult = function (t, json) {
   var r = {}; try { r = JSON.parse(json); } catch (e) {}
+  if (editing) { editing = false; $('eSave').disabled = false; $('eMsg').className = 'msg ' + (r.ok ? 'ok' : 'bad'); $('eMsg').textContent = r.message || ''; $('eName').blur(); $('eSrc').blur(); drawList(); return; }
   if (testing) { testing = false; $('test').disabled = false; $('ptext').textContent = r.message || ''; $('pbar').style.width = '100%'; drawList(); return; }
   msg(r.message || '', !!r.ok);
   setBusy(false);
@@ -165,21 +181,40 @@ $('sample').onclick = function () {
   $('add').click();
 };
 $('fileBtn').onclick = function () { $('file').click(); };
+var pendingFiles = [];
 $('file').onchange = function (e) {
   var files = Array.prototype.slice.call(e.target.files || []);
+  e.target.value = '';
   if (!files.length) return;
-  setBusy(true); msg('Okunuyor…', true);
+  pendingFiles = [];
+  var left = files.length;
   files.forEach(function (f) {
     var reader = new FileReader();
     reader.onload = function () {
-      var nm = $('name').value.trim() || (f.name || 'Liste').replace(/\.(m3u8?|txt)$/i, '');
-      tv.addText(++token, nm, String(reader.result || ''), 'dosya');
+      pendingFiles.push({ name: (f.name || 'Liste').replace(/\.(m3u8?|txt)$/i, ''), text: String(reader.result || '') });
+      if (--left === 0) askFileName();
     };
-    reader.onerror = function () { msg('Dosya okunamadı', false); setBusy(false); };
+    reader.onerror = function () { if (--left === 0) askFileName(); };
     reader.readAsText(f);
   });
-  e.target.value = '';
 };
+function askFileName() {
+  if (!pendingFiles.length) { msg('Dosya okunamadı', false); return; }
+  $('fileName').value = $('name').value.trim() || pendingFiles[0].name;
+  $('fileInfo').textContent = pendingFiles.length > 1 ? (pendingFiles.length + ' dosya seçildi; adın sonuna sıra numarası eklenir.') : ('Dosya: ' + pendingFiles[0].name);
+  $('fileBox').hidden = false;
+  $('fileName').focus(); $('fileName').select();
+}
+$('fileAdd').onclick = function () {
+  var base = $('fileName').value.trim();
+  setBusy(true); msg('Ekleniyor…', true);
+  pendingFiles.forEach(function (p, i) {
+    var nm = base ? (pendingFiles.length > 1 ? base + ' ' + (i + 1) : base) : p.name;
+    tv.addText(++token, nm, p.text, 'dosya');
+  });
+  pendingFiles = []; $('fileBox').hidden = true;
+};
+$('fileCancel').onclick = function () { pendingFiles = []; $('fileBox').hidden = true; };
 $('pasteBtn').onclick = function () { $('pasteBox').hidden = !$('pasteBox').hidden; if (!$('pasteBox').hidden) $('paste').focus(); };
 $('pasteAdd').onclick = function () {
   var text = $('paste').value;
@@ -194,6 +229,8 @@ function openList(id) { cur = id; curGroup = null; drawList(); show('vList'); hi
 function drawList() {
   var d = {}; try { d = JSON.parse(tv.detail(cur)); } catch (e) {}
   $('title').textContent = d.name || 'IPTV';
+  if (document.activeElement !== $('eName')) $('eName').value = d.name || '';
+  if (document.activeElement !== $('eSrc')) $('eSrc').value = /^https?:/i.test(d.src || '') ? d.src : '';
   $('hideDead').classList.toggle('on', !!d.hideDead);
   if (!testing) {
     $('pbar').style.width = d.tested ? '100%' : '0';
@@ -225,6 +262,13 @@ function drawGroup() {
     b.onclick = function () { tv.setChannel(cur, +b.dataset.c, b.dataset.on !== '1'); setTimeout(drawGroup, 120); };
   });
 }
+var editing = false;
+$('eSave').onclick = function () {
+  if (!cur) return;
+  editing = true; $('eSave').disabled = true;
+  $('eMsg').className = 'msg ok'; $('eMsg').textContent = 'Kaydediliyor…';
+  tv.edit(++token, cur, $('eName').value.trim(), $('eSrc').value.trim());
+};
 window.onIptvProgress = function (done, total) {
   $('pbar').style.width = Math.round(done / total * 100) + '%';
   $('ptext').textContent = 'Deneniyor… ' + done + ' / ' + total;

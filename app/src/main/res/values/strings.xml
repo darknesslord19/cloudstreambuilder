@@ -1038,4 +1038,9 @@
     <string name="adblock_blocked" formatted="true">%s announcement blocked</string>
     <string name="adblock_plugin">Plugin</string>
     <string name="key_saved_unchecked" formatted="true">Saved, but Trakt did not accept it (%s). Check the key.</string>
+    <string name="nuvio_section">NUVIO</string>
+    <string name="row_order_title">Row order</string>
+    <string name="row_order_short">Where the catalogues are on the home page · also a long press on a row title</string>
+    <string name="row_order_des" formatted="true">%s · Rows come to the top in the order you tick them: 1, 2, 3… The others follow.</string>
+    <string name="row_order_reset">Reset the order</string>
 </resources>

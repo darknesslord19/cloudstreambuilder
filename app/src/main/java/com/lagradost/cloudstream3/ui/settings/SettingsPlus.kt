@@ -349,6 +349,9 @@ class SettingsPlus : BasePreferenceFragmentCompat() {
                 icon = R.drawable.home_alt
             )
         )
+        items.add(PlusSheet.Item.Action(getString(R.string.row_order_title), getString(R.string.row_order_short), R.drawable.ic_baseline_tune_24) {
+            com.lagradost.cloudstream3.fork.RowOrder.show(activity)
+        })
         items.add(PlusSheet.Item.Header(getString(R.string.plus_home_parts)))
         HomeTweaks.Tweak.entries.forEach { tweak ->
             items.add(
