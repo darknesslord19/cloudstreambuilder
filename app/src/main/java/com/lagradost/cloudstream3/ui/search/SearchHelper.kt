@@ -16,6 +16,11 @@ import com.lagradost.cloudstream3.utils.downloader.DownloadObjects
 object SearchHelper {
     fun handleSearchClickCallback(callback: SearchClickCallback) {
         val card = callback.card
+        // A Trakt suggestion is looked for in the plugins
+        if (com.lagradost.cloudstream3.fork.TraktRecs.isRec(card)) {
+            com.lagradost.cloudstream3.fork.TraktRecs.open(callback.view.context as? android.app.Activity ?: com.lagradost.cloudstream3.CommonActivity.activity, card.name)
+            return
+        }
         when (callback.action) {
             SEARCH_ACTION_LOAD -> {
                 loadSearchResult(card)

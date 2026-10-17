@@ -135,6 +135,8 @@ object RemoteRules {
         THEME_PACK("theme_pack"),
         PROFILE_ICONS("profile_icons"),
         IPTV("iptv"),
+        TRAKT_RECS("trakt_recs"),
+        AD_BLOCK("ad_block"),
     }
 
     /**

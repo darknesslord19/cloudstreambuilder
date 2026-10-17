@@ -932,11 +932,22 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
                 when (data) {
                     is Resource.Success -> {
                         val d = data.value
-                        (homeMasterRecycler.adapter as? ParentItemAdapter)?.submitList(d.values.map {
-                            it.copy(
-                                list = it.list.copy(list = it.list.list.toMutableList())
+                        // Trakt: "Sana özel" on top, drawn again when the suggestions arrive
+                        fun submitRows() {
+                            val rows = d.values.map {
+                                it.copy(
+                                    list = it.list.copy(list = it.list.list.toMutableList())
+                                )
+                            }
+                            val trakt = context?.let { com.lagradost.cloudstream3.fork.TraktRecs.row(it) }
+                            (homeMasterRecycler.adapter as? ParentItemAdapter)?.submitList(
+                                if (trakt != null) listOf(HomeViewModel.ExpandableHomepageList(trakt, 1, false)) + rows else rows
                             )
-                        })
+                        }
+                        submitRows()
+                        com.lagradost.cloudstream3.fork.TraktRecs.onReady = {
+                            if (isAdded && homeViewModel.page.value === data) submitRows()
+                        }
 
                         saveHomepageToTV(d)
 

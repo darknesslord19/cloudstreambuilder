@@ -650,6 +650,11 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
         super.onResume()
         // The theme reached the screen, and the glow of its corners
         com.lagradost.cloudstream3.fork.ThemePack.started(this)
+        // Plugin announcements are closed, Trakt suggests something when nothing was watched for a while
+        com.lagradost.cloudstream3.fork.AdBlock.start(this)
+        window?.decorView?.postDelayed({
+            if (!isFinishing) com.lagradost.cloudstream3.fork.TraktRecs.maybeSuggest(this)
+        }, 4000)
         com.lagradost.cloudstream3.fork.ThemePack.glow(
             this, (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as? androidx.navigation.fragment.NavHostFragment)
                 ?.navController?.currentDestination?.id != R.id.navigation_player
@@ -677,6 +682,7 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
 
     override fun onPause() {
         super.onPause()
+        com.lagradost.cloudstream3.fork.AdBlock.stop()
 
         // Start any delayed updates
         if (ApkInstaller.delayedInstaller?.startInstallation() == true) {

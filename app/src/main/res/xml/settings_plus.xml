@@ -21,6 +21,18 @@
         android:title="@string/iptv_title" />
 
     <Preference
+        android:icon="@drawable/plus_sparkle_24px"
+        android:key="fork_plus_trakt"
+        android:summary="@string/trakt_des"
+        android:title="@string/trakt_title" />
+
+    <Preference
+        android:icon="@drawable/ic_baseline_tune_24"
+        android:key="fork_plus_adblock"
+        android:summary="@string/adblock_des"
+        android:title="@string/adblock_title" />
+
+    <Preference
         android:icon="@drawable/home_alt"
         android:key="fork_plus_sheet_home"
         android:summary="@string/plus_home_des"

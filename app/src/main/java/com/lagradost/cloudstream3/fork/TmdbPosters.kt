@@ -197,6 +197,14 @@ object TmdbPosters {
         }
     }
 
+    /** The details of a film ("movie") or a series ("tv") in Turkish, null without a key. */
+    suspend fun details(context: Context, kind: String, id: Int): JSONObject? {
+        val key = key(context) ?: return null
+        return withContext(Dispatchers.IO) { request(key, "$kind/$id", mapOf("language" to "tr-TR")) }
+    }
+
+    fun posterOf(path: String?): String? = path?.takeIf { it.isNotBlank() && it != "null" }?.let { POSTER + it }
+
     /** Tries a key, true when TMDB accepts it. */
     suspend fun test(key: String): Boolean = withContext(Dispatchers.IO) {
         request(key.trim(), "configuration", emptyMap()) != null

@@ -57,6 +57,16 @@ class SettingsPlus : BasePreferenceFragmentCompat() {
             activity?.let { com.lagradost.cloudstream3.fork.Iptv.show(it) }
             true
         }
+        findPreference<Preference>("fork_plus_trakt")?.isVisible = com.lagradost.cloudstream3.fork.TraktRecs.available(context)
+        findPreference<Preference>("fork_plus_trakt")?.setOnPreferenceClickListener {
+            activity?.let { showTrakt(it) }
+            true
+        }
+        findPreference<Preference>("fork_plus_adblock")?.isVisible = com.lagradost.cloudstream3.fork.AdBlock.available(context)
+        findPreference<Preference>("fork_plus_adblock")?.setOnPreferenceClickListener {
+            activity?.let { showAdBlock(it) }
+            true
+        }
         findPreference<Preference>("fork_plus_sheet_looks")?.setOnPreferenceClickListener {
             activity?.let { showLooks(it) }
             true
@@ -104,6 +114,55 @@ class SettingsPlus : BasePreferenceFragmentCompat() {
             TmdbPosters.key(context) == null -> getString(R.string.tmdb_no_key)
             else -> getString(R.string.tmdb_des)
         }
+    }
+
+    private fun showTrakt(activity: android.app.Activity) {
+        val trakt = com.lagradost.cloudstream3.fork.TraktRecs
+        PlusSheet.show(
+            activity, getString(R.string.trakt_title), getString(R.string.trakt_des), listOf(
+                PlusSheet.Item.Switch(trakt.PREF_ON, getString(R.string.trakt_main), getString(R.string.trakt_main_des), icon = R.drawable.plus_sparkle_24px),
+                PlusSheet.Item.Switch(trakt.PREF_ROW, getString(R.string.trakt_row_set), getString(R.string.trakt_row_des), dependsOn = trakt.PREF_ON, icon = R.drawable.home_alt),
+                PlusSheet.Item.Switch(trakt.PREF_POPUP, getString(R.string.trakt_popup_set), getString(R.string.trakt_popup_set_des), dependsOn = trakt.PREF_ON, icon = R.drawable.ic_fork_campaign_24),
+                PlusSheet.Item.Choice(
+                    trakt.PREF_DAYS, getString(R.string.trakt_days),
+                    listOf(getString(R.string.trakt_days_1), getString(R.string.trakt_days_3), getString(R.string.trakt_days_7)),
+                    listOf("1", "3", "7"), "3", dependsOn = trakt.PREF_POPUP, icon = R.drawable.ic_baseline_tune_24
+                ),
+                PlusSheet.Item.Custom(dependsOn = trakt.PREF_ON) {
+                    keyRow(it, trakt.adminKey(it) != null, trakt.userKey(it), trakt.PREF_USER_KEY,
+                        getString(R.string.trakt_key), "Client ID") { key -> trakt.test(key) }
+                },
+            )
+        )
+    }
+
+    private fun showAdBlock(activity: android.app.Activity) {
+        val ab = com.lagradost.cloudstream3.fork.AdBlock
+        val items = arrayListOf<PlusSheet.Item>(
+            PlusSheet.Item.Switch(ab.PREF_ON, getString(R.string.adblock_main), getString(R.string.adblock_main_des), default = false, icon = R.drawable.ic_baseline_tune_24),
+            PlusSheet.Item.Choice(
+                ab.PREF_MODE, getString(R.string.adblock_mode),
+                listOf(getString(R.string.adblock_mode_ads), getString(R.string.adblock_mode_all)),
+                listOf(ab.MODE_ADS, ab.MODE_ALL), ab.MODE_ADS, dependsOn = ab.PREF_ON
+            ),
+            PlusSheet.Item.Switch(ab.PREF_NOTE, getString(R.string.adblock_note), null, dependsOn = ab.PREF_ON),
+            PlusSheet.Item.Header(getString(R.string.adblock_recent)),
+        )
+        val log = ab.log(activity)
+        if (log.isEmpty()) items.add(PlusSheet.Item.Info(getString(R.string.adblock_none), null))
+        val allowed = ab.allowed(activity)
+        val fmt = java.text.SimpleDateFormat("d MMM HH:mm", java.util.Locale.getDefault())
+        log.take(10).forEach { e ->
+            val isAllowed = e.name in allowed
+            items.add(PlusSheet.Item.Action(
+                e.name,
+                "${fmt.format(java.util.Date(e.last))} · ${e.count}× · " + getString(if (isAllowed) R.string.adblock_allowed else R.string.adblock_allow)
+            ) {
+                ab.setAllowed(activity, e.name, !isAllowed)
+                showAdBlock(activity)
+            })
+        }
+        PlusSheet.show(activity, getString(R.string.adblock_title), getString(R.string.adblock_des), items)
     }
 
     /** What was under Düzen: moving posters, font and app icon, with the themes. */
@@ -162,13 +221,24 @@ class SettingsPlus : BasePreferenceFragmentCompat() {
                 PlusSheet.Item.Header(getString(R.string.tmdb_settings)),
                 PlusSheet.Item.Switch(TmdbPosters.PREF_HERO, getString(R.string.tmdb_hero), getString(R.string.tmdb_hero_des), dependsOn = TmdbPosters.PREF_ON, icon = R.drawable.ic_fork_image_24),
                 PlusSheet.Item.Switch(TmdbPosters.PREF_BADGE, getString(R.string.tmdb_badge), getString(R.string.tmdb_badge_des), default = false, dependsOn = TmdbPosters.PREF_ON, icon = R.drawable.title_24px),
-                PlusSheet.Item.Custom(dependsOn = TmdbPosters.PREF_ON) { keyRow(it) },
+                PlusSheet.Item.Custom(dependsOn = TmdbPosters.PREF_ON) {
+                    keyRow(it, TmdbPosters.adminKey(it) != null, TmdbPosters.userKey(it), TmdbPosters.PREF_USER_KEY,
+                        getString(R.string.tmdb_key), getString(R.string.tmdb_key_hint)) { key -> TmdbPosters.test(key) }
+                },
             )
         )
     }
 
     /** The key: locked when the developer gives one, otherwise the user saves their own. */
-    private fun keyRow(activity: android.app.Activity): View {
+    private fun keyRow(
+        activity: android.app.Activity,
+        admin: Boolean,
+        own: String?,
+        prefKey: String,
+        label: String,
+        hintText: String,
+        test: suspend (String) -> Boolean,
+    ): View {
         val ctx = activity
         val dp = { v: Int -> (v * ctx.resources.displayMetrics.density).toInt() }
         val textColor = ctx.colorFromAttribute(R.attr.textColor)
@@ -182,14 +252,13 @@ class SettingsPlus : BasePreferenceFragmentCompat() {
             ).apply { setMargins(0, dp(3), 0, dp(3)) }
         }
         box.addView(android.widget.TextView(ctx).apply {
-            text = getString(R.string.tmdb_key)
+            text = label
             textSize = 13f
             setTextColor(grayColor)
             setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_fork_key_24, 0, 0, 0)
             compoundDrawablePadding = dp(8)
             gravity = android.view.Gravity.CENTER_VERTICAL
         })
-        val admin = TmdbPosters.adminKey(ctx) != null
         val row = android.widget.LinearLayout(ctx).apply {
             orientation = android.widget.LinearLayout.HORIZONTAL
             gravity = android.view.Gravity.CENTER_VERTICAL
@@ -207,8 +276,8 @@ class SettingsPlus : BasePreferenceFragmentCompat() {
                 isEnabled = false
                 alpha = 0.6f
             } else {
-                hint = getString(R.string.tmdb_key_hint)
-                setText(TmdbPosters.userKey(ctx) ?: "")
+                hint = hintText
+                setText(own ?: "")
             }
         }
         val save = com.google.android.material.button.MaterialButton(ctx).apply {
@@ -234,7 +303,7 @@ class SettingsPlus : BasePreferenceFragmentCompat() {
         }
         when {
             admin -> show(R.string.tmdb_admin_key, okColor)
-            TmdbPosters.userKey(ctx) != null -> show(R.string.tmdb_own_key, okColor)
+            own != null -> show(R.string.tmdb_own_key, okColor)
             else -> show(R.string.tmdb_enter_key, grayColor)
         }
         box.addView(state)
@@ -242,7 +311,7 @@ class SettingsPlus : BasePreferenceFragmentCompat() {
             val key = input.text?.toString()?.trim().orEmpty()
             val prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(ctx)
             if (key.isEmpty()) {
-                prefs.edit().remove(TmdbPosters.PREF_USER_KEY).apply()
+                prefs.edit().remove(prefKey).apply()
                 show(R.string.tmdb_enter_key, grayColor)
                 updateSummaries()
                 return@setOnClickListener
@@ -250,11 +319,11 @@ class SettingsPlus : BasePreferenceFragmentCompat() {
             save.isEnabled = false
             show(R.string.tmdb_testing, grayColor)
             ioSafe {
-                val ok = TmdbPosters.test(key)
+                val ok = test(key)
                 main {
                     save.isEnabled = true
                     if (ok) {
-                        prefs.edit().putString(TmdbPosters.PREF_USER_KEY, key).apply()
+                        prefs.edit().putString(prefKey, key).apply()
                         show(R.string.tmdb_saved, okColor)
                         updateSummaries()
                     } else {

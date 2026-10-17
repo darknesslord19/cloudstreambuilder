@@ -6,4 +6,7 @@
     <!-- Tags of the TMDB posters -->
     <item name="fork_tmdb_tag" type="id" />
     <item name="fork_tmdb_badge" type="id" />
+    <!-- The announcement blocker: windows looked at, and the app's own -->
+    <item name="fork_adblock_seen" type="id" />
+    <item name="fork_adblock_own" type="id" />
 </resources>

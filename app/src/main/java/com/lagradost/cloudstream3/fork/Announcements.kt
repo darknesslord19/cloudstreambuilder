@@ -290,6 +290,7 @@ object Announcements {
             setWindowAnimations(android.R.style.Animation_Dialog)
         }
         dialog.show()
+        dialog.window?.decorView?.setTag(R.id.fork_adblock_own, true)
         (ok ?: buttons.getChildAt(0))?.requestFocus()
     }
 
