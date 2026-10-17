@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit
 
 /**
  * The addresses of the sites of the plugins. When a site moves to a new domain, the new one can be
- * given here (Plus > Domain) or from outside ("domains" in Cloudstreamplus.json); it goes into the
+ * given here (Plus > Domain) or from outside ("domain_list" in Cloudstreamplus.json); it goes into the
  * plugin and, when asked, every request to the old domain goes to the new one, so addresses the
  * plugin wrote into its code work too. Order: the user's own > the admin's > the plugin's.
  */
@@ -102,9 +102,9 @@ object Domains {
         apply(context)
     }
 
-    /** "domains": { "Provider name" or "old.host": "https://new.host" } */
+    /** "domain_list": { "Provider name" or "old.host": "https://new.host" } */
     fun adminOf(context: Context, name: String, default: String?): String? {
-        val node = ForkFeatures.general(context)?.get("domains") ?: return null
+        val node = ForkFeatures.general(context)?.get("domain_list") ?: return null
         if (!node.isObject) return null
         node.get(name)?.asText()?.let { clean(it) }?.let { return it }
         val host = hostOf(default) ?: return null
@@ -117,7 +117,7 @@ object Domains {
     }
 
     private fun adminCount(context: Context): Int =
-        ForkFeatures.general(context)?.get("domains")?.takeIf { it.isObject }?.size() ?: 0
+        ForkFeatures.general(context)?.get("domain_list")?.takeIf { it.isObject }?.size() ?: 0
 
     private fun sites(): List<MainAPI> = try {
         APIHolder.allProviders.withLock {
