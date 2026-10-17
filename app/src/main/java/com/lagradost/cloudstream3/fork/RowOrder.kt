@@ -81,7 +81,7 @@ object RowOrder {
             setTextColor(text)
         })
         list.addView(TextView(activity).apply {
-            text = activity.getString(R.string.row_order_des, api)
+            this.text = activity.getString(R.string.row_order_des, api)
             textSize = 12.5f
             setTextColor(gray)
             setPadding(0, 2.toPx, 0, 10.toPx)
