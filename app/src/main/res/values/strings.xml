@@ -1037,4 +1037,5 @@
     <string name="adblock_allowed">allowed · tap: block</string>
     <string name="adblock_blocked" formatted="true">%s announcement blocked</string>
     <string name="adblock_plugin">Plugin</string>
+    <string name="key_saved_unchecked" formatted="true">Saved, but Trakt did not accept it (%s). Check the key.</string>
 </resources>

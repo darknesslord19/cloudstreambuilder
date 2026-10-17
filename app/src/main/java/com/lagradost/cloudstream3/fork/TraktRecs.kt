@@ -90,20 +90,30 @@ object TraktRecs {
 
     // ---------------------------------------------------------------- asking Trakt
 
-    private suspend fun trakt(key: String, path: String): String? = try {
-        val r = app.get(
-            "https://api.trakt.tv/$path",
-            headers = mapOf("trakt-api-key" to key, "trakt-api-version" to "2", "Content-Type" to "application/json"),
-            timeout = 15L
+    private val headers = { key: String ->
+        mapOf(
+            "trakt-api-key" to key, "trakt-api-version" to "2", "Content-Type" to "application/json",
+            "User-Agent" to "CloudStreamPlus/1.0"
         )
+    }
+
+    private suspend fun trakt(key: String, path: String): String? = try {
+        val r = app.get("https://api.trakt.tv/$path", headers = headers(key), timeout = 15L)
         if (r.code in 200..299) r.text else null
     } catch (t: Throwable) {
         Log.w(TAG, "trakt failed", t)
         null
     }
 
-    /** Tries a key, true when Trakt accepts it. */
-    suspend fun test(key: String): Boolean = withContext(Dispatchers.IO) { trakt(key.trim(), "movies/trending?limit=1") != null }
+    /** Tries a key: null when Trakt accepts it, otherwise why not. */
+    suspend fun check(key: String): String? = withContext(Dispatchers.IO) {
+        try {
+            val r = app.get("https://api.trakt.tv/movies/trending?limit=1", headers = headers(key.trim()), timeout = 15L)
+            if (r.code in 200..299) null else "HTTP ${r.code}"
+        } catch (t: Throwable) {
+            t.message ?: "bağlantı hatası"
+        }
+    }
 
     private suspend fun build(context: Context): List<Rec> {
         val key = key(context) ?: return emptyList()

@@ -1001,4 +1001,5 @@
     <string name="adblock_allowed">izin verildi · dokun: engelle</string>
     <string name="adblock_blocked" formatted="true">%s duyurusu engellendi</string>
     <string name="adblock_plugin">Eklenti</string>
+    <string name="key_saved_unchecked" formatted="true">Kaydedildi ama Trakt doğrulamadı (%s). Anahtarı kontrol et.</string>
 </resources>

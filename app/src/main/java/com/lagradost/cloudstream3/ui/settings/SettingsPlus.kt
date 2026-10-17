@@ -130,7 +130,7 @@ class SettingsPlus : BasePreferenceFragmentCompat() {
                 ),
                 PlusSheet.Item.Custom(dependsOn = trakt.PREF_ON) {
                     keyRow(it, trakt.adminKey(it) != null, trakt.userKey(it), trakt.PREF_USER_KEY,
-                        getString(R.string.trakt_key), "Client ID") { key -> trakt.test(key) }
+                        getString(R.string.trakt_key), "Client ID", { key -> trakt.check(key) }, saveAnyway = true)
                 },
             )
         )
@@ -223,7 +223,7 @@ class SettingsPlus : BasePreferenceFragmentCompat() {
                 PlusSheet.Item.Switch(TmdbPosters.PREF_BADGE, getString(R.string.tmdb_badge), getString(R.string.tmdb_badge_des), default = false, dependsOn = TmdbPosters.PREF_ON, icon = R.drawable.title_24px),
                 PlusSheet.Item.Custom(dependsOn = TmdbPosters.PREF_ON) {
                     keyRow(it, TmdbPosters.adminKey(it) != null, TmdbPosters.userKey(it), TmdbPosters.PREF_USER_KEY,
-                        getString(R.string.tmdb_key), getString(R.string.tmdb_key_hint)) { key -> TmdbPosters.test(key) }
+                        getString(R.string.tmdb_key), getString(R.string.tmdb_key_hint), { key -> if (TmdbPosters.test(key)) null else "" })
                 },
             )
         )
@@ -237,7 +237,8 @@ class SettingsPlus : BasePreferenceFragmentCompat() {
         prefKey: String,
         label: String,
         hintText: String,
-        test: suspend (String) -> Boolean,
+        test: suspend (String) -> String?,
+        saveAnyway: Boolean = false,
     ): View {
         val ctx = activity
         val dp = { v: Int -> (v * ctx.resources.displayMetrics.density).toInt() }
@@ -319,13 +320,18 @@ class SettingsPlus : BasePreferenceFragmentCompat() {
             save.isEnabled = false
             show(R.string.tmdb_testing, grayColor)
             ioSafe {
-                val ok = test(key)
+                val problem = test(key)
                 main {
                     save.isEnabled = true
-                    if (ok) {
+                    if (problem == null) {
                         prefs.edit().putString(prefKey, key).apply()
                         show(R.string.tmdb_saved, okColor)
                         updateSummaries()
+                    } else if (saveAnyway) {
+                        // kept anyway, the reason is shown so it can be checked
+                        prefs.edit().putString(prefKey, key).apply()
+                        state.text = getString(R.string.key_saved_unchecked, problem)
+                        state.setTextColor(badColor)
                     } else {
                         show(R.string.tmdb_bad_key, badColor)
                     }
