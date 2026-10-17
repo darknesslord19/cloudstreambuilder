@@ -11,6 +11,7 @@ import com.lagradost.cloudstream3.fork.PlusSheet
 import com.lagradost.cloudstream3.fork.ForkFeatures
 import com.lagradost.cloudstream3.fork.RemoteRules
 import com.lagradost.cloudstream3.fork.TmdbPosters
+import com.lagradost.cloudstream3.ui.clear
 import com.lagradost.cloudstream3.ui.BasePreferenceFragmentCompat
 import com.lagradost.cloudstream3.ui.settings.SettingsFragment.Companion.setPaddingBottom
 import com.lagradost.cloudstream3.ui.settings.SettingsFragment.Companion.setToolBarScrollFlags
