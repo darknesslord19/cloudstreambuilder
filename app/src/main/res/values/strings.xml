@@ -1043,4 +1043,8 @@
     <string name="row_order_short">Where the catalogues are on the home page · also a long press on a row title</string>
     <string name="row_order_des" formatted="true">%s · Rows come to the top in the order you tick them: 1, 2, 3… The others follow.</string>
     <string name="row_order_reset">Reset the order</string>
+    <string name="row_order_eye">Show / hide</string>
+    <string name="row_order_add">Add a category</string>
+    <string name="row_order_add_des">The genres you pick are sorted out of what this source shows on its home page and added as new rows (by TMDB genres). Added rows can be ordered and hidden above.</string>
+    <string name="row_order_add_nokey">Sorting by genre needs a TMDB key (Plus › TMDB posters). Your picks are kept and the rows appear once a key is added.</string>
 </resources>

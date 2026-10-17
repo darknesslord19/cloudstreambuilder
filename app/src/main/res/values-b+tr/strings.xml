@@ -1007,4 +1007,8 @@
     <string name="row_order_short">Ana sayfadaki katalogların yeri · satır başlığına basılı tutarak da açılır</string>
     <string name="row_order_des" formatted="true">%s · Dokunduğun sırayla 1, 2, 3… olarak en üste dizilir. İşaretsizler arkadan gelir.</string>
     <string name="row_order_reset">Sırayı sıfırla</string>
+    <string name="row_order_eye">Göster / gizle</string>
+    <string name="row_order_add">Kategori ekle</string>
+    <string name="row_order_add_des">Seçtiğin türler, bu kaynağın ana sayfadaki içeriklerinden ayrıştırılıp yeni satır olarak eklenir (TMDB türlerine göre). Eklenen satırlar yukarıda sıralanıp gizlenebilir.</string>
+    <string name="row_order_add_nokey">Türleri ayırmak için TMDB anahtarı gerekiyor (Plus › TMDB afişleri). Seçimlerin kaydedilir, anahtar eklenince satırlar görünür.</string>
 </resources>

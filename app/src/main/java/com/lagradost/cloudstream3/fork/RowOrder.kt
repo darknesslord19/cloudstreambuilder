@@ -49,12 +49,29 @@ object RowOrder {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putString(api, JSONArray(names).toString()).apply()
     }
 
-    /** [items] in the chosen order, [nameOf] gives the name of a row. */
+    fun hidden(context: Context, api: String?): Set<String> {
+        api ?: return emptySet()
+        return try {
+            val a = JSONArray(context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString("hidden_$api", "[]"))
+            (0 until a.length()).map { a.getString(it) }.toSet()
+        } catch (t: Throwable) {
+            emptySet()
+        }
+    }
+
+    private fun saveHidden(context: Context, api: String, names: Set<String>) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putString("hidden_$api", JSONArray(names.toList()).toString()).apply()
+    }
+
+    /** [items] in the chosen order without the hidden ones, [nameOf] gives the name of a row. */
     fun <T> apply(context: Context, api: String?, items: List<T>, nameOf: (T) -> String): List<T> {
+        val hide = hidden(context, api)
         val wanted = order(context, api)
-        if (wanted.isEmpty()) return items
-        val first = wanted.mapNotNull { name -> items.firstOrNull { nameOf(it) == name } }
-        return first + items.filter { it !in first }
+        val all = if (wanted.isEmpty()) items else {
+            val first = wanted.mapNotNull { name -> items.firstOrNull { nameOf(it) == name } }
+            first + items.filter { it !in first }
+        }
+        return if (hide.isEmpty()) all else all.filter { nameOf(it) !in hide }
     }
 
     fun show(activity: Activity) {
@@ -62,6 +79,7 @@ object RowOrder {
         val rows = lastRows.distinct()
         if (rows.isEmpty()) return
         val chosen = order(activity, api).filter { it in rows }.toMutableList()
+        val hide = hidden(activity, api).toMutableSet()
         val dialog = BottomSheetDialog(activity)
         dialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         dialog.behavior.skipCollapsed = true
@@ -133,10 +151,76 @@ object RowOrder {
                     textSize = 15f
                     setTextColor(text)
                 }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+                val off = name in hide
+                (row.getChildAt(1) as? TextView)?.alpha = if (off) 0.45f else 1f
+                row.addView(android.widget.ImageView(activity).apply {
+                    setImageResource(if (off) R.drawable.ic_baseline_visibility_off_24 else R.drawable.ic_baseline_remove_red_eye_24)
+                    setColorFilter(if (off) gray else primary)
+                    setPadding(8.toPx, 8.toPx, 8.toPx, 8.toPx)
+                    isFocusable = true
+                    isClickable = true
+                    contentDescription = activity.getString(R.string.row_order_eye)
+                    background = android.graphics.drawable.StateListDrawable().apply {
+                        addState(intArrayOf(android.R.attr.state_focused), GradientDrawable().apply {
+                            cornerRadius = 10.toPx.toFloat(); setStroke(2.toPx, text)
+                        })
+                        addState(intArrayOf(), GradientDrawable().apply {
+                            cornerRadius = 10.toPx.toFloat(); setStroke(1.toPx, if (off) gray else primary)
+                        })
+                    }
+                    setOnClickListener {
+                        if (off) hide.remove(name) else hide.add(name)
+                        saveHidden(activity, api, hide)
+                        draw()
+                        onChanged?.invoke()
+                    }
+                }, LinearLayout.LayoutParams(40.toPx, 40.toPx).apply { marginStart = 10.toPx })
                 rowsBox.addView(row)
             }
         }
         draw()
+
+        // ---- extra categories, made from what the source shows
+        list.addView(TextView(activity).apply {
+            setText(R.string.row_order_add)
+            textSize = 16f
+            setTypeface(typeface, Typeface.BOLD)
+            setTextColor(text)
+            setPadding(0, 20.toPx, 0, 2.toPx)
+        })
+        list.addView(TextView(activity).apply {
+            this.text = activity.getString(
+                if (GenreRows.canWork(activity)) R.string.row_order_add_des else R.string.row_order_add_nokey
+            )
+            textSize = 12.5f
+            setTextColor(gray)
+            setPadding(0, 0, 0, 8.toPx)
+        })
+        val picked = GenreRows.chosen(activity, api).toMutableList()
+        val chips = com.google.android.material.chip.ChipGroup(activity).apply { chipSpacingVertical = 2.toPx }
+        GenreRows.genres.forEach { g ->
+            chips.addView(com.google.android.material.chip.Chip(activity).apply {
+                this.text = g.name
+                isCheckable = true
+                isChecked = g.name in picked
+                isFocusable = true
+                setTextColor(text)
+                chipBackgroundColor = android.content.res.ColorStateList(
+                    arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                    intArrayOf(primary and 0x00FFFFFF or 0x55000000, box)
+                )
+                chipStrokeWidth = 1.toPx.toFloat()
+                chipStrokeColor = android.content.res.ColorStateList(
+                    arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()), intArrayOf(primary, gray)
+                )
+                setOnCheckedChangeListener { _, on ->
+                    if (on) { if (g.name !in picked) picked.add(g.name) } else picked.remove(g.name)
+                    GenreRows.setChosen(activity, api, picked)
+                    onChanged?.invoke()
+                }
+            })
+        }
+        list.addView(chips)
 
         list.addView(TextView(activity).apply {
             setText(R.string.row_order_reset)
@@ -152,6 +236,8 @@ object RowOrder {
             }
             setOnClickListener {
                 chosen.clear()
+                hide.clear()
+                saveHidden(activity, api, hide)
                 save(activity, api, chosen)
                 draw()
                 onChanged?.invoke()

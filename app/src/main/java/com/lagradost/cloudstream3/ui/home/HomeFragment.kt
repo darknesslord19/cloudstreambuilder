@@ -949,11 +949,18 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
                         val d = data.value
                         // Trakt: "Sana özel" on top, drawn again when the suggestions arrive
                         fun submitRows() {
-                            val rows = d.values.map {
+                            val sourceRows = d.values.map {
                                 it.copy(
                                     list = it.list.copy(list = it.list.list.toMutableList())
                                 )
                             }
+                            // extra categories chosen for this source, made from its own items
+                            val extra = context?.let { ctx ->
+                                com.lagradost.cloudstream3.fork.GenreRows.rows(
+                                    ctx, homeViewModel.apiName.value, sourceRows.flatMap { it.list.list }
+                                )
+                            }.orEmpty().filter { e -> sourceRows.none { it.list.name == e.name } }
+                            val rows = sourceRows + extra.map { HomeViewModel.ExpandableHomepageList(it, 1, false) }
                             // the order chosen for this source (Plus or a long press on a row title)
                             val order = com.lagradost.cloudstream3.fork.RowOrder
                             order.lastApi = homeViewModel.apiName.value
@@ -966,6 +973,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
                         }
                         submitRows()
                         com.lagradost.cloudstream3.fork.RowOrder.onChanged = {
+                            if (isAdded && homeViewModel.page.value === data) submitRows()
+                        }
+                        com.lagradost.cloudstream3.fork.GenreRows.onReady = {
                             if (isAdded && homeViewModel.page.value === data) submitRows()
                         }
                         com.lagradost.cloudstream3.fork.TraktRecs.onReady = {

@@ -203,6 +203,35 @@ object TmdbPosters {
         return withContext(Dispatchers.IO) { request(key, "$kind/$id", mapOf("language" to "tr-TR")) }
     }
 
+    /**
+     * The TMDB genres of an item ("28,12"), kept like the posters. Null without a key or when
+     * TMDB does not know it.
+     */
+    suspend fun genresOf(context: Context, card: SearchResponse): Set<Int>? {
+        val key = key(context) ?: return null
+        val (name, nameYear) = clean(card.name)
+        if (name.isBlank()) return null
+        val year = yearOf(card) ?: nameYear
+        val kind = kindOf(card.type)
+        val cacheKey = "g|" + kind + "|" + name.lowercase() + "|" + (year ?: "")
+        kept(context, cacheKey)?.let { v -> return v.split(',').mapNotNull { it.toIntOrNull() }.toSet().ifEmpty { null } }
+        val found = try {
+            gate.withPermit {
+                val params = hashMapOf("query" to name, "language" to "tr-TR", "include_adult" to "false")
+                val results = request(key, "search/$kind", params)?.optJSONArray("results")
+                val list = (0 until (results?.length() ?: 0)).mapNotNull { results?.optJSONObject(it) }
+                    .filter { kind != "multi" || it.optString("media_type") in setOf("movie", "tv") }
+                val pick = (if (year != null) list.firstOrNull { r -> yearOfResult(r)?.let { kotlin.math.abs(it - year) <= 1 } == true } else null)
+                    ?: list.firstOrNull()
+                pick?.optJSONArray("genre_ids")?.let { a -> (0 until a.length()).map { a.optInt(it) }.toSet() }
+            }
+        } catch (t: Throwable) {
+            null
+        }
+        keep(context, cacheKey, found?.joinToString(",") ?: (NONE + System.currentTimeMillis()))
+        return found
+    }
+
     fun posterOf(path: String?): String? = path?.takeIf { it.isNotBlank() && it != "null" }?.let { POSTER + it }
 
     /** Tries a key, true when TMDB accepts it. */
