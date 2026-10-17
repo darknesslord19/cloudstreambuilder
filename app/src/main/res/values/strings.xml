@@ -999,4 +999,6 @@
     <string name="profile_pick_des">Choose an icon</string>
     <string name="iptv_title">IPTV</string>
     <string name="iptv_des">M3U / M3U8 lists, as sources on the home page</string>
+    <string name="iptv_section">IPTV LISTS</string>
+    <string name="iptv_section_plugins">PLUGINS</string>
 </resources>

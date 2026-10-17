@@ -963,4 +963,6 @@
     <string name="profile_pick_des">Bir ikon seç</string>
     <string name="iptv_title">IPTV</string>
     <string name="iptv_des">M3U / M3U8 listeleri, ana sayfada kaynak olarak</string>
+    <string name="iptv_section">IPTV LİSTELERİ</string>
+    <string name="iptv_section_plugins">EKLENTİLER</string>
 </resources>

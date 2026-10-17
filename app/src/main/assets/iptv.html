@@ -43,11 +43,28 @@ textarea{min-height:78px;resize:vertical;font-family:ui-monospace,monospace;font
 .sw::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--muted);transition:.2s}
 .sw.on{background:var(--accent)}.sw.on::after{left:21px;background:#16101f}
 .empty{font-size:13px;color:var(--muted);padding:6px 2px}
+.view[hidden]{display:none}
+.pl{cursor:pointer}
+.bar{height:6px;border-radius:6px;background:var(--line);overflow:hidden;margin:10px 0 6px}.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .25s}
+.grow{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--line);cursor:pointer}
+.grow:last-child{border-bottom:0}
+.grow .tx{flex:1;min-width:0}.grow b{display:block;font-size:14px}.grow small{font-size:11.5px;color:var(--muted)}
+.eye{background:none;border:0;color:var(--accent);font-size:17px;width:38px;height:32px;border-radius:9px}
+.eye.off{color:var(--muted);opacity:.55}
+.ck{width:22px;height:22px;border-radius:7px;border:2px solid var(--line);display:grid;place-items:center;flex:0 0 22px;font-size:13px;font-weight:900;background:none;color:#16101f}
+.ck.on{background:var(--accent);border-color:var(--accent)}
+.lg{width:38px;height:26px;border-radius:7px;background:var(--field);display:grid;place-items:center;font-size:10px;font-weight:900;color:var(--accent);flex:0 0 38px;overflow:hidden}
+.lg img{max-width:100%;max-height:100%;object-fit:contain}
+.pill{font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:7px;white-space:nowrap}
+.pill.ok{background:rgba(126,224,165,.15);color:var(--ok)}.pill.bad{background:rgba(255,138,138,.15);color:var(--bad)}.pill.wait{background:var(--line);color:var(--muted)}
+.grow.dead b{color:var(--muted)}
+.eye:focus-visible,.ck:focus-visible,.grow:focus-visible,.pl:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
 </style>
 </head>
 <body>
-<div class="hdr"><button class="back" id="back" aria-label="Geri">←</button><h1>IPTV</h1></div>
+<div class="hdr"><button class="back" id="back" aria-label="Geri">←</button><h1 id="title">IPTV</h1></div>
 
+<div class="view" id="vMain">
 <div class="card">
   <h3>Liste ekle</h3>
   <label for="name">Ad (isteğe bağlı)</label>
@@ -72,7 +89,33 @@ textarea{min-height:78px;resize:vertical;font-family:ui-monospace,monospace;font
 
 <div class="card">
   <h3>Eklenen listeler</h3>
+  <div class="hint" style="margin:0 0 4px">Kategorileri düzenlemek ve kanalları test etmek için listeye dokun.</div>
   <div id="lists"></div>
+</div>
+</div>
+
+<div class="view" id="vList" hidden>
+  <div class="card">
+    <h3>Kanal testi</h3>
+    <div class="hint" style="margin:0">Her kanal kısa bir süre denenir; açılmayanlar işaretlenir ve kategorilere girmez.</div>
+    <div class="bar"><i id="pbar"></i></div>
+    <div class="hint" style="margin:0" id="ptext"></div>
+    <div class="btns" style="grid-template-columns:2fr 1fr"><button class="btn p" id="test">Kanalları test et</button><button class="btn" id="reset">Sıfırla</button></div>
+    <div class="grow" style="border:0;cursor:default;margin-top:6px"><div class="tx"><b>Çalışmayanları gizle</b><small>Ana sayfada sadece açılan kanallar</small></div><button class="sw" id="hideDead" aria-label="Çalışmayanları gizle"></button></div>
+  </div>
+  <div class="card">
+    <h3>Kategoriler</h3>
+    <div class="hint" style="margin:0 0 4px">Göz ile göster / gizle, kategoriye dokunarak kanalları seç.</div>
+    <div id="groups"></div>
+  </div>
+</div>
+
+<div class="view" id="vGroup" hidden>
+  <div class="card">
+    <h3 id="gTitle">Kanallar</h3>
+    <div class="hint" style="margin:0 0 4px">Kutucukla kanalı ana sayfaya ekle ya da çıkar.</div>
+    <div id="chans"></div>
+  </div>
 </div>
 
 <script src="theme.js"></script>
@@ -85,6 +128,7 @@ function msg(t, ok) { var m = $('msg'); m.textContent = t; m.className = 'msg ' 
 var token = 0, waiting = {};
 window.onIptvResult = function (t, json) {
   var r = {}; try { r = JSON.parse(json); } catch (e) {}
+  if (testing) { testing = false; $('test').disabled = false; $('ptext').textContent = r.message || ''; $('pbar').style.width = '100%'; drawList(); return; }
   msg(r.message || '', !!r.ok);
   setBusy(false);
   if (r.ok) { $('urls').value = ''; $('name').value = ''; $('paste').value = ''; }
@@ -95,15 +139,18 @@ function draw() {
   var lists = [];
   try { lists = JSON.parse(tv.lists()) || []; } catch (e) {}
   $('lists').innerHTML = lists.length ? lists.map(function (l) {
-    return '<div class="pl"><div class="ic">TV</div><div class="tx"><b>' + esc(l.name) + '</b><small>' + l.count + ' kanal · ' + l.groups + ' grup · ' + esc(l.src) + '</small></div>' +
+    return '<div class="pl" tabindex="0" data-open="' + l.id + '"><div class="ic">TV</div><div class="tx"><b>' + esc(l.name) + '</b><small>' + l.shown + ' / ' + l.count + ' kanal · ' + l.groups + ' grup · ' + esc(l.src) + '</small></div>' +
       '<button class="sw ' + (l.on ? 'on' : '') + '" data-t="' + l.id + '" data-on="' + (l.on ? 1 : 0) + '" aria-label="Aç / kapa"></button>' +
       '<button class="x" data-d="' + l.id + '" aria-label="Sil">✕</button></div>';
   }).join('') : '<div class="empty">Henüz liste yok.</div>';
   Array.prototype.forEach.call(document.querySelectorAll('[data-t]'), function (b) {
-    b.onclick = function () { tv.setOn(b.dataset.t, b.dataset.on !== '1'); setTimeout(draw, 250); };
+    b.onclick = function (e) { e.stopPropagation(); tv.setOn(b.dataset.t, b.dataset.on !== '1'); setTimeout(draw, 250); };
   });
   Array.prototype.forEach.call(document.querySelectorAll('[data-d]'), function (b) {
-    b.onclick = function () { if (confirm('Bu liste silinsin mi?')) { tv.remove(b.dataset.d); setTimeout(draw, 250); } };
+    b.onclick = function (e) { e.stopPropagation(); if (confirm('Bu liste silinsin mi?')) { tv.remove(b.dataset.d); setTimeout(draw, 250); } };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-open]'), function (r) {
+    r.onclick = function () { openList(r.dataset.open); };
   });
 }
 $('add').onclick = function () {
@@ -140,7 +187,67 @@ $('pasteAdd').onclick = function () {
   setBusy(true);
   tv.addText(++token, $('name').value.trim() || 'Yapıştırılan liste', text, 'metin');
 };
-$('back').onclick = function () { try { app.close(); } catch (e) { history.back(); } };
+// ---------- a list: categories and channel test
+var cur = null, curGroup = null, testing = false;
+function show(v) { ['vMain', 'vList', 'vGroup'].forEach(function (x) { $(x).hidden = x !== v; }); window.scrollTo(0, 0); }
+function openList(id) { cur = id; curGroup = null; drawList(); show('vList'); history.pushState({ v: 'vList' }, ''); }
+function drawList() {
+  var d = {}; try { d = JSON.parse(tv.detail(cur)); } catch (e) {}
+  $('title').textContent = d.name || 'IPTV';
+  $('hideDead').classList.toggle('on', !!d.hideDead);
+  if (!testing) {
+    $('pbar').style.width = d.tested ? '100%' : '0';
+    $('ptext').textContent = d.tested ? ((d.total - d.dead) + ' çalışıyor · ' + d.dead + ' çalışmıyor') : ('Henüz test edilmedi · ' + d.total + ' kanal');
+  }
+  $('groups').innerHTML = (d.groups || []).map(function (g, i) {
+    return '<div class="grow" tabindex="0" data-g="' + i + '"><div class="tx"><b>' + esc(g.name) + '</b><small>' + g.shown + ' / ' + g.total + ' kanal görünür' + (d.tested ? ' · ' + g.dead + ' çalışmıyor' : '') + '</small></div>' +
+      '<button class="eye ' + (g.hidden ? 'off' : '') + '" data-e="' + i + '" aria-label="Göster / gizle">' + (g.hidden ? '🚫' : '👁') + '</button></div>';
+  }).join('');
+  Array.prototype.forEach.call(document.querySelectorAll('[data-e]'), function (b) {
+    b.onclick = function (e) { e.stopPropagation(); var g = d.groups[+b.dataset.e]; tv.setGroup(cur, g.name, g.hidden); setTimeout(drawList, 150); };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-g]'), function (r) {
+    r.onclick = function () { curGroup = d.groups[+r.dataset.g].name; drawGroup(); show('vGroup'); history.pushState({ v: 'vGroup' }, ''); };
+  });
+}
+function drawGroup() {
+  var list = []; try { list = JSON.parse(tv.channels(cur, curGroup)); } catch (e) {}
+  var d = {}; try { d = JSON.parse(tv.detail(cur)); } catch (e) {}
+  $('title').textContent = curGroup;
+  $('gTitle').textContent = list.length + ' kanal';
+  $('chans').innerHTML = list.map(function (c) {
+    var st = !d.tested ? '<span class="pill wait">test yok</span>' : (c.dead ? '<span class="pill bad">çalışmıyor</span>' : '<span class="pill ok">çalışıyor</span>');
+    return '<div class="grow ' + (c.dead ? 'dead' : '') + '"><button class="ck ' + (c.on ? 'on' : '') + '" data-c="' + c.i + '" data-on="' + (c.on ? 1 : 0) + '" aria-label="Seç">' + (c.on ? '✓' : '') + '</button>' +
+      '<div class="lg">' + (c.logo ? '<img src="' + esc(c.logo) + '" referrerpolicy="no-referrer" onerror="this.remove()">' : esc(c.name.slice(0, 2).toUpperCase())) + '</div>' +
+      '<div class="tx"><b>' + esc(c.name) + '</b></div>' + st + '</div>';
+  }).join('');
+  Array.prototype.forEach.call(document.querySelectorAll('[data-c]'), function (b) {
+    b.onclick = function () { tv.setChannel(cur, +b.dataset.c, b.dataset.on !== '1'); setTimeout(drawGroup, 120); };
+  });
+}
+window.onIptvProgress = function (done, total) {
+  $('pbar').style.width = Math.round(done / total * 100) + '%';
+  $('ptext').textContent = 'Deneniyor… ' + done + ' / ' + total;
+};
+$('test').onclick = function () {
+  if (testing || !cur) return;
+  testing = true; $('test').disabled = true;
+  $('pbar').style.width = '0'; $('ptext').textContent = 'Deneniyor…';
+  tv.test(++token, cur);
+};
+$('reset').onclick = function () { if (testing) return; tv.resetTest(cur); setTimeout(drawList, 200); };
+$('hideDead').onclick = function () { var on = !$('hideDead').classList.contains('on'); tv.setHideDead(on); setTimeout(drawList, 200); };
+// Back (the button or the phone's back key) goes one page back inside the page
+window.onpopstate = function (e) {
+  var v = e.state && e.state.v;
+  if (v === 'vGroup' && curGroup) { drawGroup(); show('vGroup'); }
+  else if (v === 'vList' && cur) { drawList(); show('vList'); }
+  else { $('title').textContent = 'IPTV'; draw(); show('vMain'); }
+};
+$('back').onclick = function () {
+  if ($('vMain').hidden) { history.back(); return; }
+  try { app.close(); } catch (e) { history.back(); }
+};
 draw();
 </script>
 </body>

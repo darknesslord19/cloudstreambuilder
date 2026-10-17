@@ -388,8 +388,27 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
             val chips = view.findViewById<android.widget.LinearLayout>(R.id.provider_chips)
             val check = view.findViewById<ImageView>(R.id.provider_check)
             val special = api === noneApi || api === randomApi
+            val iptv = com.lagradost.cloudstream3.fork.Iptv.isIptv(api)
 
-            title?.text = if (special || api == null) fallbackName else icons.displayName(api.name)
+            // IPTV lists right under "Random", in cards of their own with a title above the group
+            val section = view.findViewById<TextView>(R.id.provider_section)
+            val prevApi = com.lagradost.cloudstream3.fork.Iptv.pickerApis.getOrNull(position - 1)
+            val sectionTitle = when {
+                iptv && !com.lagradost.cloudstream3.fork.Iptv.isIptv(prevApi) -> getString(R.string.iptv_section)
+                !iptv && !special && api != null && com.lagradost.cloudstream3.fork.Iptv.isIptv(prevApi) -> getString(R.string.iptv_section_plugins)
+                else -> null
+            }
+            section?.text = sectionTitle
+            section?.visibility = if (sectionTitle != null) View.VISIBLE else View.GONE
+            view.findViewById<View>(R.id.provider_card)?.setBackgroundResource(
+                if (iptv) R.drawable.provider_card_iptv else R.drawable.provider_card
+            )
+
+            title?.text = when {
+                special || api == null -> fallbackName
+                iptv -> com.lagradost.cloudstream3.fork.Iptv.shortName(api)
+                else -> icons.displayName(api.name)
+            }
             check?.visibility = if (listView?.isItemChecked(position) == true) View.VISIBLE else View.GONE
 
             com.lagradost.cloudstream3.ui.BaseAdapter.clearImage(icon)
@@ -405,6 +424,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
                     icon?.setImageResource(R.drawable.ic_fork_dice_24)
                     icon?.scaleType = ImageView.ScaleType.CENTER
                 }
+                iptv -> {
+                    icon?.scaleType = ImageView.ScaleType.CENTER_CROP
+                    icon?.setImageResource(R.drawable.fork_iptv_icon)
+                }
                 api != null -> {
                     icon?.scaleType = ImageView.ScaleType.CENTER_CROP
                     letters?.text = icons.letters(api.name)
@@ -419,6 +442,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
                 val labels = ArrayList<String>()
                 getNameNextToFlagEmoji(api.lang)?.let { labels.add(it) }
                 labels.addAll(icons.typeLabels(api))
+                if (iptv) com.lagradost.cloudstream3.fork.Iptv.countLabel(this, api)?.let { labels.add(it) }
                 labels.forEach { label ->
                     chips?.addView(TextView(this).apply {
                         text = label
@@ -540,8 +564,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
                     val pinnedp = DataStoreHelper.pinnedProviders.toList()
                     pinnedphashset = pinnedp.toHashSet()
                     arrayAdapter.clear()
+                    val iptvApis = validAPIs.filter { com.lagradost.cloudstream3.fork.Iptv.isIptv(it) }
+                        .sortedBy { it.name.lowercase() }
                     val sortedApis = validAPIs
                         .filter {
+                            !com.lagradost.cloudstream3.fork.Iptv.isIptv(it) &&
                             it.hasMainPage && (pinnedphashset.contains(it.name) || it.supportedTypes.any(
                                 preSelectedTypes::contains
                             ))
@@ -560,9 +587,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
 
                     currentValidApis = mutableListOf<MainAPI>().apply {
                         addAll(validAPIs.take(2))
+                        addAll(iptvApis)
                         addAll(pinnedApis)
                         addAll(remainingApis)
                     }
+                    com.lagradost.cloudstream3.fork.Iptv.pickerApis = currentValidApis.toList()
 
                     val names = currentValidApis.map {
                         when {

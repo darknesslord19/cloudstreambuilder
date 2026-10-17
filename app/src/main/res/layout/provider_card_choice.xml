@@ -1,14 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- One source in the list of home page sources, as a slim card -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="vertical"
     android:paddingStart="12dp"
     android:paddingTop="4dp"
     android:paddingEnd="12dp"
     android:paddingBottom="4dp">
+
+    <!-- A title above the first source of a group (IPTV lists, plugins) -->
+    <TextView
+        android:id="@+id/provider_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawablePadding="8dp"
+        android:gravity="center_vertical"
+        android:letterSpacing="0.06"
+        android:paddingStart="6dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="6dp"
+        android:textColor="?attr/grayTextColor"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
 
     <LinearLayout
         android:id="@+id/provider_card"
@@ -109,4 +126,4 @@
             app:tint="?attr/primaryBlackBackground"
             tools:visibility="visible" />
     </LinearLayout>
-</FrameLayout>
+</LinearLayout>
