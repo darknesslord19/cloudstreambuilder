@@ -283,6 +283,33 @@ object AssetPage {
         }
 
         webView.webChromeClient = object : WebChromeClient() {
+            // <input type="file"> in a page: the files of the device
+            override fun onShowFileChooser(
+                view: WebView?,
+                filePathCallback: android.webkit.ValueCallback<Array<android.net.Uri>>?,
+                fileChooserParams: FileChooserParams?
+            ): Boolean {
+                val registry = (activity as? androidx.activity.ComponentActivity)?.activityResultRegistry ?: return false
+                filePathCallback ?: return false
+                var launcher: androidx.activity.result.ActivityResultLauncher<String>? = null
+                launcher = registry.register(
+                    "asset_page_files_" + System.nanoTime(),
+                    androidx.activity.result.contract.ActivityResultContracts.GetMultipleContents()
+                ) { uris ->
+                    filePathCallback.onReceiveValue(uris?.toTypedArray() ?: emptyArray())
+                    launcher?.unregister()
+                }
+                return try {
+                    launcher.launch("*/*")
+                    true
+                } catch (t: Throwable) {
+                    logError(t)
+                    filePathCallback.onReceiveValue(null)
+                    launcher.unregister()
+                    true
+                }
+            }
+
             // window.close() in the page closes the page
             override fun onCloseWindow(window: WebView?) {
                 if (cancelable) dialog.dismiss()

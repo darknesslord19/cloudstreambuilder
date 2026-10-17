@@ -997,4 +997,6 @@
     <string name="plus_looks_des">Themes, moving posters, font, app icon</string>
     <string name="profile_pick">Profile picture</string>
     <string name="profile_pick_des">Choose an icon</string>
+    <string name="iptv_title">IPTV</string>
+    <string name="iptv_des">M3U / M3U8 lists, as sources on the home page</string>
 </resources>

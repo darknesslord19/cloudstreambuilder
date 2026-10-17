@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>IPTV</title>
+<!--
+  IPTV lists of the app (Plus > IPTV). The app does the work:
+  Iptv.lists(), Iptv.add(token, name, urls), Iptv.addText(token, name, text, src),
+  Iptv.setOn(id, on), Iptv.remove(id); answers come to window.onIptvResult(token, json).
+-->
+<style>
+:root{--bg:#0f0d12;--ink:#f3eef6;--card:#1c1920;--field:#262229;--line:rgba(255,255,255,.1);--muted:#a49cab;--accent:#cdb0ff;--accent-2:#e4d6ff;--ok:#7ee0a5;--bad:#ff8a8a}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{padding:10px 0 40px}
+.hdr{display:flex;align-items:center;gap:12px;padding:8px 16px 12px}
+.hdr h1{font-size:24px;font-weight:750;flex:1}
+.back{background:none;border:0;color:var(--accent);font-size:24px;line-height:1;padding:4px 8px;border-radius:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;margin:0 14px 12px;padding:14px}
+.card h3{font-size:15.5px;margin-bottom:6px}
+label{display:block;font-size:12px;color:var(--muted);margin:10px 0 5px}
+input,textarea{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:12px;color:var(--ink);padding:11px 12px;font-size:14px;font-family:inherit;outline:none}
+input:focus,textarea:focus{border-color:var(--accent)}
+textarea{min-height:78px;resize:vertical;font-family:ui-monospace,monospace;font-size:12.5px}
+.btns{display:flex;gap:7px;margin-top:12px;overflow-x:auto;scrollbar-width:none}
+.btns::-webkit-scrollbar{display:none}
+.btn{flex:1 0 auto;border:1px solid var(--line);background:var(--field);color:var(--ink);border-radius:12px;padding:10px 11px;font-weight:800;font-size:12.5px;white-space:nowrap;font-family:inherit}
+.btn.p{background:var(--accent);border-color:var(--accent);color:#16101f}
+.btn:disabled{opacity:.5}
+.btn:focus-visible,.back:focus-visible,.sw:focus-visible,.x:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.msg{font-size:12.5px;margin-top:10px;line-height:1.45;white-space:pre-line}
+.msg.ok{color:var(--ok)}.msg.bad{color:var(--bad)}
+.hint{font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.45}
+.pl{display:flex;align-items:center;gap:12px;background:var(--field);border:1px solid var(--line);border-radius:16px;padding:11px 12px;margin-top:8px}
+.pl .ic{width:40px;height:40px;border-radius:12px;background:linear-gradient(145deg,var(--accent-2),var(--accent));display:grid;place-items:center;font-weight:900;font-size:13px;color:#16101f;flex:0 0 40px}
+.pl .tx{flex:1;min-width:0}
+.pl b{display:block;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl small{display:block;font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.x{background:none;border:0;color:var(--muted);font-size:18px;padding:6px 8px;border-radius:10px}
+.sw{width:42px;height:24px;border-radius:24px;background:var(--line);position:relative;flex:0 0 42px;border:0}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--muted);transition:.2s}
+.sw.on{background:var(--accent)}.sw.on::after{left:21px;background:#16101f}
+.empty{font-size:13px;color:var(--muted);padding:6px 2px}
+</style>
+</head>
+<body>
+<div class="hdr"><button class="back" id="back" aria-label="Geri">←</button><h1>IPTV</h1></div>
+
+<div class="card">
+  <h3>Liste ekle</h3>
+  <label for="name">Ad (isteğe bağlı)</label>
+  <input id="name" placeholder="Örn. Ulusal Kanallar">
+  <label for="urls">Link(ler) · her satıra bir tane</label>
+  <textarea id="urls" placeholder="https://.../liste.m3u&#10;https://bit.ly/kisalink&#10;https://.../kanal.m3u8"></textarea>
+  <div class="btns">
+    <button class="btn p" id="add">Ekle</button>
+    <button class="btn" id="sample">Örnek liste</button>
+    <button class="btn" id="fileBtn">Dosyadan</button>
+    <button class="btn" id="pasteBtn">Metin yapıştır</button>
+  </div>
+  <input type="file" id="file" accept=".m3u,.m3u8,.txt,audio/x-mpegurl,application/x-mpegurl,application/vnd.apple.mpegurl,text/plain,*/*" multiple hidden>
+  <div id="pasteBox" hidden>
+    <label for="paste">M3U içeriği</label>
+    <textarea id="paste" placeholder="#EXTM3U&#10;#EXTINF:-1 tvg-logo=&quot;...&quot; group-title=&quot;Haber&quot;,Kanal Adı&#10;https://.../index.m3u8"></textarea>
+    <div class="btns"><button class="btn p" id="pasteAdd">Metni ekle</button></div>
+  </div>
+  <div class="msg" id="msg"></div>
+  <div class="hint">Tek kanal linki (.m3u8) de eklenebilir. Kısaltılmış linkler takip edilir. Eklenen her liste ana sayfadaki kaynak seçicide "IPTV · ad" olarak çıkar; satırlar listedeki gruplardır.</div>
+</div>
+
+<div class="card">
+  <h3>Eklenen listeler</h3>
+  <div id="lists"></div>
+</div>
+
+<script src="theme.js"></script>
+<script>
+var app = window.CloudStream, tv = window.Iptv;
+try { if (window.applyTheme && app && app.theme) applyTheme(app); } catch (e) {}
+function $(id) { return document.getElementById(id); }
+function esc(s) { return String(s || '').replace(/[&<>"]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function msg(t, ok) { var m = $('msg'); m.textContent = t; m.className = 'msg ' + (ok ? 'ok' : 'bad'); }
+var token = 0, waiting = {};
+window.onIptvResult = function (t, json) {
+  var r = {}; try { r = JSON.parse(json); } catch (e) {}
+  msg(r.message || '', !!r.ok);
+  setBusy(false);
+  if (r.ok) { $('urls').value = ''; $('name').value = ''; $('paste').value = ''; }
+  draw();
+};
+function setBusy(b) { ['add', 'sample', 'fileBtn', 'pasteAdd'].forEach(function (id) { $(id).disabled = b; }); }
+function draw() {
+  var lists = [];
+  try { lists = JSON.parse(tv.lists()) || []; } catch (e) {}
+  $('lists').innerHTML = lists.length ? lists.map(function (l) {
+    return '<div class="pl"><div class="ic">TV</div><div class="tx"><b>' + esc(l.name) + '</b><small>' + l.count + ' kanal · ' + l.groups + ' grup · ' + esc(l.src) + '</small></div>' +
+      '<button class="sw ' + (l.on ? 'on' : '') + '" data-t="' + l.id + '" data-on="' + (l.on ? 1 : 0) + '" aria-label="Aç / kapa"></button>' +
+      '<button class="x" data-d="' + l.id + '" aria-label="Sil">✕</button></div>';
+  }).join('') : '<div class="empty">Henüz liste yok.</div>';
+  Array.prototype.forEach.call(document.querySelectorAll('[data-t]'), function (b) {
+    b.onclick = function () { tv.setOn(b.dataset.t, b.dataset.on !== '1'); setTimeout(draw, 250); };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-d]'), function (b) {
+    b.onclick = function () { if (confirm('Bu liste silinsin mi?')) { tv.remove(b.dataset.d); setTimeout(draw, 250); } };
+  });
+}
+$('add').onclick = function () {
+  var urls = $('urls').value.trim();
+  if (!/https?:\/\//i.test(urls)) { msg('Geçerli bir link yaz (http:// ya da https:// ile başlamalı)', false); return; }
+  setBusy(true); msg('Yükleniyor…', true);
+  tv.add(++token, $('name').value.trim(), urls);
+};
+$('sample').onclick = function () {
+  $('urls').value = 'https://iptv-org.github.io/iptv/countries/tr.m3u';
+  if (!$('name').value.trim()) $('name').value = 'Örnek · Türkiye';
+  $('add').click();
+};
+$('fileBtn').onclick = function () { $('file').click(); };
+$('file').onchange = function (e) {
+  var files = Array.prototype.slice.call(e.target.files || []);
+  if (!files.length) return;
+  setBusy(true); msg('Okunuyor…', true);
+  files.forEach(function (f) {
+    var reader = new FileReader();
+    reader.onload = function () {
+      var nm = $('name').value.trim() || (f.name || 'Liste').replace(/\.(m3u8?|txt)$/i, '');
+      tv.addText(++token, nm, String(reader.result || ''), 'dosya');
+    };
+    reader.onerror = function () { msg('Dosya okunamadı', false); setBusy(false); };
+    reader.readAsText(f);
+  });
+  e.target.value = '';
+};
+$('pasteBtn').onclick = function () { $('pasteBox').hidden = !$('pasteBox').hidden; if (!$('pasteBox').hidden) $('paste').focus(); };
+$('pasteAdd').onclick = function () {
+  var text = $('paste').value;
+  if (!/#EXTINF|https?:\/\//i.test(text)) { msg('Metinde kanal bulunamadı', false); return; }
+  setBusy(true);
+  tv.addText(++token, $('name').value.trim() || 'Yapıştırılan liste', text, 'metin');
+};
+$('back').onclick = function () { try { app.close(); } catch (e) { history.back(); } };
+draw();
+</script>
+</body>
+</html>

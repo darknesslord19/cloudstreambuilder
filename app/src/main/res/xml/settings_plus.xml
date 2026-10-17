@@ -15,6 +15,12 @@
         android:title="@string/plus_looks" />
 
     <Preference
+        android:icon="@drawable/ic_fork_tv_24"
+        android:key="fork_plus_iptv"
+        android:summary="@string/iptv_des"
+        android:title="@string/iptv_title" />
+
+    <Preference
         android:icon="@drawable/home_alt"
         android:key="fork_plus_sheet_home"
         android:summary="@string/plus_home_des"

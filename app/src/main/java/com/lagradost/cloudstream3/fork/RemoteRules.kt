@@ -134,6 +134,7 @@ object RemoteRules {
         TMDB_POSTERS("tmdb_posters"),
         THEME_PACK("theme_pack"),
         PROFILE_ICONS("profile_icons"),
+        IPTV("iptv"),
     }
 
     /**

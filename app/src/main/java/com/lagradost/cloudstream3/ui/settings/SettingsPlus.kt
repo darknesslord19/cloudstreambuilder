@@ -52,6 +52,11 @@ class SettingsPlus : BasePreferenceFragmentCompat() {
         findPreference<Preference>("fork_plus_sheet_tmdb")?.isVisible = TmdbPosters.available(context)
         findPreference<Preference>("fork_plus_sheet_themes")?.isVisible =
             com.lagradost.cloudstream3.fork.ThemePack.available(context)
+        findPreference<Preference>("fork_plus_iptv")?.isVisible = com.lagradost.cloudstream3.fork.Iptv.available(context)
+        findPreference<Preference>("fork_plus_iptv")?.setOnPreferenceClickListener {
+            activity?.let { com.lagradost.cloudstream3.fork.Iptv.show(it) }
+            true
+        }
         findPreference<Preference>("fork_plus_sheet_looks")?.setOnPreferenceClickListener {
             activity?.let { showLooks(it) }
             true

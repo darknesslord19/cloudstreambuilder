@@ -961,4 +961,6 @@
     <string name="plus_looks_des">Temalar, hareketli afişler, yazı tipi, uygulama ikonu</string>
     <string name="profile_pick">Profil resmi</string>
     <string name="profile_pick_des">Bir ikon seç</string>
+    <string name="iptv_title">IPTV</string>
+    <string name="iptv_des">M3U / M3U8 listeleri, ana sayfada kaynak olarak</string>
 </resources>

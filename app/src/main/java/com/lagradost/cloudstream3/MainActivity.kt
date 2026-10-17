@@ -2022,6 +2022,8 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
         AccessGate.onAppStart(this)
         Announcements.check(this)
 
+        // IPTV lists become sources of the home page
+        com.lagradost.cloudstream3.fork.Iptv.init(this)
         // What is switched on in this build: the icon follows at once, the add-on kinds as
         // soon as the switches are read, themes and fonts at the next start
         Looks.syncIcon(this)
