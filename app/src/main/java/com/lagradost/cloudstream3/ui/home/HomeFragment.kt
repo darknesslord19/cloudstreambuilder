@@ -391,6 +391,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
             val groups = com.lagradost.cloudstream3.fork.SourceGroups
             val iptv = com.lagradost.cloudstream3.fork.Iptv.isIptv(api)
             val nuvio = !special && groups.isNuvio(api)
+            val fromFile = !special && groups.isFilePlugin(api)
+            val scraper = !special && groups.isScraper(api)
 
             // Nuvio and the IPTV lists right under "Random", in cards of their own with a title above each group
             val section = view.findViewById<TextView>(R.id.provider_section)
@@ -400,6 +402,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
             val sectionTitle = if (group != 0 && group != prevGroup && (group != groups.PLUGINS || prevGroup != 0)) when (group) {
                 groups.NUVIO -> getString(R.string.nuvio_section)
                 groups.IPTV -> getString(R.string.iptv_section)
+                groups.FILES -> getString(R.string.fp_section)
                 else -> getString(R.string.iptv_section_plugins)
             } else null
             section?.text = sectionTitle
@@ -408,6 +411,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
                 when {
                     iptv -> R.drawable.provider_card_iptv
                     nuvio -> R.drawable.provider_card_nuvio
+                    fromFile -> R.drawable.provider_card_files
                     else -> R.drawable.provider_card
                 }
             )
@@ -439,6 +443,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
                 nuvio -> {
                     icon?.scaleType = ImageView.ScaleType.CENTER_CROP
                     icon?.setImageResource(R.drawable.fork_nuvio_icon)
+                }
+                fromFile -> {
+                    icon?.scaleType = ImageView.ScaleType.CENTER_CROP
+                    icon?.setImageResource(R.drawable.fork_cs3_icon)
+                }
+                scraper -> {
+                    icon?.scaleType = ImageView.ScaleType.CENTER_CROP
+                    icon?.setImageResource(R.drawable.fork_scraper_icon)
                 }
                 api != null -> {
                     icon?.scaleType = ImageView.ScaleType.CENTER_CROP
@@ -580,9 +592,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
                         .sortedBy { it.name.lowercase() }
                     val iptvApis = validAPIs.filter { com.lagradost.cloudstream3.fork.Iptv.isIptv(it) }
                         .sortedBy { it.name.lowercase() }
+                    // plugins picked from files stay right under the IPTV lists
+                    val fileApis = validAPIs.drop(2).filter { it.hasMainPage && com.lagradost.cloudstream3.fork.SourceGroups.isFilePlugin(it) }
+                        .sortedBy { it.name.lowercase() }
                     val sortedApis = validAPIs
                         .filter {
-                            !com.lagradost.cloudstream3.fork.Iptv.isIptv(it) && it !in nuvioApis &&
+                            !com.lagradost.cloudstream3.fork.Iptv.isIptv(it) && it !in nuvioApis && it !in fileApis &&
                             it.hasMainPage && (pinnedphashset.contains(it.name) || it.supportedTypes.any(
                                 preSelectedTypes::contains
                             ))
@@ -603,6 +618,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
                         addAll(validAPIs.take(2))
                         addAll(nuvioApis)
                         addAll(iptvApis)
+                        addAll(fileApis)
                         addAll(pinnedApis)
                         addAll(remainingApis)
                     }

@@ -10,7 +10,14 @@ import com.lagradost.cloudstream3.addons.AddonManager
 object SourceGroups {
     const val NUVIO = 1
     const val IPTV = 2
-    const val PLUGINS = 3
+    const val FILES = 3
+    const val PLUGINS = 4
+
+    /** A plugin picked from the phone's files (Plus > Dosyadan eklentiler). */
+    fun isFilePlugin(api: MainAPI?): Boolean = api?.sourcePlugin?.contains("/fork_file_plugins/") == true
+
+    /** A source made by Plus > Site Kazıyıcı. */
+    fun isScraper(api: MainAPI?): Boolean = com.lagradost.cloudstream3.fork.scraper.Scrapers.isScraper(api?.sourcePlugin)
 
     fun isNuvio(api: MainAPI?): Boolean {
         val tag = api?.sourcePlugin ?: return false
@@ -25,6 +32,7 @@ object SourceGroups {
         api == null -> 0
         isNuvio(api) -> NUVIO
         Iptv.isIptv(api) -> IPTV
+        isFilePlugin(api) -> FILES
         else -> PLUGINS
     }
 }
