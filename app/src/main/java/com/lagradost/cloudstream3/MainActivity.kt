@@ -646,6 +646,12 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
         }
     }
 
+    // Plus > Reklam engelleme: windows right after a touch were asked for
+    override fun onUserInteraction() {
+        super.onUserInteraction()
+        com.lagradost.cloudstream3.fork.AdBlock.touched()
+    }
+
     override fun onResume() {
         super.onResume()
         // The theme reached the screen, and the glow of its corners

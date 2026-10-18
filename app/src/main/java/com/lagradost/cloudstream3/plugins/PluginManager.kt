@@ -687,6 +687,15 @@ object PluginManager {
         }
     }
 
+    /** Plus > Reklam engelleme: the plugin a class (of a dialog, a listener) comes from, by its name. */
+    fun forkPluginNameOf(loader: ClassLoader?): String? {
+        loader ?: return null
+        val plugin = synchronized(classLoaders) { classLoaders.entries.firstOrNull { it.key === loader }?.value } ?: return null
+        val path = plugin.filename ?: return null
+        val data = (getPluginsOnline() + getPluginsLocal()).firstOrNull { it.filePath == path }
+        return data?.internalName?.substringBefore(".cs3")?.ifBlank { null } ?: File(path).nameWithoutExtension
+    }
+
     /** Why the last plugin could not be loaded (Plus > Dosyadan eklentiler shows it). */
     @Volatile
     var forkLastLoadError: String? = null

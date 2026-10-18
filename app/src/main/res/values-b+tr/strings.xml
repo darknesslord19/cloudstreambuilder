@@ -1002,10 +1002,10 @@
     <string name="adblock_title">Reklam engelleme</string>
     <string name="adblock_des">Eklentilerin açılış duyurularını kapatır</string>
     <string name="adblock_main">Eklenti duyurularını engelle</string>
-    <string name="adblock_main_des">Telegram, bağış ve benzeri pencereler</string>
+    <string name="adblock_main_des">Telegram, bağış, \"destek ol\" ve benzeri pencereler. Uygulamanın kendi pencerelerine dokunmaz.</string>
     <string name="adblock_mode">Neyi engellesin</string>
-    <string name="adblock_mode_ads">Reklam içerenler</string>
-    <string name="adblock_mode_all">Eklentilerin tüm pencereleri</string>
+    <string name="adblock_mode_ads">Duyuru ve bağış pencereleri</string>
+    <string name="adblock_mode_all">Eklentilerin kendiliğinden açtığı tüm pencereler</string>
     <string name="adblock_note">Engellenince kısa bilgi göster</string>
     <string name="adblock_recent">Son engellenenler</string>
     <string name="adblock_none">Henüz engellenen yok</string>
@@ -1013,6 +1013,13 @@
     <string name="adblock_allowed">izin verildi · dokun: engelle</string>
     <string name="adblock_blocked" formatted="true">%s duyurusu engellendi</string>
     <string name="adblock_plugin">Eklenti</string>
+    <string name="adblock_note_des">Hangi eklentinin penceresi kapatıldıysa kısa bir bilgi çıkar</string>
+    <string name="adblock_none_des">Bir eklenti duyuru açtığında burada adıyla görünür</string>
+    <string name="adblock_state_blocked">Engelleniyor</string>
+    <string name="adblock_state_allowed">İzin verildi</string>
+    <string name="adblock_tap_allow">Dokun: bu eklentinin pencerelerine izin ver</string>
+    <string name="adblock_tap_block">Dokun: tekrar engelle</string>
+    <string name="adblock_clear">Listeyi temizle</string>
     <string name="key_saved_unchecked" formatted="true">Kaydedildi ama Trakt doğrulamadı (%s). Anahtarı kontrol et.</string>
     <string name="nuvio_section">NUVIO</string>
     <string name="row_order_title">Satır sırası</string>

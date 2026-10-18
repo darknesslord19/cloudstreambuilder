@@ -165,23 +165,30 @@ class SettingsPlus : BasePreferenceFragmentCompat() {
                 listOf(getString(R.string.adblock_mode_ads), getString(R.string.adblock_mode_all)),
                 listOf(ab.MODE_ADS, ab.MODE_ALL), ab.MODE_ADS, dependsOn = ab.PREF_ON
             ),
-            PlusSheet.Item.Switch(ab.PREF_NOTE, getString(R.string.adblock_note), null, dependsOn = ab.PREF_ON),
+            PlusSheet.Item.Switch(ab.PREF_NOTE, getString(R.string.adblock_note), getString(R.string.adblock_note_des), default = true, dependsOn = ab.PREF_ON),
             PlusSheet.Item.Header(getString(R.string.adblock_recent)),
         )
         val log = ab.log(activity)
-        if (log.isEmpty()) items.add(PlusSheet.Item.Info(getString(R.string.adblock_none), null))
+        if (log.isEmpty()) items.add(PlusSheet.Item.Info(getString(R.string.adblock_none), getString(R.string.adblock_none_des)))
         val allowed = ab.allowed(activity)
         val fmt = java.text.SimpleDateFormat("d MMM HH:mm", java.util.Locale.getDefault())
-        log.take(10).forEach { e ->
+        log.take(15).forEach { e ->
             val isAllowed = e.name in allowed
+            val state = getString(if (isAllowed) R.string.adblock_state_allowed else R.string.adblock_state_blocked)
             items.add(PlusSheet.Item.Action(
-                e.name,
-                "${fmt.format(java.util.Date(e.last))} · ${e.count}× · " + getString(if (isAllowed) R.string.adblock_allowed else R.string.adblock_allow)
+                if (e.title.isNotBlank()) "${e.name} · ${e.title}" else e.name,
+                "$state · ${e.count}× · son ${fmt.format(java.util.Date(e.last))}\n" +
+                    getString(if (isAllowed) R.string.adblock_tap_block else R.string.adblock_tap_allow),
+                if (isAllowed) R.drawable.ic_baseline_remove_red_eye_24 else R.drawable.ic_baseline_visibility_off_24
             ) {
                 ab.setAllowed(activity, e.name, !isAllowed)
                 showAdBlock(activity)
             })
         }
+        if (log.isNotEmpty()) items.add(PlusSheet.Item.Action(getString(R.string.adblock_clear), null) {
+            ab.clearLog(activity)
+            showAdBlock(activity)
+        })
         PlusSheet.show(activity, getString(R.string.adblock_title), getString(R.string.adblock_des), items)
     }
 
