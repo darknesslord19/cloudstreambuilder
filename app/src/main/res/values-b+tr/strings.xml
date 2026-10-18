@@ -967,7 +967,10 @@
     <string name="fp_title">Dosyadan eklentiler</string>
     <string name="fp_des">Telefondaki .cs3 dosyalarını yükle, isim ver, aç kapat ya da sil</string>
     <string name="vpn_title">VPN</string>
-    <string name="vpn_des">Sadece CloudStream için: WARP ya da kendi sunucun, engelli siteleri açar</string>
+    <string name="vpn_des">Sunucusuz DPI aşma, WARP ya da kendi sunucun; engelli siteleri açar</string>
+    <string name="vpn_device_note_title">Telefon geneli VPN</string>
+    <string name="vpn_device_note_text">%1$s · diğer uygulamalar da bundan geçiyor</string>
+    <string name="vpn_device_note_stop">Kapat</string>
     <string name="domains_title">Domain</string>
     <string name="domains_des">Site taşınınca: domaini ya da sadece uzantısını değiştir</string>
     <string name="domains_local">Yerel</string>

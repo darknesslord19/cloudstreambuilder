@@ -44,6 +44,7 @@ import javax.net.ssl.SSLException
 object Vpn {
     private const val TAG = "ForkVpn"
     private const val PREFS = "fork_vpn"
+    const val MODE_DPI = "dpi"
     const val MODE_WARP = "warp"
     const val MODE_OWN = "own"
     const val MODE_ADMIN = "admin"
@@ -59,6 +60,20 @@ object Vpn {
 
     @Volatile
     private var port = 0
+
+    /** DPI aşma: the port that goes through WARP for the sites ByeDPI cannot open (0: none) */
+    @Volatile
+    private var warpPort = 0
+
+    /** the SOCKS port the phone-wide VPN uses (0: none) */
+    @Volatile
+    private var socksPort = 0
+
+    @Volatile
+    private var modeNow = MODE_WARP
+
+    /** DPI aşma: the sites that did not open through ByeDPI and go through WARP */
+    private val warpHosts: MutableSet<String> = ConcurrentHashMap.newKeySet()
 
     @Volatile
     var since = 0L
@@ -98,7 +113,18 @@ object Vpn {
 
     // ---------------------------------------------------------------- settings
 
-    fun mode(context: Context): String = store(context).getString("mode", MODE_WARP) ?: MODE_WARP
+    fun mode(context: Context): String {
+        val dpi = Dpi.available(context)
+        val m = store(context).getString("mode", null) ?: if (dpi) MODE_DPI else MODE_WARP
+        return if (m == MODE_DPI && !dpi) MODE_WARP else m
+    }
+
+    fun modeName(context: Context): String = when (if (running) modeNow else mode(context)) {
+        MODE_DPI -> "DPI aşma"
+        MODE_OWN -> "Kendi sunucum"
+        MODE_ADMIN -> "Admin sunucusu"
+        else -> "WARP"
+    }
     fun scopeOf(context: Context): String = store(context).getString("scope", SCOPE_SMART) ?: SCOPE_SMART
     fun flag(context: Context, key: String, default: Boolean) = store(context).getBoolean(key, default)
 
@@ -343,21 +369,43 @@ object Vpn {
         if (!available(ctx)) return "VPN kapalı (admin)"
         if (!Core.supported(ctx)) return "Bu cihaz VPN çekirdeğini desteklemiyor"
         readSettings(ctx)
+        val mode = mode(ctx)
         return try {
-            val out = outbound(ctx)
             val p = freePort()
-            Core.start(ctx, VpnConfig.full(out, p), p)
+            val sp = if (deviceAvailable(ctx)) freePort() else 0
+            var wp = 0
+            if (mode == MODE_DPI) {
+                if (!Dpi.supported(ctx)) throw IllegalStateException("Bu cihaz DPI aşmayı desteklemiyor")
+                val dp = freePort()
+                Dpi.start(ctx, Dpi.current(ctx).first, dp)
+                val warp = if (flag(ctx, "dpi_warp", true)) try {
+                    Warp.outbound(ctx)
+                } catch (t: Throwable) {
+                    Log.w(TAG, "warp for the fallback", t)
+                    null
+                } else null
+                if (warp != null) wp = freePort()
+                Core.start(ctx, VpnConfig.dpi(p, sp, dp, Dpi.dnsUrl(ctx), warp, wp), p)
+            } else {
+                Core.start(ctx, VpnConfig.full(outbound(ctx), p, sp), p)
+            }
             port = p
+            warpPort = wp
+            socksPort = sp
+            modeNow = mode
+            warpHosts.clear()
             running = true
             since = System.currentTimeMillis()
             bytesAtStart = appBytes()
             lastError = null
             dropConnections()
+            if (deviceOn(ctx)) startDevice(ctx)
             onState?.invoke()
             null
         } catch (t: Throwable) {
             Log.w(TAG, "start", t)
             Core.stop()
+            Dpi.stop()
             running = false
             (t.message ?: t.javaClass.simpleName).also { lastError = it }
         }
@@ -367,9 +415,51 @@ object Vpn {
     fun stop() {
         if (!running) return
         running = false
+        appContext?.let { ForkVpnService.stop(it) }
         Core.stop()
+        Dpi.stop()
+        warpPort = 0
+        socksPort = 0
         dropConnections()
         onState?.invoke()
+    }
+
+    // ---------------------------------------------------------------- the whole phone
+
+    fun deviceAvailable(context: Context?): Boolean = available(context) && ForkFeatures.isOn(Feature.VPN_DEVICE, context)
+    fun deviceOn(context: Context): Boolean = deviceAvailable(context) && flag(context, "device", false)
+    fun deviceActive(): Boolean = ForkVpnService.active
+
+    /** Android asks once whether the app may make a VPN; null when it may. */
+    fun devicePermission(context: Context): android.content.Intent? = try {
+        android.net.VpnService.prepare(context)
+    } catch (t: Throwable) {
+        null
+    }
+
+    fun startDevice(context: Context) {
+        if (!running || socksPort <= 0) return
+        if (devicePermission(context) != null) {
+            lastError = "Telefon geneli için VPN izni gerekli"
+            return
+        }
+        ForkVpnService.start(context.applicationContext, socksPort)
+    }
+
+    fun stopDevice(context: Context) = ForkVpnService.stop(context.applicationContext)
+
+    /** The VPN of the phone was taken over (another VPN app, or turned off in the settings). */
+    fun deviceRevoked(context: Context) {
+        set(context, "device", false)
+        onState?.invoke()
+    }
+
+    fun deviceAppsMode(context: Context): String = store(context).getString("dev_apps_mode", "all") ?: "all"
+    fun deviceApps(context: Context): Set<String> = store(context).getStringSet("dev_apps", emptySet()) ?: emptySet()
+
+    fun setDeviceApps(context: Context, mode: String, apps: Set<String>) {
+        store(context).edit().putString("dev_apps_mode", mode).putStringSet("dev_apps", apps).apply()
+        if (ForkVpnService.active) startDevice(context)
     }
 
     fun restart(context: Context): String? {
@@ -392,6 +482,7 @@ object Vpn {
         readSettings(ctx)
         if (available(ctx) && flag(ctx, "auto", false)) scope.launch { start(ctx) }
         if (!available(ctx) && running) stop()
+        if (running && !deviceAvailable(ctx) && ForkVpnService.active) stopDevice(ctx)
     }
 
     // ---------------------------------------------------------------- which requests go through
@@ -415,9 +506,15 @@ object Vpn {
 
     private fun isLocal(host: String) = host == "127.0.0.1" || host == "localhost" || host == "::1"
 
-    private fun proxies(): List<Proxy> {
-        val socks = Proxy(Proxy.Type.HTTP, InetSocketAddress("127.0.0.1", port))
-        return if (failOpen) listOf(socks, Proxy.NO_PROXY) else listOf(socks)
+    private fun proxies(host: String): List<Proxy> {
+        val p = if (warpPort > 0 && inSet(host, warpHosts)) warpPort else port
+        val proxy = Proxy(Proxy.Type.HTTP, InetSocketAddress("127.0.0.1", p))
+        return if (failOpen) listOf(proxy, Proxy.NO_PROXY) else listOf(proxy)
+    }
+
+    private fun inSet(host: String, set: Set<String>): Boolean {
+        val h = bare(host)
+        return set.any { h == it || h.endsWith(".$it") }
     }
 
     private fun tunnels(host: String?, player: Boolean): Boolean {
@@ -431,7 +528,7 @@ object Vpn {
 
     private class Selector(val player: Boolean) : ProxySelector() {
         override fun select(uri: URI?): List<Proxy> =
-            if (tunnels(uri?.host, player)) proxies() else listOf(Proxy.NO_PROXY)
+            if (tunnels(uri?.host, player)) proxies(uri!!.host) else listOf(Proxy.NO_PROXY)
 
         override fun connectFailed(uri: URI?, sa: SocketAddress?, ioe: IOException?) {}
     }
@@ -482,7 +579,13 @@ object Vpn {
         val ctx = appContext ?: return false
         val host = request.url.host
         if (isLocal(host) || !looksBlocked(e) || !available(ctx)) return false
-        if (running && tunnels(host, false)) return false // it already went through the tunnel
+        if (running && tunnels(host, false)) {
+            // DPI aşma could not open it: once more through WARP
+            if (modeNow != MODE_DPI || warpPort <= 0 || inSet(host, warpHosts)) return false
+            warpHosts.add(bare(host))
+            Log.i(TAG, "through WARP now: $host")
+            return true
+        }
         if (!running) {
             if (!autoOpen || !Core.supported(ctx)) return false
             if (start(ctx) != null) return false

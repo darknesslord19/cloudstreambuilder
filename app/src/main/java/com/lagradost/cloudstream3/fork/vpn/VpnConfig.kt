@@ -246,17 +246,63 @@ object VpnConfig {
 
     // ---------------------------------------------------------------- the whole config
 
-    fun full(outbound: JSONObject, port: Int): String {
+    private fun dnsOf(server: String) = JSONObject()
+        .put("servers", JSONArray().put(server).put(if (server.contains("8.8.8.8")) "https+local://1.1.1.1/dns-query" else "https+local://8.8.8.8/dns-query"))
+        .put("queryStrategy", "UseIPv4")
+
+    private fun httpIn(tag: String, port: Int) = JSONObject()
+        .put("tag", tag).put("listen", "127.0.0.1").put("port", port).put("protocol", "http").put("settings", JSONObject())
+
+    /** The port the phone-wide VPN (hev-socks5-tunnel) sends the other apps' packets to. */
+    private fun socksIn(port: Int) = JSONObject()
+        .put("tag", "dev").put("listen", "127.0.0.1").put("port", port).put("protocol", "socks")
+        .put("settings", JSONObject().put("auth", "noauth").put("udp", true))
+        .put("sniffing", JSONObject().put("enabled", true).put("destOverride", JSONArray().put("http").put("tls")))
+
+    private fun dnsRule() = JSONObject().put("type", "field").put("inboundTag", JSONArray().put("dev")).put("port", "53").put("outboundTag", "dns-out")
+
+    fun full(outbound: JSONObject, port: Int, socksPort: Int = 0): String {
         val out = JSONObject(outbound.toString()).put("tag", "proxy")
+        val inbounds = JSONArray().put(httpIn("in", port))
+        if (socksPort > 0) inbounds.put(socksIn(socksPort))
         return JSONObject()
             .put("log", JSONObject().put("loglevel", "warning"))
-            .put("dns", JSONObject()
-                .put("servers", JSONArray().put("https+local://1.1.1.1/dns-query").put("https+local://8.8.8.8/dns-query"))
-                .put("queryStrategy", "UseIPv4"))
-            .put("inbounds", JSONArray().put(JSONObject()
-                .put("tag", "in").put("listen", "127.0.0.1").put("port", port).put("protocol", "http")
-                .put("settings", JSONObject())))
-            .put("outbounds", JSONArray().put(out).put(JSONObject().put("tag", "direct").put("protocol", "freedom")))
+            .put("dns", dnsOf("https+local://1.1.1.1/dns-query"))
+            .put("inbounds", inbounds)
+            .put("outbounds", JSONArray().put(out).put(JSONObject().put("tag", "direct").put("protocol", "freedom"))
+                .put(JSONObject().put("tag", "dns-out").put("protocol", "dns")))
+            .put("routing", JSONObject().put("rules", JSONArray().put(dnsRule())))
+            .toString()
+    }
+
+    /**
+     * DPI aşma: Xray finds the address of a site over HTTPS (the operator's DNS may lie), then
+     * connects to it through ByeDPI (a SOCKS program on [dpiPort]). With [warp], a second port
+     * ([warpPort]) goes through WARP, for the sites ByeDPI cannot open.
+     */
+    fun dpi(port: Int, socksPort: Int, dpiPort: Int, dns: String, warp: JSONObject?, warpPort: Int): String {
+        val inbounds = JSONArray().put(httpIn("in", port))
+        if (socksPort > 0) inbounds.put(socksIn(socksPort))
+        if (warp != null && warpPort > 0) inbounds.put(httpIn("in-warp", warpPort))
+        val outbounds = JSONArray()
+            .put(JSONObject().put("tag", "dpi-out").put("protocol", "freedom")
+                .put("settings", JSONObject().put("domainStrategy", "UseIPv4"))
+                .put("streamSettings", JSONObject().put("sockopt", JSONObject().put("dialerProxy", "byedpi"))))
+            .put(JSONObject().put("tag", "byedpi").put("protocol", "socks")
+                .put("settings", JSONObject().put("servers", JSONArray().put(JSONObject().put("address", "127.0.0.1").put("port", dpiPort)))))
+            .put(JSONObject().put("tag", "direct").put("protocol", "freedom").put("settings", JSONObject().put("domainStrategy", "UseIPv4")))
+            .put(JSONObject().put("tag", "dns-out").put("protocol", "dns"))
+        if (warp != null && warpPort > 0) outbounds.put(JSONObject(warp.toString()).put("tag", "warp"))
+        val rules = JSONArray().put(dnsRule())
+            // UDP (games, calls, QUIC) is not changed by ByeDPI: it goes straight
+            .put(JSONObject().put("type", "field").put("inboundTag", JSONArray().put("dev")).put("network", "udp").put("outboundTag", "direct"))
+        if (warp != null && warpPort > 0) rules.put(JSONObject().put("type", "field").put("inboundTag", JSONArray().put("in-warp")).put("outboundTag", "warp"))
+        return JSONObject()
+            .put("log", JSONObject().put("loglevel", "warning"))
+            .put("dns", dnsOf(dns))
+            .put("inbounds", inbounds)
+            .put("outbounds", outbounds)
+            .put("routing", JSONObject().put("domainStrategy", "AsIs").put("rules", rules))
             .toString()
     }
 }

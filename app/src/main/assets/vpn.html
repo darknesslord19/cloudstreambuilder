@@ -7,8 +7,10 @@
 <!--
   The VPN of the app (Plus > VPN). The app does the work through window.Vpn:
   data(), toggle(), setMode(m), setScope(s), setFlag(k, on), addServer(token, raw, name),
-  removeServer(id), select(id), ping(), test(), warpLicense(token, key), clearLearned().
-  Answers: window.onVpnResult(token, json), onVpnPing(id, ms), onVpnTest(json), onVpnState().
+  removeServer(id), select(id), ping(), test(), warpLicense(token, key), clearLearned(),
+  setDpi(key, value), find(), cancelFind(), setDevice(on), apps(), setApps(mode, jsonList).
+  Answers: window.onVpnResult(token, json), onVpnPing(id, ms), onVpnTest(json), onVpnState(),
+  onDpiFind(json row), onVpnApps(json).
 -->
 <style>
 :root{--bg:#0f0d12;--ink:#f3eef6;--card:#1c1920;--field:#262229;--line:rgba(255,255,255,.1);--muted:#a49cab;--accent:#cdb0ff;--accent-2:#e4d6ff;--ok:#5fd394;--bad:#ff7d7d;--warn:#f3b45a;--warp:#f6821f}
@@ -85,11 +87,36 @@ textarea:focus,input.t:focus{border-color:var(--accent)}
 .test b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.test span{font-size:10.5px;color:var(--muted)}
 .test i{font-style:normal;text-align:center;color:var(--muted)}
 .btn:focus-visible,.back:focus-visible,.sw:focus-visible,.x:focus-visible,.mode:focus-visible,.srv:focus-visible,.opt:focus-visible,.power:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.mode.dpi{grid-column:1/-1}
+.mode.dpi .ic{background:rgba(95,211,148,.16);color:var(--ok)}
+.rec2{position:absolute;top:10px;right:34px;font-size:9.5px;font-weight:800;color:var(--ok);background:rgba(95,211,148,.14);padding:2px 6px;border-radius:6px}
+.prof{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.prof button{border:1px solid var(--line);background:var(--field);color:var(--ink);border-radius:11px;padding:8px 11px;font-size:12.5px;font-weight:700;font-family:inherit}
+.prof button.on{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.prof button:focus-visible,.app:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.tests{margin-top:10px;display:grid;gap:6px}
+.trow{display:flex;align-items:center;gap:10px;background:var(--field);border-radius:12px;padding:9px 11px}
+.trow .tx{flex:1;min-width:0}.trow b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.trow small{color:var(--muted);font-size:11.5px;display:block}
+.tp{font-size:10.5px;font-weight:800;padding:3px 8px;border-radius:8px;background:var(--line);color:var(--muted);white-space:nowrap}
+.tp.ok{background:rgba(95,211,148,.15);color:var(--ok)}.tp.bad{background:rgba(255,125,125,.15);color:var(--bad)}.tp.part{background:rgba(243,180,90,.15);color:var(--warn)}
+.adv .r{display:flex;gap:8px;align-items:center;margin-top:8px}
+.adv label{flex:1;font-size:12.5px;color:var(--muted)}
+.adv select,.adv input.s{background:var(--bg);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:8px;font-family:inherit;font-size:13px;width:160px}
+.flow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:4px;font-size:12px}
+.flow span{padding:5px 9px;border-radius:9px;background:var(--field);font-weight:700}
+.flow i{font-style:normal;color:var(--muted)}
+.args{font:11px ui-monospace,monospace;color:var(--muted);margin-top:8px;word-break:break-all;line-height:1.5}
+.newtag{font-size:9.5px;font-weight:800;color:var(--bg);background:var(--ok);padding:2px 6px;border-radius:6px;margin-left:6px;vertical-align:2px}
+.apps{max-height:360px;overflow:auto;margin-top:8px;border-radius:12px;background:var(--bg)}
+.app{display:flex;align-items:center;gap:10px;padding:10px 12px;border:0;border-bottom:1px solid var(--line);background:none;color:var(--ink);width:100%;text-align:left;font-family:inherit}
+.app .tx{flex:1;min-width:0}.app b{display:block;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.app small{font-size:11px;color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.box{width:20px;height:20px;border-radius:6px;border:2px solid var(--line);flex:none;display:grid;place-items:center;font-size:13px;font-weight:900;color:var(--bg)}
+.app.on .box{background:var(--accent);border-color:var(--accent)}.app.on .box::after{content:"✓"}
 [hidden]{display:none!important}
 </style>
 </head>
 <body>
-<div class="hdr"><button class="back" id="back" aria-label="Geri">←</button><h1>VPN</h1><span class="chip">Sadece CloudStream</span></div>
+<div class="hdr"><button class="back" id="back" aria-label="Geri">←</button><h1>VPN</h1><span class="chip" id="chip">Sadece CloudStream</span></div>
 <div class="wrap">
   <div class="card banner" id="unsupported" hidden>Bu cihaz VPN çekirdeğini desteklemiyor (işlemci türü). Diğer özellikler çalışmaya devam eder.</div>
 
@@ -108,11 +135,34 @@ textarea:focus,input.t:focus{border-color:var(--accent)}
 
   <div class="card">
     <h3>Bağlantı türü</h3>
-    <p>Bağlanmak için kullanılacak sunucu.</p>
+    <p id="modesHint">Bağlanmak için kullanılacak yol.</p>
     <div class="modes">
+      <button class="mode dpi" data-m="dpi" id="dpiMode" hidden><span class="tick"></span><span class="rec2">ÖNERİLEN</span><div class="ic">D</div><b>DPI aşma<span class="newtag">YENİ</span></b><small>Sunucusuz · ByeDPI · engeli paketleri parçalayarak aşar, hız kaybı yok, IP değişmez</small></button>
       <button class="mode" data-m="warp"><span class="tick"></span><div class="ic" style="background:rgba(246,130,31,.16);color:var(--warp)">W</div><b>WARP</b><small>Ücretsiz · Cloudflare · engelleri aşar, IP Türkiye kalır</small></button>
       <button class="mode" data-m="own"><span class="tick"></span><div class="ic" style="background:var(--field);color:var(--accent);box-shadow:inset 0 0 0 1px var(--line)">S</div><b>Kendi sunucum</b><small>WireGuard ya da VLESS / VMess / Trojan / SS</small></button>
       <button class="mode admin" data-m="admin" id="adminMode" hidden><span class="tick"></span><div class="ic" style="background:rgba(95,211,148,.15);color:var(--ok)">A</div><div><b>Admin sunucusu</b><small id="adminName">Admin tarafından ekli · ayar gerekmez</small></div></button>
+    </div>
+  </div>
+
+  <div class="card" id="dpiCard" hidden>
+    <h3>DPI aşma ayarı</h3>
+    <p>Sağlayıcını seç ya da "Otomatik bul" de: yöntemler engelli sitelerde tek tek denenir, açan kaydedilir.</p>
+    <div class="banner" id="dpiUnsupported" hidden style="margin-bottom:8px">Bu cihazda DPI aşma çalışmıyor (işlemci türü).</div>
+    <div class="prof" id="prof"></div>
+    <div class="args" id="args"></div>
+    <button class="btn w p" id="find">Otomatik bul</button>
+    <div class="tests" id="tests"></div>
+    <div class="grow" style="margin-top:6px"><div class="tx"><b>DPI işe yaramazsa WARP'a geç</b><small>Site yine açılmazsa aynı istek WARP ile tekrar denenir</small></div><button class="sw" id="dpiWarp" aria-label="DPI işe yaramazsa WARP'a geç"></button></div>
+    <div class="flow"><span>Doğrudan</span><i>→</i><span style="color:var(--ok)">DPI aşma</span><i id="flowW1">→</i><span style="color:var(--warp)" id="flowW2">WARP</span></div>
+    <button class="btn w" id="advBtn">Gelişmiş ayarlar</button>
+    <div class="adv" id="adv" hidden>
+      <div class="r"><label for="meth">Yöntem</label><select id="meth"><option value="split">Parçala (split)</option><option value="disorder">Sırasını karıştır (disorder)</option><option value="fake">Sahte paket (fake)</option><option value="oob">Bant dışı (OOB)</option></select></div>
+      <div class="r"><label for="pos">Bölme yeri</label><select id="pos"><option value="sni">Site adının ortası (SNI)</option><option value="first">1. bayt</option><option value="host">Host başlığı</option></select></div>
+      <div class="r" id="ttlRow"><label for="ttl">Sahte paket TTL</label><input class="s" id="ttl" inputmode="numeric" maxlength="2"></div>
+      <div class="r"><label for="dns">DNS (şifreli)</label><select id="dns"><option value="cloudflare">Cloudflare</option><option value="google">Google</option><option value="adguard">AdGuard</option><option value="quad9">Quad9</option></select></div>
+      <input class="t" id="cmd" placeholder="Özel komut (ByeDPI) · ör. -o1 -r-5+se -a1" autocapitalize="off" spellcheck="false">
+      <div class="row2"><button class="btn" id="cmdClear">Temizle</button><button class="btn p" id="cmdSave">Komutu kaydet</button></div>
+      <div class="hint">Yöntem, bölme yeri ya da komut değişince "Gelişmiş" ayarı kullanılır. Komut doluysa o geçerlidir.</div>
     </div>
   </div>
 
@@ -151,11 +201,28 @@ textarea:focus,input.t:focus{border-color:var(--accent)}
     <div class="hint" id="learned"></div>
   </div>
 
+  <div class="card" id="devCard" hidden>
+    <h3>Telefonun tamamı</h3>
+    <div class="grow"><div class="tx"><b>Diğer uygulamaları da kapsa</b><small id="devSub">Açıkken telefonun diğer uygulamaları da aynı yoldan geçer. Android bir kez VPN izni ister.</small></div><button class="sw" id="devSw" aria-label="Diğer uygulamaları da kapsa"></button></div>
+    <div id="devOpts" hidden>
+      <button class="opt" data-a="all"><span class="radio"></span><div><b>Bütün uygulamalar</b><small>CloudStream dışındaki her şey.</small></div></button>
+      <button class="opt" data-a="only"><span class="radio"></span><div><b>Sadece seçtiklerim</b><small>Yalnızca seçtiğin uygulamalar geçer.</small></div></button>
+      <button class="opt" data-a="except"><span class="radio"></span><div><b>Seçtiklerim hariç</b><small>Bankalar gibi seçtiklerin VPN'siz kalır.</small></div></button>
+      <button class="btn w" id="pickApps">Uygulama seç</button>
+      <div id="appBox" hidden>
+        <input class="t" id="appQ" placeholder="Ara" autocapitalize="off" spellcheck="false">
+        <div class="apps" id="apps"><div class="hint" style="padding:12px">Yükleniyor…</div></div>
+        <button class="btn p w" id="appsSave">Kaydet</button>
+      </div>
+      <div class="msg" id="devMsg"></div>
+    </div>
+  </div>
+
   <div class="card">
     <h3>Ayarlar</h3>
-    <div class="grow"><div class="tx"><b>Açılışta otomatik bağlan</b><small>Uygulama açılınca VPN de açılır</small></div><button class="sw" data-k="auto" aria-label="Açılışta otomatik bağlan"></button></div>
-    <div class="grow"><div class="tx"><b>Engel algılanınca kendiliğinden aç</b><small>Bir site açılmazsa VPN'i açıp tekrar dener</small></div><button class="sw" data-k="smart" aria-label="Engel algılanınca aç"></button></div>
-    <div class="grow"><div class="tx"><b>Koparsa doğrudan devam et</b><small>Kapalıyken bağlantı kopunca istekler durur</small></div><button class="sw" data-k="failopen" aria-label="Koparsa doğrudan devam et"></button></div>
+    <div class="grow"><div class="tx"><b>Açılışta otomatik bağlan</b><small>Uygulama açılınca VPN de açılır</small></div><button class="sw k" data-k="auto" aria-label="Açılışta otomatik bağlan"></button></div>
+    <div class="grow"><div class="tx"><b>Engel algılanınca kendiliğinden aç</b><small>Bir site açılmazsa VPN'i açıp tekrar dener</small></div><button class="sw k" data-k="smart" aria-label="Engel algılanınca aç"></button></div>
+    <div class="grow"><div class="tx"><b>Koparsa doğrudan devam et</b><small>Kapalıyken bağlantı kopunca istekler durur</small></div><button class="sw k" data-k="failopen" aria-label="Koparsa doğrudan devam et"></button></div>
   </div>
 
   <div class="card">
@@ -187,10 +254,13 @@ function draw() {
   $('hero').className = 'card hero ' + (waiting ? 'st-wait' : on ? 'st-on' : '');
   $('state').textContent = waiting ? 'Bağlanıyor…' : on ? 'Bağlı' : 'Kapalı';
   var sub = $('sub'); sub.className = 'sub';
-  if (waiting) sub.textContent = d.mode === 'warp' && !(d.warp && d.warp.has) ? 'WARP hesabı açılıyor…' : 'Sunucuya bağlanılıyor…';
-  else if (on) sub.textContent = (d.where || '') + (d.where ? ' · ' : '') + fmt(Date.now() - d.since);
+  var dev = d.device || {}, devOn = !!(dev.available && dev.on);
+  var idle = devOn ? 'Dokun, bağlan · diğer uygulamalar da kapsanır' : 'Dokun, bağlan · telefonun diğer uygulamaları etkilenmez';
+  if (waiting) sub.textContent = d.mode === 'dpi' ? 'DPI aşma hazırlanıyor…' : d.mode === 'warp' && !(d.warp && d.warp.has) ? 'WARP hesabı açılıyor…' : 'Sunucuya bağlanılıyor…';
+  else if (on) sub.textContent = (d.mode === 'dpi' ? 'DPI aşma açık · sunucu yok' : (d.where || '')) + ((d.mode === 'dpi' || d.where) ? ' · ' : '') + fmt(Date.now() - d.since) + (dev.active ? ' · tüm telefon' : '');
   else if (d.error) { sub.className = 'sub err'; sub.textContent = d.error; }
-  else sub.textContent = 'Dokun, bağlan · telefonun diğer uygulamaları etkilenmez';
+  else sub.textContent = idle;
+  $('chip').textContent = dev.active || (devOn && !on) ? 'Tüm telefon' : 'Sadece CloudStream';
   $('meta').hidden = !on;
   $('mIp').textContent = lastIp || '–'; $('mPing').textContent = lastPing != null ? lastPing + ' ms' : '–'; $('mData').textContent = mb(d.bytes || 0);
   Array.prototype.forEach.call(document.querySelectorAll('.mode'), function (b) { b.classList.toggle('on', b.getAttribute('data-m') === d.mode); });
@@ -198,11 +268,13 @@ function draw() {
   if (d.admin) $('adminName').textContent = 'Admin tarafından ekli · ' + d.admin.name + ' · ayar gerekmez';
   $('ownCard').hidden = d.mode !== 'own'; $('warpCard').hidden = d.mode !== 'warp';
   $('warpState').textContent = d.warp && d.warp.has ? (d.warp.plus ? 'WARP+ hesabı hazır' : 'Ücretsiz hesap hazır') : 'Hesap henüz açılmadı';
-  Array.prototype.forEach.call(document.querySelectorAll('.opt'), function (o) { o.classList.toggle('on', o.getAttribute('data-s') === d.scope); });
-  Array.prototype.forEach.call(document.querySelectorAll('.sw'), function (s) { s.classList.toggle('on', !!d[s.getAttribute('data-k')]); });
+  Array.prototype.forEach.call(document.querySelectorAll('.opt[data-s]'), function (o) { o.classList.toggle('on', o.getAttribute('data-s') === d.scope); });
+  Array.prototype.forEach.call(document.querySelectorAll('.sw.k'), function (s) { s.classList.toggle('on', !!d[s.getAttribute('data-k')]); });
   $('learned').innerHTML = d.scope === 'smart' ? (d.learned ? d.learned + ' site engelli olarak öğrenildi · <a href="#" id="clr" style="color:var(--accent)">temizle</a>' : 'Henüz engelli site öğrenilmedi.') : '';
   var c = $('clr'); if (c) c.onclick = function (e) { e.preventDefault(); V.clearLearned(); load(); };
   drawServers();
+  drawDpi();
+  drawDevice();
   $('ver').textContent = d.version || '';
 }
 
@@ -221,6 +293,117 @@ function drawServers() {
   Array.prototype.forEach.call(document.querySelectorAll('[data-x]'), function (b) { b.onclick = function () { V.removeServer(b.getAttribute('data-x')); load(); }; });
 }
 
+// ---- DPI aşma
+var dpiRows = [];
+function drawDpi() {
+  var p = d.dpi || {};
+  $('dpiMode').hidden = !p.available;
+  $('dpiCard').hidden = d.mode !== 'dpi' || !p.available;
+  if ($('dpiCard').hidden) return;
+  $('dpiUnsupported').hidden = p.supported !== false;
+  var list = (p.presets || []).slice();
+  if (p.found) list.push({ id: 'found', name: 'Bulunan', label: p.foundName });
+  list.push({ id: 'adv', name: 'Gelişmiş', label: '' });
+  $('prof').innerHTML = list.map(function (x) {
+    return '<button class="' + (x.id === p.preset ? 'on' : '') + '" data-p="' + esc(x.id) + '" title="' + esc(x.label) + '">' + esc(x.name) + '</button>';
+  }).join('');
+  Array.prototype.forEach.call(document.querySelectorAll('#prof button'), function (b) {
+    b.onclick = function () { var id = b.getAttribute('data-p'); if (id === 'adv') $('adv').hidden = false; if (id === p.preset) return; if (d.running) waiting = true; V.setDpi('dpi_preset', id); load(); };
+  });
+  $('args').textContent = 'Kullanılan: ' + (p.name || '') + ' · ' + (p.args || '');
+  $('find').textContent = p.finding ? 'Durdur' : 'Otomatik bul';
+  $('dpiWarp').classList.toggle('on', !!p.warp);
+  $('flowW1').hidden = $('flowW2').hidden = !p.warp;
+  if (document.activeElement !== $('meth')) $('meth').value = p.meth || 'split';
+  if (document.activeElement !== $('pos')) $('pos').value = p.pos || 'sni';
+  if (document.activeElement !== $('ttl')) $('ttl').value = p.ttl || '8';
+  if (document.activeElement !== $('dns')) $('dns').value = p.dns || 'cloudflare';
+  if (document.activeElement !== $('cmd') && !$('cmd')._dirty) $('cmd').value = p.cmd || '';
+  $('ttlRow').hidden = (p.meth || 'split') !== 'fake';
+}
+function drawRows() {
+  $('tests').innerHTML = dpiRows.map(function (r) {
+    var cls = r.state === 'ok' ? 'ok' : r.state === 'bad' ? 'bad' : r.state === 'part' ? 'part' : '';
+    var t = r.state === 'ok' ? 'Açıldı' : r.state === 'bad' ? 'Engelli' : r.state === 'part' ? 'Kısmen' : '…';
+    if (r.i === 0 && r.state === 'bad') t = 'Engel var';
+    if (r.i === 0 && r.state === 'ok') t = 'Engel yok';
+    if (r.i === -1) t = r.state === 'ok' ? 'Kaydedildi' : 'Bitti';
+    return '<div class="trow"><div class="tx"><b>' + esc(r.name) + '</b><small>' + esc(r.note) + '</small></div><span class="tp ' + cls + '">' + t + '</span></div>';
+  }).join('');
+}
+$('find').onclick = function () {
+  if (d.dpi && d.dpi.finding) { V.cancelFind(); return; }
+  dpiRows = []; drawRows(); V.find(); setTimeout(load, 300);
+};
+window.onDpiFind = function (json) {
+  var r = {}; try { r = JSON.parse(json); } catch (e) { return; }
+  var at = -1;
+  for (var i = 0; i < dpiRows.length; i++) if (dpiRows[i].i === r.i && r.i !== -1) at = i;
+  if (at >= 0) dpiRows[at] = r; else dpiRows.push(r);
+  // only the last tries are kept on the screen
+  if (dpiRows.length > 9) dpiRows = [dpiRows[0]].concat(dpiRows.slice(-8));
+  drawRows();
+  if (r.i === -1) load();
+};
+$('dpiWarp').onclick = function () { if (d.running) waiting = true; V.setFlag('dpi_warp', !(d.dpi && d.dpi.warp)); load(); };
+$('advBtn').onclick = function () { $('adv').hidden = !$('adv').hidden; };
+function advSet(key, value) { if (d.running) waiting = true; V.setDpi(key, value); load(); }
+$('meth').onchange = function () { advSet('dpi_meth', $('meth').value); };
+$('pos').onchange = function () { advSet('dpi_pos', $('pos').value); };
+$('ttl').onchange = function () { var n = parseInt($('ttl').value, 10); if (!(n >= 1 && n <= 64)) n = 8; advSet('dpi_ttl', String(n)); };
+$('dns').onchange = function () { advSet('dpi_dns', $('dns').value); };
+$('cmd').oninput = function () { $('cmd')._dirty = true; };
+$('cmdSave').onclick = function () { $('cmd')._dirty = false; advSet('dpi_cmd', $('cmd').value.trim()); };
+$('cmdClear').onclick = function () { $('cmd').value = ''; $('cmd')._dirty = false; advSet('dpi_cmd', ''); };
+
+// ---- the whole phone
+var allApps = null, picked = {};
+function drawDevice() {
+  var v = d.device || {};
+  $('devCard').hidden = !v.available;
+  if (!v.available) return;
+  $('devSw').classList.toggle('on', !!v.on);
+  $('devOpts').hidden = !v.on;
+  $('devSub').textContent = v.on ? (v.active ? 'Açık · diğer uygulamalar da geçiyor' : d.running ? 'Açılıyor…' : 'VPN açılınca diğer uygulamalar da geçer') : 'Açıkken telefonun diğer uygulamaları da aynı yoldan geçer. Android bir kez VPN izni ister.';
+  if (v.error && v.on) { $('devMsg').className = 'msg bad'; $('devMsg').textContent = v.error; }
+  Array.prototype.forEach.call(document.querySelectorAll('.opt[data-a]'), function (o) { o.classList.toggle('on', o.getAttribute('data-a') === (v.apps || 'all')); });
+  var n = (v.list || []).length;
+  $('pickApps').hidden = (v.apps || 'all') === 'all';
+  $('pickApps').textContent = 'Uygulama seç' + (n ? ' · ' + n + ' seçili' : '');
+}
+$('devSw').onclick = function () {
+  var v = d.device || {};
+  $('devMsg').textContent = '';
+  V.setDevice(!v.on); setTimeout(load, 200);
+};
+Array.prototype.forEach.call(document.querySelectorAll('.opt[data-a]'), function (o) {
+  o.onclick = function () { V.setApps(o.getAttribute('data-a'), JSON.stringify((d.device && d.device.list) || [])); load(); };
+});
+function drawApps() {
+  var q = $('appQ').value.trim().toLowerCase();
+  if (!allApps) return;
+  var list = allApps.filter(function (a) { return !q || a.name.toLowerCase().indexOf(q) >= 0 || a.pkg.indexOf(q) >= 0; });
+  list.sort(function (a, b) { return (picked[b.pkg] ? 1 : 0) - (picked[a.pkg] ? 1 : 0); });
+  $('apps').innerHTML = list.length ? list.map(function (a) {
+    return '<button class="app ' + (picked[a.pkg] ? 'on' : '') + '" data-pkg="' + esc(a.pkg) + '"><span class="box"></span><div class="tx"><b>' + esc(a.name) + '</b><small>' + esc(a.pkg) + '</small></div></button>';
+  }).join('') : '<div class="hint" style="padding:12px">Bulunamadı</div>';
+  Array.prototype.forEach.call(document.querySelectorAll('.app'), function (b) {
+    b.onclick = function () { var k = b.getAttribute('data-pkg'); if (picked[k]) delete picked[k]; else picked[k] = true; b.classList.toggle('on', !!picked[k]); };
+  });
+}
+$('pickApps').onclick = function () {
+  var box = $('appBox'); box.hidden = !box.hidden; if (box.hidden) return;
+  picked = {}; ((d.device && d.device.list) || []).forEach(function (k) { picked[k] = true; });
+  if (allApps) drawApps(); else V.apps();
+};
+window.onVpnApps = function (json) { try { allApps = JSON.parse(json); } catch (e) { allApps = []; } drawApps(); };
+$('appQ').oninput = drawApps;
+$('appsSave').onclick = function () {
+  V.setApps((d.device && d.device.apps) || 'only', JSON.stringify(Object.keys(picked)));
+  $('appBox').hidden = true; $('devMsg').className = 'msg ok'; $('devMsg').textContent = Object.keys(picked).length + ' uygulama kaydedildi';
+  load();
+};
+
 $('power').onclick = function () {
   if (waiting || d.supported === false) return;
   waiting = !d.running; draw();
@@ -231,8 +414,8 @@ window.onVpnState = function () { waiting = false; load(); if (d.running) runTes
 Array.prototype.forEach.call(document.querySelectorAll('.mode'), function (b) {
   b.onclick = function () { var m = b.getAttribute('data-m'); if (m === d.mode) return; if (d.running) waiting = true; V.setMode(m); load(); };
 });
-Array.prototype.forEach.call(document.querySelectorAll('.opt'), function (o) { o.onclick = function () { V.setScope(o.getAttribute('data-s')); load(); }; });
-Array.prototype.forEach.call(document.querySelectorAll('.sw'), function (s) { s.onclick = function () { var k = s.getAttribute('data-k'); V.setFlag(k, !d[k]); load(); }; });
+Array.prototype.forEach.call(document.querySelectorAll('.opt[data-s]'), function (o) { o.onclick = function () { V.setScope(o.getAttribute('data-s')); load(); }; });
+Array.prototype.forEach.call(document.querySelectorAll('.sw.k'), function (s) { s.onclick = function () { var k = s.getAttribute('data-k'); V.setFlag(k, !d[k]); load(); }; });
 
 // ---- servers
 function showAdd(on) { $('addBox').hidden = !on; if (on) $('paste').focus(); }
@@ -261,6 +444,8 @@ window.onVpnResult = function (t, json) {
     $('savePaste').disabled = false;
     var m = $('addMsg'); m.className = 'msg ' + (r.ok ? 'ok' : 'bad'); m.textContent = r.message;
     if (r.ok) { $('paste').value = ''; $('srvName').value = ''; showAdd(false); }
+  } else if (r.what === 'device') {
+    var dm = $('devMsg'); dm.className = 'msg ' + (r.ok ? 'ok' : 'bad'); dm.textContent = r.message;
   } else if (r.what === 'warp') {
     var w = $('warpMsg'); w.className = 'msg ' + (r.ok ? 'ok' : 'bad'); w.textContent = r.message;
     if (r.ok) $('warpBox').hidden = true;
@@ -289,7 +474,7 @@ window.onVpnTest = function (json) {
 
 $('back').onclick = function () { try { app.close(); } catch (e) { history.back(); } };
 load();
-setInterval(function () { if (d.running && !waiting) { try { var n = JSON.parse(V.data()); n.where = d.where; d = n; } catch (e) {} draw(); } }, 1000);
+setInterval(function () { if ((d.running || (d.device && d.device.on)) && !waiting) { try { var n = JSON.parse(V.data()); n.where = d.where; d = n; } catch (e) {} draw(); } }, 1000);
 </script>
 </body>
 </html>

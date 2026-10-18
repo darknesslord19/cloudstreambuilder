@@ -48,6 +48,39 @@ jobs:
         get Xray-linux-arm32-v7a armeabi-v7a
         ls -la app/src/main/jniLibs/*/
 
+    # Plus > VPN > DPI aşma: ByeDPI (hufrea/byedpi, a small SOCKS program, packed as libciadpi.so
+    # so it may be run) and hev-socks5-tunnel (heiher, the VPN for the whole phone), pinned versions,
+    # built with the Android NDK of the runner.
+    - name: Build the DPI bypass
+      run: |
+        set -eo pipefail
+        {
+        NDK="${ANDROID_NDK_LATEST_HOME:-${ANDROID_NDK_HOME:-$ANDROID_NDK_ROOT}}"
+        echo "NDK: $NDK"
+        TC="$NDK/toolchains/llvm/prebuilt/linux-x86_64/bin"
+        OUT="$GITHUB_WORKSPACE/app/src/main/jniLibs"
+        git clone -q https://github.com/hufrea/byedpi /tmp/byedpi
+        git -C /tmp/byedpi checkout -q ba532298de7b28cfe854aea83d061369d13ca290
+        byedpi() {
+          mkdir -p "$OUT/$2"
+          (cd /tmp/byedpi && "$TC/$1-clang" -std=c99 -O2 -D_DEFAULT_SOURCE -I. $(ls *.c | grep -v win_service) \
+            -Wl,-z,max-page-size=16384 -o "$OUT/$2/libciadpi.so")
+        }
+        byedpi aarch64-linux-android21 arm64-v8a
+        byedpi armv7a-linux-androideabi21 armeabi-v7a
+        git clone -q https://github.com/heiher/hev-socks5-tunnel /tmp/hev
+        git -C /tmp/hev checkout -q 4d6c334dbfb68a79d1970c2744e62d09f71df12f
+        git -C /tmp/hev submodule update --init --recursive -q
+        mkdir -p /tmp/hevmk
+        printf '%s\n' 'APP_OPTIM := release' 'APP_PLATFORM := android-21' 'APP_ABI := armeabi-v7a arm64-v8a' \
+          'APP_CFLAGS := -O3 -DPKGNAME=com/lagradost/cloudstream3/fork/vpn -DCLSNAME=HevTunnel' \
+          'NDK_TOOLCHAIN_VERSION := clang' 'APP_LDFLAGS := -Wl,-z,max-page-size=16384' > /tmp/hevmk/Application.mk
+        "$NDK/ndk-build" -j4 NDK_PROJECT_PATH=/tmp/hevbuild APP_BUILD_SCRIPT=/tmp/hev/Android.mk \
+          NDK_APPLICATION_MK=/tmp/hevmk/Application.mk NDK_LIBS_OUT=/tmp/hevlibs
+        for abi in arm64-v8a armeabi-v7a; do cp "/tmp/hevlibs/$abi/libhev-socks5-tunnel.so" "$OUT/$abi/"; done
+        ls -la "$OUT"/*/
+        } 2>&1 | tee build.log
+
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 

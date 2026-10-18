@@ -141,6 +141,8 @@ object RemoteRules {
         VPN("vpn"),
         FILE_PLUGINS("file_plugins"),
         SCRAPER("scraper"),
+        VPN_DPI("vpn_dpi"),
+        VPN_DEVICE("vpn_device"),
     }
 
     /**
