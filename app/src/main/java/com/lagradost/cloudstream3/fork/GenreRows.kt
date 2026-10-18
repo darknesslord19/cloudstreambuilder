@@ -215,12 +215,12 @@ object GenreRows {
     fun count(c: Custom, items: List<SearchResponse>): Pair<Int, Boolean> {
         val unique = items.distinctBy { it.url }
         val n = unique.count { matches(c, it, infos[it.url]) }
-        val unknown = c.needsTmdb && unique.any { it.url !in infos && it.url !in noInfo }
+        val unknown = c.needsTmdb && unique.any { !infos.containsKey(it.url) && it.url !in noInfo }
         return n to unknown
     }
 
     private suspend fun fill(context: Context, cards: List<SearchResponse>, adult: Boolean) {
-        val todo = cards.filter { it.url !in infos && it.url !in noInfo }
+        val todo = cards.filter { !infos.containsKey(it.url) && it.url !in noInfo }
         if (todo.isEmpty() || !canWork(context)) return
         val gate = kotlinx.coroutines.sync.Semaphore(6)
         kotlinx.coroutines.coroutineScope {
