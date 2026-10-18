@@ -21,6 +21,12 @@
         android:title="@string/iptv_title" />
 
     <Preference
+        android:icon="@drawable/ic_baseline_public_24"
+        android:key="fork_plus_scraper"
+        android:summary="@string/scr_des"
+        android:title="@string/scr_title" />
+
+    <Preference
         android:icon="@drawable/ic_baseline_extension_24"
         android:key="fork_plus_file_plugins"
         android:summary="@string/fp_des"

@@ -675,6 +675,7 @@ object PluginManager {
             currentlyLoading = null
             true
         } catch (e: Throwable) {
+            forkLastLoadError = (e.cause ?: e).let { c -> c.javaClass.simpleName + ": " + (c.message ?: "") }.take(300)
             Log.e(TAG, "Failed to load $file: ${Log.getStackTraceString(e)}")
             showToast(
                 // context.getActivity(), // we are not always on the main thread
@@ -686,9 +687,17 @@ object PluginManager {
         }
     }
 
+    /** Why the last plugin could not be loaded (Plus > Dosyadan eklentiler shows it). */
+    @Volatile
+    var forkLastLoadError: String? = null
+
     /** Plus > Dosyadan eklentiler: a .cs3 the user picked, kept in the app's own folder. */
-    suspend fun forkLoadFilePlugin(context: Context, file: File, name: String): Boolean =
-        loadPlugin(context, file, PluginData(name, null, false, file.absolutePath, PLUGIN_VERSION_NOT_SET))
+    suspend fun forkLoadFilePlugin(context: Context, file: File, name: String): Boolean {
+        forkLastLoadError = null
+        val ok = loadPlugin(context, file, PluginData(name, null, false, file.absolutePath, PLUGIN_VERSION_NOT_SET))
+        if (!ok && forkLastLoadError == null) forkLastLoadError = "manifest.json ya da eklenti sınıfı bulunamadı"
+        return ok
+    }
 
     fun unloadPlugin(absolutePath: String) {
         Log.i(TAG, "Unloading plugin: $absolutePath")

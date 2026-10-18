@@ -2032,6 +2032,8 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
 
         // IPTV lists become sources of the home page
         com.lagradost.cloudstream3.fork.Iptv.init(this)
+        // Plus > Site Kazıyıcı: sites described with JSON become sources
+        com.lagradost.cloudstream3.fork.scraper.Scrapers.init(this)
         // Sites that moved to a new domain (Plus > Domain)
         com.lagradost.cloudstream3.fork.Domains.init(this)
         // Plus > VPN: connects at start when asked

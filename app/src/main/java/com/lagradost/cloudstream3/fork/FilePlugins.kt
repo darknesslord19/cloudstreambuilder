@@ -88,11 +88,51 @@ object FilePlugins {
 
     private fun isLoaded(context: Context, id: String) = PluginManager.plugins.containsKey(fileOf(context, id).absolutePath)
 
+    /** why a plugin could not be loaded, by id */
+    private val errors = java.util.concurrent.ConcurrentHashMap<String, String>()
+
     private suspend fun load(context: Context, e: Entry): Boolean {
         val f = fileOf(context, e.id)
-        if (!f.exists()) return false
+        if (!f.exists()) {
+            errors[e.id] = "Dosya bulunamadı"
+            return false
+        }
         if (isLoaded(context, e.id)) return true
-        return PluginManager.forkLoadFilePlugin(context, f, e.plugin)
+        val ok = PluginManager.forkLoadFilePlugin(context, f, e.plugin)
+        if (ok) errors.remove(e.id) else errors[e.id] = PluginManager.forkLastLoadError ?: "Yüklenemedi"
+        return ok
+    }
+
+    /** The sources of a plugin, and why the home page picker would not show one. */
+    fun sourcesOf(context: Context, id: String): JSONArray {
+        val path = fileOf(context, id).absolutePath
+        val apis = try {
+            APIHolder.allProviders.withLock { APIHolder.allProviders.filter { it.sourcePlugin == path } }
+        } catch (t: Throwable) {
+            emptyList()
+        }
+        val shown = try {
+            with(com.lagradost.cloudstream3.utils.AppContextUtils) { context.filterProviderByPreferredMedia() }.toSet()
+        } catch (t: Throwable) {
+            null
+        }
+        val langs = try {
+            with(com.lagradost.cloudstream3.utils.AppContextUtils) { context.getApiProviderLangSettings() }
+        } catch (t: Throwable) {
+            null
+        }
+        val out = JSONArray()
+        apis.forEach { api ->
+            val why = when {
+                !api.hasMainPage -> "Ana sayfası yok, sadece aramada çıkar"
+                langs != null && !langs.contains(com.lagradost.cloudstream3.AllLanguagesName) && !langs.contains(api.lang) ->
+                    "Dil ayarı gizliyor (${api.lang})"
+                shown != null && api !in shown -> "Tür tercihleri gizliyor"
+                else -> null
+            }
+            out.put(JSONObject().put("name", api.name).put("lang", api.lang).put("why", why ?: JSONObject.NULL))
+        }
+        return out
     }
 
     private fun unload(context: Context, id: String) {
@@ -135,7 +175,8 @@ object FilePlugins {
         fun list(): String {
             val a = JSONArray()
             FilePlugins.list(activity).forEach { e ->
-                a.put(e.json().put("loaded", isLoaded(activity, e.id)).put("providers", JSONArray(providersOf(activity, e.id))))
+                a.put(e.json().put("loaded", isLoaded(activity, e.id)).put("sources", sourcesOf(activity, e.id))
+                    .put("error", errors[e.id] ?: JSONObject.NULL))
             }
             return a.toString()
         }
@@ -191,7 +232,9 @@ object FilePlugins {
                     save(activity, FilePlugins.list(activity) + e)
                     val ok = load(activity, e)
                     refresh()
-                    out.put("ok", ok).put("message", if (ok) "${e.label} yüklendi" else "Eklenti yüklenemedi; bu CloudStream sürümüyle uyumsuz olabilir")
+                    val n = sourcesOf(activity, e.id).length()
+                    out.put("ok", ok).put("message", if (!ok) "Yüklenemedi: " + (errors[e.id] ?: "uyumsuz eklenti")
+                        else if (n == 0) "${e.label} yüklendi ama kaynak eklemedi" else "${e.label} yüklendi · $n kaynak")
                 }
                 answer(token, out)
             }

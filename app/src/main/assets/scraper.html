@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Site Kazıyıcı</title>
+<!--
+  Plus > Site Kazıyıcı. The app does the work through window.Scraper: list(), get(id),
+  save(token, id, text), remove(id), setOn(id, on), test(token, id, text, query), fetch(token, url).
+  Answers: window.onScrResult(token, json), window.onScrStep(token, json).
+-->
+<style>
+:root{--bg:#0f0d12;--ink:#f3eef6;--card:#1c1920;--field:#262229;--line:rgba(255,255,255,.1);--muted:#a49cab;--accent:#cdb0ff;--accent-2:#e4d6ff;--ok:#5fd394;--bad:#ff7d7d;--warn:#f3b45a;--api:#7cc7ff}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{padding:10px 0 40px}
+.hdr{display:flex;align-items:center;gap:12px;padding:8px 16px 12px}
+.hdr h1{font-size:22px;font-weight:750;flex:1}
+.back{background:none;border:0;color:var(--accent);font-size:24px;padding:4px 8px;cursor:pointer}
+.wrap{padding:0 14px}
+.view[hidden]{display:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px;margin-bottom:12px}
+.card h3{font-size:15px;margin-bottom:4px}
+.card>p{font-size:12px;color:var(--muted);line-height:1.45}
+.btn{border:1px solid var(--line);background:var(--field);color:var(--ink);border-radius:12px;padding:10px 8px;font-weight:800;font-size:12.5px;font-family:inherit;min-height:44px;cursor:pointer}
+.btn.p{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.btn.d{color:var(--bad);border-color:rgba(255,125,125,.4);background:transparent}
+.btns{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px}
+.w{width:100%;margin-top:10px}
+.site{display:flex;align-items:center;gap:11px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px;margin-bottom:8px;cursor:pointer}
+.av{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-weight:900;font-size:11px;flex:0 0 42px}
+.av.html{background:var(--field);color:var(--accent)}
+.av.api{background:rgba(124,199,255,.16);color:var(--api)}
+.site .tx{flex:1;min-width:0}.site b{display:block;font-size:15px}.site small{display:block;font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sw{width:42px;height:24px;border-radius:24px;background:var(--line);position:relative;flex:0 0 42px;border:0;cursor:pointer}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--muted);transition:.2s}
+.sw.on{background:var(--accent)}.sw.on::after{left:21px;background:var(--bg)}
+.pill{font-size:10.5px;font-weight:800;padding:3px 8px;border-radius:8px;white-space:nowrap}
+.pill.ok{background:rgba(95,211,148,.15);color:var(--ok)}.pill.bad{background:rgba(255,125,125,.15);color:var(--bad)}.pill.warn{background:rgba(243,180,90,.15);color:var(--warn)}
+.sect{font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin:16px 4px 8px}
+textarea{width:100%;min-height:260px;background:var(--bg);border:1px solid var(--line);border-radius:12px;color:var(--ink);padding:10px;font:11.5px/1.5 ui-monospace,monospace;outline:none;resize:vertical;margin-top:10px}
+textarea:focus{border-color:var(--accent)}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--field);padding:4px;border-radius:13px;margin-top:10px}
+.tab{border:0;background:none;color:var(--muted);font-weight:800;font-size:12.5px;padding:9px;border-radius:10px;font-family:inherit;cursor:pointer}
+.tab.on{background:var(--card);color:var(--ink);box-shadow:0 0 0 1px var(--line)}
+.check{margin-top:10px;display:grid;gap:5px}
+.ck{display:flex;gap:8px;align-items:flex-start;font-size:12px;line-height:1.4}
+.ck i{font-style:normal;width:18px;height:18px;border-radius:6px;display:grid;place-items:center;font-size:11px;font-weight:900;flex:none}
+.ck.ok i{background:rgba(95,211,148,.18);color:var(--ok)}.ck.bad i{background:rgba(255,125,125,.18);color:var(--bad)}.ck.warn i{background:rgba(243,180,90,.18);color:var(--warn)}
+.ck code{font:11px ui-monospace,monospace;color:var(--accent-2)}
+/* test */
+.steps{display:grid;gap:8px}
+.step{background:var(--field);border-radius:14px;padding:11px 12px}
+.step .h{display:flex;align-items:center;gap:8px}
+.step .h b{flex:1;font-size:13.5px}
+.step .num{width:22px;height:22px;border-radius:7px;background:var(--bg);display:grid;place-items:center;font-size:11px;font-weight:900;color:var(--accent)}
+.step small{display:block;font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.45;word-break:break-all}
+.posters{display:flex;gap:6px;overflow-x:auto;margin-top:8px;padding-bottom:2px}
+.posters div{flex:0 0 62px;height:90px;border-radius:9px;background:var(--bg) center/cover no-repeat;display:flex;align-items:flex-end;padding:4px;font-size:9px;font-weight:700;line-height:1.15;text-shadow:0 1px 3px #000;overflow:hidden}
+.q{display:flex;gap:6px;margin-top:10px}
+.q input{flex:1;min-width:0;background:var(--bg);border:1px solid var(--line);border-radius:12px;color:var(--ink);padding:10px 12px;font-size:14px;outline:none;font-family:inherit}
+.q .btn{min-height:42px;padding:8px 14px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,40px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:13px;font-weight:700;opacity:0;transition:.25s;z-index:30;pointer-events:none;max-width:90%;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.note{font-size:11.5px;color:var(--muted);text-align:center;margin:18px 16px 0;line-height:1.5}
+.pill.new{background:var(--line);color:var(--muted)}.pill.wait{background:var(--line);color:var(--muted)}
+.msg{font-size:12.5px;margin-top:8px;line-height:1.45}.msg.ok{color:var(--ok)}.msg.bad{color:var(--bad)}
+.linkbox{display:flex;gap:6px;margin-top:10px}.linkbox input{flex:1;min-width:0;background:var(--bg);border:1px solid var(--line);border-radius:12px;color:var(--ink);padding:10px 12px;font-size:13px;outline:none}
+.empty{text-align:center;color:var(--muted);font-size:13px;padding:22px 8px;line-height:1.6}
+.btn:focus-visible,.back:focus-visible,.sw:focus-visible,.site:focus-visible,.tab:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+[hidden]{display:none!important}
+</style>
+
+</head>
+<body>
+  <div class="hdr"><button class="back" id="back" aria-label="Geri">←</button><h1 id="title">Site Kazıyıcı</h1></div>
+
+  <div class="view wrap" id="vList">
+    <div class="card">
+      <h3>Site ekle</h3>
+      <p>Bir sitenin nasıl okunacağını anlatan JSON'u ekle; site ana sayfada kaynak olarak çıkar. İki tür var: <b>HTML</b> (sayfadan seçicilerle) ve <b>API</b> (sitenin JSON servisinden).</p>
+      <div class="btns">
+        <button class="btn p" id="addPaste">Yapıştır</button>
+        <button class="btn" id="addFile">Dosyadan</button>
+        <button class="btn" id="addLink">Linkten</button>
+      </div>
+      <input type="file" id="file" accept=".json,application/json,text/plain,*/*" hidden>
+      <div class="linkbox" id="linkBox" hidden><input id="linkUrl" placeholder="https://…/site.json" autocapitalize="off" spellcheck="false"><button class="btn p" id="linkGo">Al</button></div>
+      <div class="msg" id="listMsg"></div>
+    </div>
+    <div class="sect">Siteler</div>
+    <div id="sites"></div>
+  </div>
+
+  <div class="view wrap" id="vEdit" hidden>
+    <div class="card">
+      <h3>JSON</h3>
+      <div class="tabs"><button class="tab on" data-t="html">HTML şablonu</button><button class="tab" data-t="api">API şablonu</button></div>
+      <textarea id="json" spellcheck="false" autocapitalize="off"></textarea>
+      <div class="check" id="check"></div>
+      <div class="btns" style="grid-template-columns:1fr 1fr"><button class="btn" id="testBtn">Test et</button><button class="btn p" id="saveBtn">Kaydet</button></div>
+      <button class="btn d w" id="delBtn" hidden>Siteyi sil</button>
+      <div class="msg" id="editMsg"></div>
+    </div>
+  </div>
+
+  <div class="view wrap" id="vTest" hidden>
+    <div class="card">
+      <h3 id="tName">Test</h3>
+      <p>Her adım siteden gerçekten okunur; nerede takıldığı görünür.</p>
+      <div class="q"><input id="tq" value="a"><button class="btn p" id="tRun">Çalıştır</button></div>
+    </div>
+    <div class="steps" id="steps"></div>
+    <button class="btn w" id="toEdit">JSON'u düzenle</button>
+  </div>
+
+<script src="theme.js"></script>
+<script>
+var app = window.CloudStream, S = window.Scraper;
+try { if (window.applyTheme && app && app.theme) applyTheme(app); } catch (e) {}
+function $(i) { return document.getElementById(i); }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+var T = {
+  html: {name:"MySite",baseUrl:"https://example.com",homeUrl:"/",catalogs:[{id:"home",name:"Home",type:"movie"}],search:{url:"/search?q={query}&page={page}",item:".result-item",title:".title",href:"a@href",poster:"img@src"},detail:{title:"h1",poster:".poster img@src",overview:".desc",type:"series"},episodes:{url:"{href}",item:".episode",number:"data-ep",href:"a@href"},streams:{video:"video@src",m3u8:"source[type*=m3u8]@src",iframe:"iframe@src"}},
+  api: {name:"JustAnime",baseUrl:"https://justanime.to",api:{base:"https://core.justanime.to/api",proxy:"https://neko.justanime.to/m3u8-proxy",headers:{"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36","Accept":"application/json, text/plain, */*","Referer":"https://justanime.to/","Origin":"https://justanime.to"},catalogs:[{id:"trending",name:"Trending",type:"series"},{id:"popular",name:"Popular",type:"series"},{id:"latestEpisode",name:"Latest Episodes",type:"series"},{id:"airing",name:"Airing Now",type:"series"},{id:"upcoming",name:"Upcoming",type:"series"},{id:"favourite",name:"Favourites",type:"series"}],homePath:"/home",searchPath:"/search",searchResults:"results",detailPath:"/anime/{id}",detailData:"data",episodesPath:"/anime/{id}/episodes",episodesPageParam:"page",episodesItems:"episodes",episodesHasNext:"hasNextPage",episodesMaxPages:30,episodeNumber:"number",episodeName:"title",streamsPath:"/watch/{id}/episode/{ep}/anineko/{lang}/hd1",streamsLangs:"sub,dub",streamsSources:"sources",streamsUrl:"url",streamsQuality:"quality",streamsIsM3u8:"isM3U8",streamsSubtitles:"subtitles",streamsSubUrl:"url",streamsSubLang:"lang",streamsHeaders:"headers",proxyStreams:true}}
+};
+var sites = [], cur = null, token = 0, waits = {}, history_ = [];
+
+function show(v) {
+  ["vList","vEdit","vTest"].forEach(function (x) { $(x).hidden = x !== v; });
+  $("title").textContent = v === "vList" ? "Site Kazıyıcı" : v === "vEdit" ? (cur && cur.name ? cur.name : "Yeni site") : "Test · " + (cur && cur.name || "");
+  window.scrollTo(0, 0);
+}
+function go(v) { if (history_[history_.length - 1] !== v) history_.push(v); history.pushState({ v: v }, ""); show(v); }
+window.onpopstate = function () { history_.pop(); var v = history_[history_.length - 1] || "vList"; if (v === "vList") load(); show(v); };
+
+function load() { try { sites = JSON.parse(S.list()); } catch (e) { sites = []; } drawSites(); }
+var ST = { ok: "Çalışıyor", warn: "Eksik", bad: "Bozuk", "new": "Test edilmedi" };
+function drawSites() {
+  $("sites").innerHTML = sites.length ? sites.map(function (s, i) {
+    return '<div class="site" tabindex="0" data-i="' + i + '"><div class="av ' + s.kind + '">' + (s.kind === "api" ? "API" : "HTML") + '</div><div class="tx"><b>' + esc(s.name) + '</b><small>' + esc(String(s.base).replace(/^https?:\/\//, "")) + ' · ' + esc(s.problem || s.info) + '</small></div><span class="pill ' + (s.problem ? "bad" : s.st) + '">' + (s.problem ? "Hatalı" : ST[s.st] || s.st) + '</span><button class="sw ' + (s.on ? "on" : "") + '" data-sw="' + i + '" aria-label="Aç / kapat"></button></div>';
+  }).join("") : '<div class="empty">Henüz site yok. Yapıştır, dosyadan ya da linkten ekle.</div>';
+  Array.prototype.forEach.call(document.querySelectorAll(".site"), function (e) {
+    e.onclick = function (ev) {
+      var sw = ev.target.getAttribute("data-sw");
+      if (sw != null) { var s = sites[+sw]; s.on = !s.on; S.setOn(s.id, s.on); drawSites(); return; }
+      var s2 = sites[+e.getAttribute("data-i")]; cur = { id: s2.id, name: s2.name, kind: s2.kind }; openEdit(S.get(s2.id));
+    };
+    e.onkeydown = function (ev) { if (ev.key === "Enter") e.click(); };
+  });
+}
+
+function validate() {
+  var out = [], j;
+  try { j = JSON.parse($("json").value); } catch (e) { $("check").innerHTML = '<div class="ck bad"><i>✕</i><span>JSON hatalı: ' + esc(e.message) + '</span></div>'; return null; }
+  var api = !!j.api;
+  out.push(["ok", "Tür: <b>" + (api ? "API" : "HTML") + "</b> · ad: " + esc(j.name || "?")]);
+  if (!j.name) out.push(["bad", "<code>name</code> yok"]);
+  if (!/^https?:\/\//.test(j.baseUrl || "")) out.push(["bad", "<code>baseUrl</code> http(s):// ile başlamalı"]);
+  if (api) {
+    var a = j.api;
+    out.push([/^https?:\/\//.test(a.base || "") ? "ok" : "bad", "<code>api.base</code> " + esc(a.base || "yok")]);
+    out.push(["ok", "Arama: <code>" + esc(a.searchPath || "/search") + "</code>" + (a.searchParam ? "" : " · <code>?q=</code>")]);
+    out.push([a.streamsPath ? "ok" : "bad", "Kaynak: <code>" + esc(a.streamsPath || "streamsPath yok") + "</code>"]);
+    if (!a.itemId && !a.itemTitle) out.push(["warn", "Öğe alanları yazılmamış; <code>id / title / poster</code> aranır (değiştirmek için <code>itemId, itemTitle, itemPoster</code>)"]);
+    if (a.proxyStreams) out.push([a.proxy ? "ok" : "bad", "Videolar <code>proxy</code> üzerinden açılır"]);
+  } else {
+    out.push([j.search && j.search.item ? "ok" : "bad", "Arama öğesi: <code>" + esc(j.search && j.search.item || "search.item yok") + "</code>"]);
+    out.push([j.detail && j.detail.title ? "ok" : "warn", "Detay başlığı: <code>" + esc(j.detail && j.detail.title || "h1 (varsayılan)") + "</code>"]);
+    var cats = j.catalogs || [];
+    if (!cats.some(function (c) { return c.url; })) out.push(["warn", "Kataloglarda adres yok; ana sayfa <code>homeUrl</code>'den arama seçicileriyle okunur (her kataloğa <code>url</code> + <code>item</code> eklenebilir)"]);
+    out.push([j.episodes && j.episodes.item ? "ok" : "warn", "Bölümler: <code>" + esc(j.episodes && j.episodes.item || "yok · film gibi açılır") + "</code>"]);
+    out.push([j.streams ? "ok" : "warn", "Kaynak: " + esc(Object.keys(j.streams || {}).join(", ") || "sayfadaki m3u8 / iframe aranır") + " (iframe'ler uygulamanın çözücüleriyle açılır)"]);
+  }
+  $("check").innerHTML = out.map(function (o) { return '<div class="ck ' + o[0] + '"><i>' + (o[0] === "ok" ? "✓" : o[0] === "bad" ? "✕" : "!") + '</i><span>' + o[1] + '</span></div>'; }).join("");
+  return out.some(function (o) { return o[0] === "bad"; }) ? null : j;
+}
+function openEdit(text, kind) {
+  $("json").value = text || JSON.stringify(T[kind || "html"], null, 2);
+  var k = kind || (/"api"\s*:/.test($("json").value) ? "api" : "html");
+  Array.prototype.forEach.call(document.querySelectorAll(".tab"), function (t) { t.classList.toggle("on", t.getAttribute("data-t") === k); });
+  $("delBtn").hidden = !(cur && cur.id); $("editMsg").textContent = "";
+  validate(); go("vEdit");
+}
+Array.prototype.forEach.call(document.querySelectorAll(".tab"), function (t) {
+  t.onclick = function () {
+    var m = $("editMsg");
+    if ($("json").value.trim() && t.getAttribute("data-sure") !== "1") { t.setAttribute("data-sure", "1"); m.className = "msg"; m.textContent = "Şablonu yüklemek için tekrar dokun (yazdığın JSON silinir)"; setTimeout(function () { t.removeAttribute("data-sure"); }, 4000); return; }
+    t.removeAttribute("data-sure"); openEdit(null, t.getAttribute("data-t"));
+  };
+});
+$("json").oninput = validate;
+$("addPaste").onclick = function () { cur = null; openEdit(null, "html"); };
+$("addFile").onclick = function () { $("file").click(); };
+$("file").onchange = function () {
+  var f = $("file").files && $("file").files[0]; if (!f) return;
+  var r = new FileReader(); r.onload = function () { cur = null; openEdit(String(r.result || "")); }; r.readAsText(f); $("file").value = "";
+};
+$("addLink").onclick = function () { $("linkBox").hidden = !$("linkBox").hidden; if (!$("linkBox").hidden) $("linkUrl").focus(); };
+$("linkGo").onclick = function () { var u = $("linkUrl").value.trim(); if (!u) return; var t = ++token; waits[t] = "fetch"; $("listMsg").className = "msg"; $("listMsg").textContent = "İndiriliyor…"; S.fetch(t, u); };
+
+$("saveBtn").onclick = function () {
+  var j = validate(); var m = $("editMsg");
+  if (!j) { m.className = "msg bad"; m.textContent = "Önce kırmızı satırları düzelt"; return; }
+  var t = ++token; waits[t] = "save"; S.save(t, cur && cur.id || null, $("json").value);
+};
+$("delBtn").onclick = function () {
+  var b = $("delBtn"); if (!cur || !cur.id) return;
+  if (b.getAttribute("data-sure") !== "1") { b.setAttribute("data-sure", "1"); b.textContent = "Emin misin? Sil"; setTimeout(function () { b.removeAttribute("data-sure"); b.textContent = "Siteyi sil"; }, 4000); return; }
+  b.removeAttribute("data-sure"); b.textContent = "Siteyi sil"; S.remove(cur.id); cur = null; history.back();
+};
+$("testBtn").onclick = function () { var j = validate(); if (!j) { $("editMsg").className = "msg bad"; $("editMsg").textContent = "JSON'da eksik var"; return; } cur = cur || {}; cur.name = j.name; cur.text = $("json").value; go("vTest"); run(); };
+$("toEdit").onclick = function () { history.back(); };
+$("tRun").onclick = run;
+
+var testToken = 0;
+function stepHtml(s) {
+  var posters = (s.posters || []).map(function (p) { return '<div style="background-image:url(\'' + esc(p.poster) + '\')">' + esc(p.name) + '</div>'; }).join("");
+  return '<div class="step"><div class="h"><span class="num">' + s.n + '</span><b>' + esc(s.title) + '</b><span class="pill ' + s.st + '">' + (s.st === "ok" ? "Tamam" : s.st === "bad" ? "Hata" : s.st === "warn" ? "Eksik" : "…") + '</span></div>' +
+    (s.url ? '<small>' + esc(s.url) + '</small>' : '') + '<small style="color:var(--ink)">' + esc(s.text) + '</small>' + (posters ? '<div class="posters">' + posters + '</div>' : '') + '</div>';
+}
+function run() {
+  $("steps").innerHTML = '<div class="step"><div class="h"><span class="num">…</span><b>Siteye bağlanılıyor</b><span class="pill wait">…</span></div></div>';
+  $("tName").textContent = "Test · " + (cur.name || "");
+  testToken = ++token; waits[testToken] = "test";
+  S.test(testToken, cur.id || null, cur.text || S.get(cur.id), $("tq").value.trim());
+}
+window.onScrStep = function (t, json) {
+  if (t !== testToken) return;
+  var s = JSON.parse(json), box = $("steps");
+  var wait = box.querySelector(".pill.wait"); if (wait) wait.closest(".step").remove();
+  box.insertAdjacentHTML("beforeend", stepHtml(s));
+  box.insertAdjacentHTML("beforeend", '<div class="step"><div class="h"><span class="num">…</span><b>Sıradaki adım</b><span class="pill wait">…</span></div></div>');
+};
+window.onScrResult = function (t, json) {
+  var r = {}; try { r = JSON.parse(json); } catch (e) {}
+  var w = waits[t]; delete waits[t];
+  if (w === "test") {
+    var wait = $("steps").querySelector(".pill.wait"); if (wait) wait.closest(".step").remove();
+    $("steps").insertAdjacentHTML("beforeend", '<div class="msg ' + (r.st === "ok" ? "ok" : "bad") + '" style="padding:4px 6px">' + (r.st === "ok" ? "✓ Bütün adımlar çalıştı" : r.st === "warn" ? "Bazı adımlar eksik; JSON'u düzenleyip tekrar dene" : "Hata var; JSON'u düzenleyip tekrar dene") + '</div>');
+  } else if (w === "save") {
+    var m = $("editMsg"); m.className = "msg " + (r.ok ? "ok" : "bad"); m.textContent = r.message;
+    if (r.ok) { cur = cur || {}; cur.id = r.id; $("delBtn").hidden = false; }
+  } else if (w === "fetch") {
+    if (r.ok) { $("listMsg").textContent = ""; $("linkBox").hidden = true; cur = null; openEdit(r.text); }
+    else { $("listMsg").className = "msg bad"; $("listMsg").textContent = r.message; }
+  }
+};
+$("back").onclick = function () { if (!$("vList").hidden) { try { app.close(); } catch (e) {} return; } history.back(); };
+history_.push("vList");
+load();
+</script>
+</body>
+</html>

@@ -140,6 +140,7 @@ object RemoteRules {
         DOMAINS("domains"),
         VPN("vpn"),
         FILE_PLUGINS("file_plugins"),
+        SCRAPER("scraper"),
     }
 
     /**

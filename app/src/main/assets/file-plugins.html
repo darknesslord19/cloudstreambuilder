@@ -52,6 +52,8 @@ label.l{display:block;font-size:12px;color:var(--muted);margin:8px 0 5px}
 .prov{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
 .prov span{font-size:11px;font-weight:700;padding:3px 8px;border-radius:7px;background:var(--field);color:var(--accent)}
 .prov span.no{color:var(--muted)}
+.prov span.hid{color:var(--warn);background:rgba(243,180,90,.12)}
+.why{font-size:11.5px;color:var(--warn);margin-top:6px;line-height:1.4}.why.bad{color:var(--bad);word-break:break-word}
 .acts{display:flex;gap:6px;margin-top:10px}
 .acts .btn{min-height:36px;padding:7px 12px;font-size:12px}
 .edit{display:flex;gap:6px;margin-top:10px}
@@ -99,12 +101,15 @@ function load() { try { items = JSON.parse(F.list()); } catch (e) { items = []; 
 function draw() {
   $('count').textContent = items.length ? items.length + ' eklenti' : '';
   $('list').innerHTML = items.length ? items.map(function (p) {
-    var prov = p.providers && p.providers.length ? p.providers.map(function (n) { return '<span>' + esc(n) + '</span>'; }).join('') : '<span class="no">' + (p.on ? (p.loaded ? 'Kaynak eklemedi' : 'Yüklenemedi') : 'Kapalı') + '</span>';
+    var src = p.sources || [];
+    var prov = src.length ? src.map(function (x) { return '<span' + (x.why ? ' class="hid"' : '') + '>' + esc(x.name) + (x.lang ? ' · ' + esc(x.lang) : '') + '</span>'; }).join('') : '<span class="no">' + (p.on ? (p.loaded ? 'Kaynak eklemedi' : 'Yüklenemedi') : 'Kapalı') + '</span>';
+    var whys = src.filter(function (x) { return x.why; }).map(function (x) { return '<div class="why">' + esc(x.name) + ': ' + esc(x.why) + '</div>'; }).join('');
+    if (p.on && !p.loaded && p.error) whys += '<div class="why bad">' + esc(p.error) + '</div>';
     return '<div class="pl' + (p.on ? '' : ' off') + '" data-id="' + esc(p.id) + '">' +
       '<div class="top"><div class="av">' + esc((p.label || '?').charAt(0).toUpperCase()) + '</div>' +
       '<div class="tx"><b>' + esc(p.label) + '</b><small>' + esc(p.plugin) + (p.version ? ' · v' + p.version : '') + ' · ' + kb(p.size) + ' · ' + day(p.added) + '</small></div>' +
       '<button class="sw' + (p.on ? ' on' : '') + '" data-sw="' + esc(p.id) + '" aria-label="Aç / kapat"></button></div>' +
-      '<div class="prov">' + prov + '</div>' +
+      '<div class="prov">' + prov + '</div>' + whys +
       (editing === p.id
         ? '<div class="edit"><input class="t" id="ren" value="' + esc(p.label) + '"><button class="btn p" data-save="' + esc(p.id) + '">Kaydet</button></div>'
         : '<div class="acts"><button class="btn" data-ren="' + esc(p.id) + '">İsim ver</button><button class="btn d" data-del="' + esc(p.id) + '">Sil</button></div>') +
