@@ -961,6 +961,8 @@
     <string name="plus_looks_des">Temalar, hareketli afişler, yazı tipi, uygulama ikonu</string>
     <string name="profile_pick">Profil resmi</string>
     <string name="profile_pick_des">Bir ikon seç</string>
+    <string name="vpn_title">VPN</string>
+    <string name="vpn_des">Sadece CloudStream için: WARP ya da kendi sunucun, engelli siteleri açar</string>
     <string name="domains_title">Domain</string>
     <string name="domains_des">Site taşınınca: domaini ya da sadece uzantısını değiştir</string>
     <string name="domains_local">Yerel</string>

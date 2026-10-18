@@ -207,6 +207,14 @@ object Domains {
         chain.proceed(b.build())
     }
 
+    /** Hosts of the sites the last check could not open (the VPN's "only blocked sites" uses them). */
+    fun troubledHosts(): Set<String> = try {
+        sites().filter { api -> results[api.name]?.st.let { it != null && it != "ok" } }
+            .mapNotNull { hostOf(it.mainUrl) }.toSet()
+    } catch (t: Throwable) {
+        emptySet()
+    }
+
     // ---------------------------------------------------------------- checking
 
     class Check(val st: String, val next: String?, val code: Int, val ms: Long, val msg: String) {

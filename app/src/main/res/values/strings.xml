@@ -997,6 +997,8 @@
     <string name="plus_looks_des">Themes, moving posters, font, app icon</string>
     <string name="profile_pick">Profile picture</string>
     <string name="profile_pick_des">Choose an icon</string>
+    <string name="vpn_title">VPN</string>
+    <string name="vpn_des">For CloudStream only: WARP or your own server, opens blocked sites</string>
     <string name="domains_title">Domain</string>
     <string name="domains_des">When a site moves: change the domain or just its ending</string>
     <string name="domains_local">Local</string>

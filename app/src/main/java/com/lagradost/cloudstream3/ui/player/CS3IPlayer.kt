@@ -738,13 +738,13 @@ class CS3IPlayer : IPlayer {
             headers: Map<String, String>?,
             interceptor: Interceptor?
         ): HttpDataSource.Factory {
-            val client = if (interceptor == null) {
+            val client = com.lagradost.cloudstream3.fork.vpn.Vpn.forPlayer(if (interceptor == null) {
                 app.baseClient
             } else {
                 app.baseClient.newBuilder()
                     .addInterceptor(interceptor)
                     .build()
-            }
+            })
             val source = OkHttpDataSource.Factory(client).setUserAgent(USER_AGENT)
 
             if (!headers.isNullOrEmpty()) {
@@ -797,9 +797,10 @@ class CS3IPlayer : IPlayer {
             }?.value ?: USER_AGENT
 
             val source = if (interceptor == null) {
-                if (engine == null) {
+                // Cronet cannot use the VPN tunnel, a video that has to go through it takes OkHttp
+                if (engine == null || com.lagradost.cloudstream3.fork.vpn.Vpn.tunnelsVideo(link.url)) {
                     Log.d(TAG, "Using DefaultHttpDataSource for $link")
-                    OkHttpDataSource.Factory(app.baseClient).setUserAgent(userAgent)
+                    OkHttpDataSource.Factory(com.lagradost.cloudstream3.fork.vpn.Vpn.forPlayer(app.baseClient)).setUserAgent(userAgent)
                 } else {
                     Log.d(TAG, "Using CronetDataSource for $link")
                     CronetDataSource.Factory(engine, Executors.newSingleThreadExecutor())
@@ -813,6 +814,7 @@ class CS3IPlayer : IPlayer {
                 Log.d(TAG, "Using OkHttpDataSource for $link")
                 val client = app.baseClient.newBuilder()
                     .addInterceptor(interceptor)
+                    .proxySelector(com.lagradost.cloudstream3.fork.vpn.Vpn.playerSelector)
                     .build()
                 OkHttpDataSource.Factory(client).setUserAgent(userAgent)
             }

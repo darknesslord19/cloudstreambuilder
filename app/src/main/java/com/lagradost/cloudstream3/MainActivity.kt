@@ -2032,6 +2032,8 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
         com.lagradost.cloudstream3.fork.Iptv.init(this)
         // Sites that moved to a new domain (Plus > Domain)
         com.lagradost.cloudstream3.fork.Domains.init(this)
+        // Plus > VPN: connects at start when asked
+        com.lagradost.cloudstream3.fork.vpn.Vpn.init(this)
         // What is switched on in this build: the icon follows at once, the add-on kinds as
         // soon as the switches are read, themes and fonts at the next start
         Looks.syncIcon(this)

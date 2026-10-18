@@ -21,6 +21,12 @@
         android:title="@string/iptv_title" />
 
     <Preference
+        android:icon="@drawable/ic_fork_vpn_24"
+        android:key="fork_plus_vpn"
+        android:summary="@string/vpn_des"
+        android:title="@string/vpn_title" />
+
+    <Preference
         android:icon="@drawable/ic_baseline_public_24"
         android:key="fork_plus_domains"
         android:summary="@string/domains_des"

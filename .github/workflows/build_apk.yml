@@ -32,6 +32,15 @@ jobs:
         distribution: temurin
         java-version: 17
 
+    # Plus > VPN: the Xray core for Android (AndroidLibXrayLite, pinned version)
+    - name: Download the VPN core
+      run: |
+        mkdir -p app/libs
+        curl -fL --retry 3 -o app/libs/libv2ray.aar \
+          https://github.com/2dust/AndroidLibXrayLite/releases/download/v26.9.30/libv2ray.aar
+        ls -la app/libs
+        unzip -l app/libs/libv2ray.aar | grep -E "\.so|classes.jar"
+
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 

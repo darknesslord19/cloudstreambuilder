@@ -138,6 +138,7 @@ object RemoteRules {
         TRAKT_RECS("trakt_recs"),
         AD_BLOCK("ad_block"),
         DOMAINS("domains"),
+        VPN("vpn"),
     }
 
     /**

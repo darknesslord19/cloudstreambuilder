@@ -45,6 +45,9 @@ fun buildDefaultClient(context: Context, ignoreSSL: Boolean = false): OkHttpClie
         .followSslRedirects(true)
         // sites that moved to a new domain (Plus > Domain)
         .addInterceptor(com.lagradost.cloudstream3.fork.Domains.interceptor)
+        // Plus > VPN: the requests that should go through the tunnel, and a second try for a blocked site
+        .proxySelector(com.lagradost.cloudstream3.fork.vpn.Vpn.selector)
+        .addInterceptor(com.lagradost.cloudstream3.fork.vpn.Vpn.interceptor)
         .apply {
             if (ignoreSSL) {
                 ignoreAllSSLErrors()

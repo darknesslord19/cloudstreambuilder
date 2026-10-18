@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>VPN</title>
+<!--
+  The VPN of the app (Plus > VPN). The app does the work through window.Vpn:
+  data(), toggle(), setMode(m), setScope(s), setFlag(k, on), addServer(token, raw, name),
+  removeServer(id), select(id), ping(), test(), warpLicense(token, key), clearLearned().
+  Answers: window.onVpnResult(token, json), onVpnPing(id, ms), onVpnTest(json), onVpnState().
+-->
+<style>
+:root{--bg:#0f0d12;--ink:#f3eef6;--card:#1c1920;--field:#262229;--line:rgba(255,255,255,.1);--muted:#a49cab;--accent:#cdb0ff;--accent-2:#e4d6ff;--ok:#5fd394;--bad:#ff7d7d;--warn:#f3b45a;--warp:#f6821f}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{padding:10px 0 40px}
+.hdr{display:flex;align-items:center;gap:12px;padding:8px 16px 6px}
+.hdr h1{font-size:24px;font-weight:750;flex:1}
+.back{background:none;border:0;color:var(--accent);font-size:24px;line-height:1;padding:4px 8px;border-radius:10px}
+.chip{font-size:11px;padding:3px 9px;border-radius:99px;background:var(--field);color:var(--muted);font-weight:700}
+.wrap{padding:0 14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px;margin-top:12px}
+.card h3{font-size:15px;margin-bottom:4px}
+.card>p{font-size:12px;color:var(--muted);line-height:1.45;margin-bottom:10px}
+.banner{border-color:rgba(255,125,125,.4);color:var(--bad);font-size:13px;font-weight:700;line-height:1.45}
+.hero{text-align:center;padding:22px 14px 16px;position:relative;overflow:hidden}
+.power{position:relative;width:132px;height:132px;border-radius:50%;margin:4px auto 14px;border:0;background:var(--field);display:grid;place-items:center;transition:.3s;box-shadow:inset 0 0 0 2px var(--line)}
+.power svg{width:50px;height:50px;stroke:var(--muted);transition:.3s}
+.power .ring{position:absolute;inset:-7px;border-radius:50%;border:3px solid transparent;transition:.3s}
+.st-on .power{background:var(--accent);box-shadow:0 12px 40px -10px var(--accent)}
+.st-on .power svg{stroke:var(--bg)}
+.st-on .power .ring{border-color:var(--accent);opacity:.45}
+.st-wait .power .ring{border-color:var(--accent) transparent transparent transparent;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.state{font-size:20px;font-weight:800}
+.st-on .state{color:var(--accent)}
+.sub{font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.4}
+.sub.err{color:var(--bad)}
+.meta{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:14px}
+.meta div{background:var(--field);border-radius:12px;padding:8px 4px;min-width:0}
+.meta b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.meta span{font-size:10.5px;color:var(--muted)}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mode{border:1.5px solid var(--line);background:var(--field);border-radius:16px;padding:12px;text-align:left;color:var(--ink);font-family:inherit;position:relative}
+.mode.on{border-color:var(--accent)}
+.mode .ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-weight:900;font-size:13px;margin-bottom:8px}
+.mode b{display:block;font-size:14px}.mode small{font-size:11.5px;color:var(--muted);line-height:1.35;display:block;margin-top:2px}
+.mode .tick{position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;border:2px solid var(--line)}
+.mode.on .tick{background:var(--accent);border-color:var(--accent)}
+.admin{grid-column:1/-1;display:flex;align-items:center;gap:10px}
+.admin .ic{margin:0;flex:0 0 34px}
+.admin>div:not(.ic){flex:1;min-width:0}
+.srv{display:flex;align-items:center;gap:10px;padding:11px 10px;border-radius:14px;background:var(--field);margin-top:7px;border:1.5px solid transparent;width:100%;color:var(--ink);text-align:left;font-family:inherit}
+.srv.on{border-color:var(--accent)}
+.kind{width:34px;height:34px;border-radius:10px;background:var(--bg);display:grid;place-items:center;font-size:10px;font-weight:900;color:var(--accent);flex:none}
+.srv .tx{flex:1;min-width:0}.srv b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.srv small{font-size:11.5px;color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ping{font-size:11px;font-weight:800;padding:3px 8px;border-radius:8px;background:var(--line);color:var(--muted);white-space:nowrap}
+.ping.ok{background:rgba(95,211,148,.15);color:var(--ok)}.ping.mid{background:rgba(243,180,90,.15);color:var(--warn)}.ping.bad{background:rgba(255,125,125,.15);color:var(--bad)}
+.x{background:none;border:0;color:var(--muted);font-size:16px;padding:6px 8px;border-radius:9px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+.btn{border:1px solid var(--line);background:var(--field);color:var(--ink);border-radius:12px;padding:10px 6px;font-weight:800;font-size:12.5px;font-family:inherit;min-height:44px}
+.btn.p{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.btn.w{width:100%;margin-top:10px}
+.btn:disabled{opacity:.5}
+textarea,input.t{width:100%;margin-top:10px;background:var(--bg);border:1px solid var(--line);border-radius:12px;color:var(--ink);padding:10px;font:12px ui-monospace,monospace;outline:none}
+textarea{min-height:96px;resize:vertical}
+textarea:focus,input.t:focus{border-color:var(--accent)}
+.hint{font-size:11.5px;color:var(--muted);line-height:1.45;margin-top:8px}
+.msg{font-size:12.5px;margin-top:8px;line-height:1.45}.msg.ok{color:var(--ok)}.msg.bad{color:var(--bad)}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:10px 4px;border:0;border-top:1px solid var(--line);background:none;color:var(--ink);width:100%;text-align:left;font-family:inherit}
+.opt:first-of-type{border-top:0}
+.radio{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);flex:none;margin-top:1px;display:grid;place-items:center}
+.opt.on .radio{border-color:var(--accent)}.opt.on .radio::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.opt b{font-size:14px;display:block}.opt small{font-size:12px;color:var(--muted);line-height:1.35}
+.rec{font-size:10px;font-weight:800;color:var(--ok);background:rgba(95,211,148,.14);padding:2px 6px;border-radius:6px;margin-left:5px;vertical-align:1px}
+.grow{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.grow:first-of-type{border-top:0;padding-top:2px}
+.grow .tx{flex:1;min-width:0}.grow b{font-size:14px;display:block}.grow small{font-size:12px;color:var(--muted);line-height:1.35;display:block}
+.sw{width:42px;height:24px;border-radius:24px;background:var(--line);position:relative;flex:0 0 42px;border:0}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--muted);transition:.2s}
+.sw.on{background:var(--accent)}.sw.on::after{left:21px;background:var(--bg)}
+.small{min-height:36px;padding:6px 12px}
+.test{display:grid;grid-template-columns:1fr 24px 1fr;gap:6px;align-items:center;margin-top:10px}
+.test div{background:var(--field);border-radius:12px;padding:10px;text-align:center;min-width:0}
+.test b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.test span{font-size:10.5px;color:var(--muted)}
+.test i{font-style:normal;text-align:center;color:var(--muted)}
+.btn:focus-visible,.back:focus-visible,.sw:focus-visible,.x:focus-visible,.mode:focus-visible,.srv:focus-visible,.opt:focus-visible,.power:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="hdr"><button class="back" id="back" aria-label="Geri">←</button><h1>VPN</h1><span class="chip">Sadece CloudStream</span></div>
+<div class="wrap">
+  <div class="card banner" id="unsupported" hidden>Bu cihaz VPN çekirdeğini desteklemiyor (işlemci türü). Diğer özellikler çalışmaya devam eder.</div>
+
+  <div class="card hero" id="hero">
+    <button class="power" id="power" aria-label="Bağlan / kes"><span class="ring"></span>
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round"><path d="M12 3v9"/><path d="M6.3 6.8a8 8 0 1 0 11.4 0"/></svg>
+    </button>
+    <div class="state" id="state">Kapalı</div>
+    <div class="sub" id="sub">Dokun, bağlan · telefonun diğer uygulamaları etkilenmez</div>
+    <div class="meta" id="meta" hidden>
+      <div><b id="mIp">–</b><span>Görünen IP</span></div>
+      <div><b id="mPing">–</b><span>Gecikme</span></div>
+      <div><b id="mData">0 MB</b><span>Bu oturum</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Bağlantı türü</h3>
+    <p>Bağlanmak için kullanılacak sunucu.</p>
+    <div class="modes">
+      <button class="mode" data-m="warp"><span class="tick"></span><div class="ic" style="background:rgba(246,130,31,.16);color:var(--warp)">W</div><b>WARP</b><small>Ücretsiz · Cloudflare · engelleri aşar, IP Türkiye kalır</small></button>
+      <button class="mode" data-m="own"><span class="tick"></span><div class="ic" style="background:var(--field);color:var(--accent);box-shadow:inset 0 0 0 1px var(--line)">S</div><b>Kendi sunucum</b><small>WireGuard ya da VLESS / VMess / Trojan / SS</small></button>
+      <button class="mode admin" data-m="admin" id="adminMode" hidden><span class="tick"></span><div class="ic" style="background:rgba(95,211,148,.15);color:var(--ok)">A</div><div><b>Admin sunucusu</b><small id="adminName">Admin tarafından ekli · ayar gerekmez</small></div></button>
+    </div>
+  </div>
+
+  <div class="card" id="ownCard" hidden>
+    <h3>Sunucularım</h3>
+    <p>Birini seç; en hızlıyı bulmak için "Ping ölç"e bas.</p>
+    <div id="srvs"></div>
+    <div class="row2">
+      <button class="btn" id="addPaste">Yapıştır</button>
+      <button class="btn" id="addFile">Dosyadan (.conf)</button>
+    </div>
+    <input type="file" id="file" accept=".conf,.txt,text/plain,*/*" hidden>
+    <div id="addBox" hidden>
+      <input class="t" id="srvName" placeholder="Ad (isteğe bağlı)">
+      <textarea id="paste" placeholder="[Interface]&#10;PrivateKey = …&#10;&#10;ya da vless://… / vmess://… / trojan://… / ss://…" spellcheck="false" autocapitalize="off"></textarea>
+      <button class="btn p w" id="savePaste">Sunucuyu ekle</button>
+    </div>
+    <div class="msg" id="addMsg"></div>
+    <button class="btn w" id="pingAll">Ping ölç</button>
+  </div>
+
+  <div class="card" id="warpCard" hidden>
+    <h3>WARP hesabı</h3>
+    <p>İlk bağlanışta ücretsiz hesap kendiliğinden açılır. WARP+ anahtarın varsa daha hızlı olur.</p>
+    <div class="grow"><div class="tx"><b>Durum</b><small id="warpState">Hesap henüz açılmadı</small></div></div>
+    <div class="grow"><div class="tx"><b>WARP+ anahtarı</b><small>İsteğe bağlı · 26 karakter</small></div><button class="btn small" id="warpKeyBtn">Gir</button></div>
+    <div id="warpBox" hidden><input class="t" id="warpKey" placeholder="xxxxxxxx-xxxxxxxx-xxxxxxxx" autocapitalize="off" spellcheck="false"><button class="btn p w" id="warpSave">Kaydet</button></div>
+    <div class="msg" id="warpMsg"></div>
+  </div>
+
+  <div class="card">
+    <h3>Hangi trafik tünelden geçsin?</h3>
+    <button class="opt" data-s="smart"><span class="radio"></span><div><b>Sadece engelli siteler<span class="rec">ÖNERİLEN</span></b><small>Açılmayan siteler ve onların videoları geçer; uygulama hangilerinin engelli olduğunu kendisi öğrenir. En hızlı ve en az veri.</small></div></button>
+    <button class="opt" data-s="sites"><span class="radio"></span><div><b>Bütün siteler, video doğrudan</b><small>Eklenti istekleri tünelden; video kendi hızınla. Sunucu kotası harcanmaz.</small></div></button>
+    <button class="opt" data-s="all"><span class="radio"></span><div><b>Her şey</b><small>Siteler ve videolar dahil CloudStream'in bütün trafiği.</small></div></button>
+    <div class="hint" id="learned"></div>
+  </div>
+
+  <div class="card">
+    <h3>Ayarlar</h3>
+    <div class="grow"><div class="tx"><b>Açılışta otomatik bağlan</b><small>Uygulama açılınca VPN de açılır</small></div><button class="sw" data-k="auto" aria-label="Açılışta otomatik bağlan"></button></div>
+    <div class="grow"><div class="tx"><b>Engel algılanınca kendiliğinden aç</b><small>Bir site açılmazsa VPN'i açıp tekrar dener</small></div><button class="sw" data-k="smart" aria-label="Engel algılanınca aç"></button></div>
+    <div class="grow"><div class="tx"><b>Koparsa doğrudan devam et</b><small>Kapalıyken bağlantı kopunca istekler durur</small></div><button class="sw" data-k="failopen" aria-label="Koparsa doğrudan devam et"></button></div>
+  </div>
+
+  <div class="card">
+    <h3>Bağlantı testi</h3>
+    <div class="test">
+      <div><b id="tA">–</b><span id="tAs">VPN'siz</span></div><i>→</i>
+      <div><b id="tB">–</b><span id="tBs">VPN ile</span></div>
+    </div>
+    <button class="btn w" id="testBtn">Test et</button>
+  </div>
+  <p class="hint" style="text-align:center;margin-top:14px" id="ver"></p>
+</div>
+
+<script src="theme.js"></script>
+<script>
+var app = window.CloudStream, V = window.Vpn;
+try { if (window.applyTheme && app && app.theme) applyTheme(app); } catch (e) {}
+function $(id) { return document.getElementById(id); }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+var d = {}, waiting = false, token = 0, pings = {}, lastIp = null, lastPing = null;
+
+function load() { try { d = JSON.parse(V.data()); } catch (e) { d = {}; } draw(); }
+function fmt(ms) { var s = Math.floor(ms / 1000), h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60, r = s % 60; return (h ? h + ':' : '') + (m < 10 ? '0' : '') + m + ':' + (r < 10 ? '0' : '') + r; }
+function mb(b) { return b > 1073741824 ? (b / 1073741824).toFixed(2) + ' GB' : (b / 1048576).toFixed(1) + ' MB'; }
+
+function draw() {
+  $('unsupported').hidden = d.supported !== false;
+  var on = !!d.running;
+  $('hero').className = 'card hero ' + (waiting ? 'st-wait' : on ? 'st-on' : '');
+  $('state').textContent = waiting ? 'Bağlanıyor…' : on ? 'Bağlı' : 'Kapalı';
+  var sub = $('sub'); sub.className = 'sub';
+  if (waiting) sub.textContent = d.mode === 'warp' && !(d.warp && d.warp.has) ? 'WARP hesabı açılıyor…' : 'Sunucuya bağlanılıyor…';
+  else if (on) sub.textContent = (d.where || '') + (d.where ? ' · ' : '') + fmt(Date.now() - d.since);
+  else if (d.error) { sub.className = 'sub err'; sub.textContent = d.error; }
+  else sub.textContent = 'Dokun, bağlan · telefonun diğer uygulamaları etkilenmez';
+  $('meta').hidden = !on;
+  $('mIp').textContent = lastIp || '–'; $('mPing').textContent = lastPing != null ? lastPing + ' ms' : '–'; $('mData').textContent = mb(d.bytes || 0);
+  Array.prototype.forEach.call(document.querySelectorAll('.mode'), function (b) { b.classList.toggle('on', b.getAttribute('data-m') === d.mode); });
+  $('adminMode').hidden = !d.admin;
+  if (d.admin) $('adminName').textContent = 'Admin tarafından ekli · ' + d.admin.name + ' · ayar gerekmez';
+  $('ownCard').hidden = d.mode !== 'own'; $('warpCard').hidden = d.mode !== 'warp';
+  $('warpState').textContent = d.warp && d.warp.has ? (d.warp.plus ? 'WARP+ hesabı hazır' : 'Ücretsiz hesap hazır') : 'Hesap henüz açılmadı';
+  Array.prototype.forEach.call(document.querySelectorAll('.opt'), function (o) { o.classList.toggle('on', o.getAttribute('data-s') === d.scope); });
+  Array.prototype.forEach.call(document.querySelectorAll('.sw'), function (s) { s.classList.toggle('on', !!d[s.getAttribute('data-k')]); });
+  $('learned').innerHTML = d.scope === 'smart' ? (d.learned ? d.learned + ' site engelli olarak öğrenildi · <a href="#" id="clr" style="color:var(--accent)">temizle</a>' : 'Henüz engelli site öğrenilmedi.') : '';
+  var c = $('clr'); if (c) c.onclick = function (e) { e.preventDefault(); V.clearLearned(); load(); };
+  drawServers();
+  $('ver').textContent = d.version || '';
+}
+
+function drawServers() {
+  var list = d.servers || [];
+  $('srvs').innerHTML = list.length ? list.map(function (s) {
+    var p = pings[s.id], cls = p == null ? '' : p < 0 ? 'bad' : p < 250 ? 'ok' : 'mid';
+    var pt = p == null ? '–' : p === 'wait' ? '…' : p < 0 ? 'yok' : p + ' ms';
+    if (p === 'wait') cls = '';
+    return '<div class="srv ' + (s.id === d.selected ? 'on' : '') + '" tabindex="0" data-id="' + esc(s.id) + '"><div class="kind">' + esc(s.kind.slice(0, 4).toUpperCase()) + '</div><div class="tx"><b>' + esc(s.name) + '</b><small>' + esc(s.kind + ' · ' + s.host + ':' + s.port) + '</small></div><span class="ping ' + cls + '">' + pt + '</span><button class="x" data-x="' + esc(s.id) + '" aria-label="Sil">✕</button></div>';
+  }).join('') : '<div class="hint">Henüz sunucu yok. Ayarını yapıştır ya da .conf dosyasını seç.</div>';
+  Array.prototype.forEach.call(document.querySelectorAll('.srv'), function (e) {
+    e.onclick = function (ev) { if (ev.target.getAttribute('data-x')) return; V.select(e.getAttribute('data-id')); load(); };
+    e.onkeydown = function (ev) { if (ev.key === 'Enter') e.click(); };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-x]'), function (b) { b.onclick = function () { V.removeServer(b.getAttribute('data-x')); load(); }; });
+}
+
+$('power').onclick = function () {
+  if (waiting || d.supported === false) return;
+  waiting = !d.running; draw();
+  V.toggle();
+};
+window.onVpnState = function () { waiting = false; load(); if (d.running) runTest(true); };
+
+Array.prototype.forEach.call(document.querySelectorAll('.mode'), function (b) {
+  b.onclick = function () { var m = b.getAttribute('data-m'); if (m === d.mode) return; if (d.running) waiting = true; V.setMode(m); load(); };
+});
+Array.prototype.forEach.call(document.querySelectorAll('.opt'), function (o) { o.onclick = function () { V.setScope(o.getAttribute('data-s')); load(); }; });
+Array.prototype.forEach.call(document.querySelectorAll('.sw'), function (s) { s.onclick = function () { var k = s.getAttribute('data-k'); V.setFlag(k, !d[k]); load(); }; });
+
+// ---- servers
+function showAdd(on) { $('addBox').hidden = !on; if (on) $('paste').focus(); }
+$('addPaste').onclick = function () { showAdd($('addBox').hidden); };
+$('addFile').onclick = function () { $('file').click(); };
+$('file').onchange = function () {
+  var f = $('file').files && $('file').files[0]; if (!f) return;
+  var r = new FileReader();
+  r.onload = function () { $('paste').value = String(r.result || ''); if (!$('srvName').value) $('srvName').value = f.name.replace(/\.(conf|txt)$/i, ''); showAdd(true); };
+  r.readAsText(f); $('file').value = '';
+};
+$('savePaste').onclick = function () {
+  var raw = $('paste').value.trim(); if (!raw) return;
+  var t = ++token; $('savePaste').disabled = true; V.addServer(t, raw, $('srvName').value.trim());
+};
+$('pingAll').onclick = function () { (d.servers || []).forEach(function (s) { pings[s.id] = 'wait'; }); drawServers(); V.ping(); };
+window.onVpnPing = function (id, ms) { pings[id] = ms; drawServers(); };
+
+// ---- warp+
+$('warpKeyBtn').onclick = function () { $('warpBox').hidden = !$('warpBox').hidden; if (!$('warpBox').hidden) $('warpKey').focus(); };
+$('warpSave').onclick = function () { var k = $('warpKey').value.trim(); if (!k) return; $('warpMsg').className = 'msg'; $('warpMsg').textContent = 'Kontrol ediliyor…'; V.warpLicense(++token, k); };
+
+window.onVpnResult = function (t, json) {
+  var r = {}; try { r = JSON.parse(json); } catch (e) {}
+  if (r.what === 'add') {
+    $('savePaste').disabled = false;
+    var m = $('addMsg'); m.className = 'msg ' + (r.ok ? 'ok' : 'bad'); m.textContent = r.message;
+    if (r.ok) { $('paste').value = ''; $('srvName').value = ''; showAdd(false); }
+  } else if (r.what === 'warp') {
+    var w = $('warpMsg'); w.className = 'msg ' + (r.ok ? 'ok' : 'bad'); w.textContent = r.message;
+    if (r.ok) $('warpBox').hidden = true;
+  }
+  load();
+};
+
+// ---- test
+function runTest(quiet) {
+  if (!quiet) { $('tA').textContent = '…'; $('tB').textContent = d.running ? '…' : 'Bağlı değil'; $('tBs').textContent = d.running ? 'VPN ile' : 'Önce VPN\'i aç'; }
+  V.test();
+}
+$('testBtn').onclick = function () { runTest(false); };
+window.onVpnTest = function (json) {
+  var r = {}; try { r = JSON.parse(json); } catch (e) {}
+  if (r.direct) { $('tA').textContent = r.direct.ip || 'hata'; $('tAs').textContent = 'VPN\'siz' + (r.direct.loc ? ' · ' + r.direct.loc : ''); }
+  if (r.vpn) {
+    var ok = r.vpn.ip && !r.vpn.error;
+    $('tB').textContent = ok ? r.vpn.ip : 'Çalışmıyor';
+    $('tBs').textContent = ok ? (r.vpn.loc || '') + (r.vpn.warp && r.vpn.warp !== 'off' ? ' · WARP' : '') + ' · ✓ çalışıyor' : (r.vpn.error || 'hata');
+    if (ok) { lastIp = r.vpn.ip; d.where = (r.vpn.loc || '') + (r.vpn.colo ? ' · ' + r.vpn.colo : ''); }
+  }
+  if (r.ping != null) lastPing = r.ping;
+  draw();
+};
+
+$('back').onclick = function () { try { app.close(); } catch (e) { history.back(); } };
+load();
+setInterval(function () { if (d.running && !waiting) { try { var n = JSON.parse(V.data()); n.where = d.where; d = n; } catch (e) {} draw(); } }, 1000);
+</script>
+</body>
+</html>

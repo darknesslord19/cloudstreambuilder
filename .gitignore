@@ -226,3 +226,6 @@ fabric.properties
 !/gradle/wrapper/gradle-wrapper.jar
 
 # End of https://www.toptal.com/developers/gitignore/api/kotlin,java,android,androidstudio,visualstudiocode
+
+# Plus > VPN: downloaded by the build workflow
+app/libs/*.aar
