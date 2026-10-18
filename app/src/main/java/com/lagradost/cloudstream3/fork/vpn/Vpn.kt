@@ -197,64 +197,121 @@ object Vpn {
 
     // ---------------------------------------------------------------- the core
 
-    /** Everything that touches the native library, so a phone without it only loses the VPN. */
+    /**
+     * Xray runs as its own small program (lib/<abi>/libxray.so in the APK, the official Xray
+     * build for Android), so it does not clash with the other Go library of the app (torrents).
+     */
     private object Core {
         @Volatile
-        private var controller: Any? = null
-        private var env = false
+        private var process: java.lang.Process? = null
+        private val output = java.util.ArrayDeque<String>()
+        private var versionText: String? = null
 
-        val supported: Boolean by lazy {
-            try {
-                libv2ray.Libv2ray.checkVersionX()
-                true
+        private fun binary(context: Context): java.io.File? =
+            java.io.File(context.applicationInfo.nativeLibraryDir ?: return null, "libxray.so").takeIf { it.exists() }
+
+        fun supported(context: Context) = binary(context) != null
+
+        private fun dir(context: Context) = java.io.File(context.filesDir, "xray").apply { mkdirs() }
+
+        private fun launch(context: Context, config: String, name: String): java.lang.Process {
+            val bin = binary(context) ?: throw IllegalStateException("Bu cihaz VPN çekirdeğini desteklemiyor")
+            val file = java.io.File(dir(context), "$name.json").apply { writeText(config) }
+            val pb = ProcessBuilder(bin.absolutePath, "run", "-c", file.absolutePath).redirectErrorStream(true)
+            pb.environment()["XRAY_LOCATION_ASSET"] = dir(context).absolutePath
+            pb.directory(dir(context))
+            return pb.start()
+        }
+
+        private fun keepOutput(p: java.lang.Process) {
+            Thread {
+                try {
+                    p.inputStream.bufferedReader().forEachLine { line ->
+                        synchronized(output) {
+                            output.addLast(line)
+                            while (output.size > 30) output.removeFirst()
+                        }
+                        Log.i(TAG, "xray: $line")
+                    }
+                } catch (t: Throwable) {
+                }
+            }.apply { isDaemon = true }.start()
+        }
+
+        private fun lastError(): String = synchronized(output) {
+            output.lastOrNull { it.contains("fail", true) || it.contains("error", true) || it.contains("invalid", true) }
+                ?: output.lastOrNull() ?: ""
+        }.substringAfter("] ").take(160)
+
+        private fun alive(p: java.lang.Process): Boolean = try {
+            p.exitValue(); false
+        } catch (e: IllegalThreadStateException) {
+            true
+        }
+
+        fun version(context: Context): String {
+            versionText?.let { return it }
+            val bin = binary(context) ?: return ""
+            return try {
+                val p = ProcessBuilder(bin.absolutePath, "version").redirectErrorStream(true).start()
+                val first = p.inputStream.bufferedReader().readLine().orEmpty()
+                p.destroy()
+                first.substringBefore(" (").trim().also { versionText = it }
             } catch (t: Throwable) {
-                Log.w(TAG, "no xray", t)
-                false
+                ""
             }
         }
 
-        fun version(): String = try {
-            libv2ray.Libv2ray.checkVersionX()
-        } catch (t: Throwable) {
-            ""
-        }
-
-        private fun env(context: Context) {
-            if (env) return
-            val dir = java.io.File(context.filesDir, "xray").apply { mkdirs() }
-            libv2ray.Libv2ray.initCoreEnv(dir.absolutePath, "")
-            env = true
-        }
-
-        fun start(context: Context, config: String) {
-            env(context)
-            val c = (controller as? libv2ray.CoreController) ?: libv2ray.Libv2ray.newCoreController(object : libv2ray.CoreCallbackHandler {
-                override fun startup(): Long = 0
-                override fun shutdown(): Long = 0
-                override fun onEmitStatus(p0: Long, p1: String?): Long {
-                    Log.i(TAG, "xray: $p1")
-                    return 0
-                }
-            }).also { controller = it }
-            c.startLoop(config, 0)
+        fun start(context: Context, config: String, port: Int) {
+            stop()
+            synchronized(output) { output.clear() }
+            val p = launch(context, config, "config")
+            keepOutput(p)
+            process = p
+            waitPort(port)
+            if (!alive(p)) {
+                process = null
+                throw IllegalStateException("Xray başlamadı: " + lastError().ifBlank { "çıkış kodu " + p.exitValue() })
+            }
         }
 
         fun stop() {
+            val p = process ?: return
+            process = null
             try {
-                (controller as? libv2ray.CoreController)?.stopLoop()
+                p.destroy()
+                Thread { try { Thread.sleep(1500); if (alive(p)) p.destroy() } catch (t: Throwable) {} }.start()
             } catch (t: Throwable) {
-                Log.w(TAG, "stop", t)
             }
         }
 
-        fun delay(context: Context, config: String): Long {
-            env(context)
-            return libv2ray.Libv2ray.measureOutboundDelay(config, "https://www.gstatic.com/generate_204")
+        fun isAlive(): Boolean = process?.let { alive(it) } == true
+
+        /** A short-lived second Xray on another port, to time a request through a server. */
+        fun delay(context: Context, outbound: JSONObject): Long {
+            val port = freePort()
+            val p = launch(context, VpnConfig.full(outbound, port), "probe")
+            try {
+                waitPort(port)
+                if (!alive(p)) return -1
+                val client = OkHttpClient.Builder().proxy(Proxy(Proxy.Type.HTTP, InetSocketAddress("127.0.0.1", port)))
+                    .connectTimeout(8, TimeUnit.SECONDS).readTimeout(8, TimeUnit.SECONDS).build()
+                val req = Request.Builder().url("https://www.gstatic.com/generate_204").build()
+                // the first request also opens the tunnel; the second is the real delay
+                client.newCall(req).execute().close()
+                val start = System.currentTimeMillis()
+                client.newCall(req).execute().use { if (it.code >= 400) return -1 }
+                return System.currentTimeMillis() - start
+            } catch (t: Throwable) {
+                return -1
+            } finally {
+                p.destroy()
+            }
         }
     }
 
-    fun supported(): Boolean = Core.supported
-    fun coreVersion(): String = Core.version()
+    fun supported(context: Context): Boolean = Core.supported(context)
+    fun coreVersion(context: Context): String = Core.version(context)
 
     private fun freePort(): Int = ServerSocket(0).use { it.localPort }
 
@@ -284,14 +341,13 @@ object Vpn {
         if (running) return null
         val ctx = context.applicationContext
         if (!available(ctx)) return "VPN kapalı (admin)"
-        if (!Core.supported) return "Bu cihaz VPN çekirdeğini desteklemiyor"
+        if (!Core.supported(ctx)) return "Bu cihaz VPN çekirdeğini desteklemiyor"
         readSettings(ctx)
         return try {
             val out = outbound(ctx)
             val p = freePort()
-            Core.start(ctx, VpnConfig.full(out, p))
+            Core.start(ctx, VpnConfig.full(out, p), p)
             port = p
-            waitPort(p)
             running = true
             since = System.currentTimeMillis()
             bytesAtStart = appBytes()
@@ -428,7 +484,7 @@ object Vpn {
         if (isLocal(host) || !looksBlocked(e) || !available(ctx)) return false
         if (running && tunnels(host, false)) return false // it already went through the tunnel
         if (!running) {
-            if (!autoOpen || !Core.supported) return false
+            if (!autoOpen || !Core.supported(ctx)) return false
             if (start(ctx) != null) return false
         }
         if (scopeNow == SCOPE_SMART && learned.add(bare(host))) saveLearned(ctx)
@@ -471,7 +527,7 @@ object Vpn {
 
     /** Real delay through a server, in ms; -1 when it does not work. */
     fun delay(context: Context, mode: String, serverId: String?): Long = try {
-        if (!Core.supported) -1 else Core.delay(context, VpnConfig.full(outbound(context, mode, serverId), freePort()))
+        if (!Core.supported(context)) -1 else Core.delay(context, outbound(context, mode, serverId))
     } catch (t: Throwable) {
         Log.w(TAG, "delay", t)
         -1

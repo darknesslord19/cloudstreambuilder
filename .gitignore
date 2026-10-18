@@ -229,3 +229,4 @@ fabric.properties
 
 # Plus > VPN: downloaded by the build workflow
 app/libs/*.aar
+app/src/main/jniLibs/*/libxray.so

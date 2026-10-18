@@ -32,8 +32,8 @@ object VpnPage {
             val c = activity
             val admin = Vpn.adminServer(c)
             return JSONObject()
-                .put("supported", Vpn.supported())
-                .put("version", Vpn.coreVersion())
+                .put("supported", Vpn.supported(c))
+                .put("version", Vpn.coreVersion(c))
                 .put("running", Vpn.running)
                 .put("since", Vpn.since)
                 .put("bytes", Vpn.sessionBytes())

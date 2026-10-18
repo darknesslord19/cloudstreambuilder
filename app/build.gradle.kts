@@ -226,8 +226,6 @@ android {
             // Enables legacy JNI packaging to reduce APK size (similar to builds before minSdk 23).
             // Note: This may increase app startup time slightly.
             useLegacyPackaging = true
-            // Plus > VPN: the Xray core only for ARM phones and TVs, to keep the APK smaller
-            excludes += setOf("lib/x86/libgojni.so", "lib/x86_64/libgojni.so")
         }
     }
 
@@ -235,8 +233,6 @@ android {
 }
 
 dependencies {
-    // Plus > VPN: Xray core (libv2ray.aar of AndroidLibXrayLite, downloaded by the build workflow)
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.aar"))))
     // Testing
     testImplementation(libs.junit)
     testImplementation(libs.json)
