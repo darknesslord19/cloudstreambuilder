@@ -1062,6 +1062,8 @@
     <string name="cat_name_needed">Bir ad gerekli</string>
     <string name="cat_rule_needed">Bir kelime yaz ya da tür, yıl, puan veya ülke seç</string>
     <string name="cat_name_taken">Bu adda bir tür var</string>
+    <string name="notch_nav">Çukurlu alt menü</string>
+    <string name="notch_nav_des">Seçili sekme renkli baloncukta, çukur ona kayar · uygulama yeniden açılınca</string>
     <string name="adult_title">+18 Kategoriler</string>
     <string name="adult_des">Başta kapalı: eklentilerin +18 satırları gizlenir; +18 kategoriler, PIN kilidi</string>
 </resources>

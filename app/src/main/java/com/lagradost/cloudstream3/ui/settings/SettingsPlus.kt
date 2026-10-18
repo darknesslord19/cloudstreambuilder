@@ -235,6 +235,7 @@ class SettingsPlus : BasePreferenceFragmentCompat() {
                 }
             })
         }
+        items.add(PlusSheet.Item.Switch(com.lagradost.cloudstream3.fork.NotchNav.PREF, getString(R.string.notch_nav), getString(R.string.notch_nav_des), icon = R.drawable.home_alt))
         // Plus > Görünüm > +18 Kategoriler
         if (com.lagradost.cloudstream3.fork.Adult.available(context)) {
             items.add(PlusSheet.Item.Action(getString(R.string.adult_title), getString(R.string.adult_des), R.drawable.video_locked) {

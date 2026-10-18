@@ -669,7 +669,8 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
         // Home screen settings: names under the icons of the bottom bar
         try {
             binding?.navView?.labelVisibilityMode =
-                if (com.lagradost.cloudstream3.fork.HomeTweaks.on(this, com.lagradost.cloudstream3.fork.HomeTweaks.Tweak.NAV))
+                if (com.lagradost.cloudstream3.fork.NotchNav.on(this)) com.google.android.material.navigation.NavigationBarView.LABEL_VISIBILITY_UNLABELED
+                else if (com.lagradost.cloudstream3.fork.HomeTweaks.on(this, com.lagradost.cloudstream3.fork.HomeTweaks.Tweak.NAV))
                     com.google.android.material.navigation.NavigationBarView.LABEL_VISIBILITY_LABELED
                 else com.google.android.material.navigation.NavigationBarView.LABEL_VISIBILITY_UNLABELED
         } catch (t: Throwable) {
@@ -1758,7 +1759,12 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
                     navController
                 )
             }
-
+            // Plus > Görünüm: the bar with a round notch under the chosen tab
+            try {
+                if (isLayout(PHONE)) com.lagradost.cloudstream3.fork.NotchNav.attach(this@MainActivity, this)
+            } catch (t: Throwable) {
+                logError(t)
+            }
         }
 
         binding?.navRailView?.apply {

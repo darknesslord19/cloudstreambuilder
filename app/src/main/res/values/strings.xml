@@ -1098,6 +1098,8 @@
     <string name="cat_name_needed">A name is needed</string>
     <string name="cat_rule_needed">Write a word or choose a genre, year, rating or country</string>
     <string name="cat_name_taken">A genre has this name</string>
+    <string name="notch_nav">Notched bottom bar</string>
+    <string name="notch_nav_des">The chosen tab in a coloured bubble, the notch slides to it · after restarting the app</string>
     <string name="adult_title">+18 Categories</string>
     <string name="adult_des">Off at first: +18 rows of plugins are hidden; choose +18 categories, PIN lock</string>
 </resources>
