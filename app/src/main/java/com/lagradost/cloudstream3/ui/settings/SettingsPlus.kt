@@ -57,11 +57,6 @@ class SettingsPlus : BasePreferenceFragmentCompat() {
             activity?.let { com.lagradost.cloudstream3.fork.Iptv.show(it) }
             true
         }
-        findPreference<Preference>("fork_plus_adult")?.isVisible = com.lagradost.cloudstream3.fork.Adult.available(context)
-        findPreference<Preference>("fork_plus_adult")?.setOnPreferenceClickListener {
-            activity?.let { com.lagradost.cloudstream3.fork.AdultPage.show(it) }
-            true
-        }
         findPreference<Preference>("fork_plus_scraper")?.isVisible = com.lagradost.cloudstream3.fork.scraper.Scrapers.available(context)
         findPreference<Preference>("fork_plus_scraper")?.setOnPreferenceClickListener {
             activity?.let { com.lagradost.cloudstream3.fork.scraper.Scrapers.show(it) }
@@ -238,6 +233,12 @@ class SettingsPlus : BasePreferenceFragmentCompat() {
                         .setNegativeButton(R.string.cancel) { _, _ -> }
                         .show()
                 }
+            })
+        }
+        // Plus > Görünüm > +18 Kategoriler
+        if (com.lagradost.cloudstream3.fork.Adult.available(context)) {
+            items.add(PlusSheet.Item.Action(getString(R.string.adult_title), getString(R.string.adult_des), R.drawable.video_locked) {
+                (activity as? androidx.fragment.app.FragmentActivity)?.let { com.lagradost.cloudstream3.fork.AdultPage.show(it) }
             })
         }
         PlusSheet.show(activity, getString(R.string.plus_looks), getString(R.string.plus_looks_des), items)
