@@ -139,6 +139,7 @@ object RemoteRules {
         AD_BLOCK("ad_block"),
         DOMAINS("domains"),
         VPN("vpn"),
+        FILE_PLUGINS("file_plugins"),
     }
 
     /**

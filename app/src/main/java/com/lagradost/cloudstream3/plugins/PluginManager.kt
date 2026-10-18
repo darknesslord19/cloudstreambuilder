@@ -686,6 +686,10 @@ object PluginManager {
         }
     }
 
+    /** Plus > Dosyadan eklentiler: a .cs3 the user picked, kept in the app's own folder. */
+    suspend fun forkLoadFilePlugin(context: Context, file: File, name: String): Boolean =
+        loadPlugin(context, file, PluginData(name, null, false, file.absolutePath, PLUGIN_VERSION_NOT_SET))
+
     fun unloadPlugin(absolutePath: String) {
         Log.i(TAG, "Unloading plugin: $absolutePath")
         val plugin = plugins[absolutePath]

@@ -1428,6 +1428,8 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
                         this@MainActivity,
                         false
                     )
+                    // Plus > Dosyadan eklentiler: the .cs3 files picked from the phone
+                    com.lagradost.cloudstream3.fork.FilePlugins.init(this@MainActivity)
                 }
 
 // Add your channel creation here

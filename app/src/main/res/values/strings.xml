@@ -997,6 +997,8 @@
     <string name="plus_looks_des">Themes, moving posters, font, app icon</string>
     <string name="profile_pick">Profile picture</string>
     <string name="profile_pick_des">Choose an icon</string>
+    <string name="fp_title">Plugins from files</string>
+    <string name="fp_des">Load .cs3 files from the phone, name them, switch them off or delete them</string>
     <string name="vpn_title">VPN</string>
     <string name="vpn_des">For CloudStream only: WARP or your own server, opens blocked sites</string>
     <string name="domains_title">Domain</string>

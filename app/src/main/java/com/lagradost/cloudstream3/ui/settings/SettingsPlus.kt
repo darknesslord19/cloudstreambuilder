@@ -57,6 +57,11 @@ class SettingsPlus : BasePreferenceFragmentCompat() {
             activity?.let { com.lagradost.cloudstream3.fork.Iptv.show(it) }
             true
         }
+        findPreference<Preference>("fork_plus_file_plugins")?.isVisible = com.lagradost.cloudstream3.fork.FilePlugins.available(context)
+        findPreference<Preference>("fork_plus_file_plugins")?.setOnPreferenceClickListener {
+            activity?.let { com.lagradost.cloudstream3.fork.FilePlugins.show(it) }
+            true
+        }
         findPreference<Preference>("fork_plus_vpn")?.isVisible = com.lagradost.cloudstream3.fork.vpn.Vpn.available(context)
         findPreference<Preference>("fork_plus_vpn")?.setOnPreferenceClickListener {
             activity?.let { com.lagradost.cloudstream3.fork.vpn.VpnPage.show(it) }

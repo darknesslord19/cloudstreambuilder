@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Dosyadan eklentiler</title>
+<!--
+  Plugins picked from the phone's files (Plus > Dosyadan eklentiler). The app does the work through
+  window.FilePlugins: list(), inspect(token, fileName, base64), install(token, pendingId, label),
+  cancel(pendingId), rename(id, label), setOn(token, id, on), remove(token, id).
+  Answers come to window.onFpResult(token, json).
+-->
+<style>
+:root{--bg:#0f0d12;--ink:#f3eef6;--card:#1c1920;--field:#262229;--line:rgba(255,255,255,.1);--muted:#a49cab;--accent:#cdb0ff;--accent-2:#e4d6ff;--ok:#5fd394;--bad:#ff7d7d;--warn:#f3b45a}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{padding:10px 0 40px}
+.hdr{display:flex;align-items:center;gap:12px;padding:8px 16px 12px}
+.hdr h1{font-size:22px;font-weight:750;flex:1}
+.back{background:none;border:0;color:var(--accent);font-size:24px;line-height:1;padding:4px 8px;border-radius:10px}
+.wrap{padding:0 14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px;margin-bottom:12px}
+.card h3{font-size:15px;margin-bottom:4px}
+.card p{font-size:12px;color:var(--muted);line-height:1.45}
+.btn{border:1px solid var(--line);background:var(--field);color:var(--ink);border-radius:12px;padding:10px 12px;font-weight:800;font-size:13px;font-family:inherit;min-height:44px}
+.btn.p{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.btn.d{color:var(--bad);border-color:rgba(255,125,125,.4);background:transparent}
+.btn.w{width:100%;margin-top:12px}
+.btn:disabled{opacity:.5}
+.pick{display:flex;flex-direction:column;align-items:center;gap:6px;border:1.5px dashed var(--line);border-radius:16px;padding:20px 12px;margin-top:12px;background:var(--field);color:var(--ink);width:100%;font-family:inherit}
+.pick b{font-size:15px}.pick small{font-size:12px;color:var(--muted)}
+.pick .ic{width:44px;height:44px;border-radius:13px;background:linear-gradient(145deg,var(--accent-2),var(--accent));color:var(--bg);display:grid;place-items:center;font-size:22px;font-weight:900}
+.warn{font-size:11.5px;color:var(--warn);line-height:1.45;margin-top:10px}
+.new{border-color:var(--accent)}
+.new .meta{font-size:12px;color:var(--muted);margin:2px 0 8px}
+.new .rep{font-size:12px;color:var(--warn);margin-bottom:6px}
+input.t{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:12px;color:var(--ink);padding:11px 12px;font-size:14px;font-family:inherit;outline:none}
+input.t:focus{border-color:var(--accent)}
+label.l{display:block;font-size:12px;color:var(--muted);margin:8px 0 5px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.sect{font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin:18px 4px 8px;display:flex;justify-content:space-between}
+.pl{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px;margin-bottom:8px}
+.pl.off{opacity:.62}
+.top{display:flex;align-items:center;gap:11px}
+.av{width:42px;height:42px;border-radius:12px;background:var(--field);color:var(--accent);display:grid;place-items:center;font-weight:900;font-size:16px;flex:0 0 42px}
+.top .tx{flex:1;min-width:0}
+.top b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top small{display:block;font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sw{width:42px;height:24px;border-radius:24px;background:var(--line);position:relative;flex:0 0 42px;border:0}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--muted);transition:.2s}
+.sw.on{background:var(--accent)}.sw.on::after{left:21px;background:var(--bg)}
+.prov{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+.prov span{font-size:11px;font-weight:700;padding:3px 8px;border-radius:7px;background:var(--field);color:var(--accent)}
+.prov span.no{color:var(--muted)}
+.acts{display:flex;gap:6px;margin-top:10px}
+.acts .btn{min-height:36px;padding:7px 12px;font-size:12px}
+.edit{display:flex;gap:6px;margin-top:10px}
+.edit .btn{min-height:42px}
+.msg{font-size:12.5px;margin-top:8px;line-height:1.45}.msg.ok{color:var(--ok)}.msg.bad{color:var(--bad)}
+.empty{text-align:center;color:var(--muted);font-size:13px;padding:22px 8px;line-height:1.6}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,40px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:13px;font-weight:700;opacity:0;transition:.25s;z-index:30;pointer-events:none;max-width:90%;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.btn:focus-visible,.back:focus-visible,.sw:focus-visible,.pick:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="hdr"><button class="back" id="back" aria-label="Geri">←</button><h1>Dosyadan eklentiler</h1></div>
+<div class="wrap">
+  <div class="card">
+    <h3>.cs3 dosyası yükle</h3>
+    <p>İndirilenler, WhatsApp ya da Telegram'dan gelen eklenti dosyalarını seç. Uygulama kendi klasörüne kopyalar; izin gerekmez. Birden fazla seçebilirsin.</p>
+    <button class="pick" id="pick"><span class="ic">+</span><b>Dosya seç (.cs3)</b><small>Seçtiklerin önce burada onaya gelir</small></button>
+    <input type="file" id="file" accept=".cs3,application/octet-stream,*/*" multiple hidden>
+    <div class="warn">⚠ Eklentiler uygulamanın bütün yetkileriyle çalışır. Sadece güvendiğin kaynaklardan gelen dosyaları yükle.</div>
+  </div>
+
+  <div id="pending"></div>
+
+  <div class="sect"><span>Yüklenenler</span><span id="count"></span></div>
+  <div id="list"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="theme.js"></script>
+<script>
+var app = window.CloudStream, F = window.FilePlugins;
+try { if (window.applyTheme && app && app.theme) applyTheme(app); } catch (e) {}
+function $(id) { return document.getElementById(id); }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function toast(t) { var e = $('toast'); e.textContent = t; e.classList.add('on'); clearTimeout(e._t); e._t = setTimeout(function () { e.classList.remove('on'); }, 2400); }
+function kb(n) { return n > 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB'; }
+function day(t) { try { var d = new Date(t); return d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }); } catch (e) { return ''; } }
+
+var token = 0, waits = {}, pend = [], editing = null, items = [];
+
+function load() { try { items = JSON.parse(F.list()); } catch (e) { items = []; } draw(); }
+
+function draw() {
+  $('count').textContent = items.length ? items.length + ' eklenti' : '';
+  $('list').innerHTML = items.length ? items.map(function (p) {
+    var prov = p.providers && p.providers.length ? p.providers.map(function (n) { return '<span>' + esc(n) + '</span>'; }).join('') : '<span class="no">' + (p.on ? (p.loaded ? 'Kaynak eklemedi' : 'Yüklenemedi') : 'Kapalı') + '</span>';
+    return '<div class="pl' + (p.on ? '' : ' off') + '" data-id="' + esc(p.id) + '">' +
+      '<div class="top"><div class="av">' + esc((p.label || '?').charAt(0).toUpperCase()) + '</div>' +
+      '<div class="tx"><b>' + esc(p.label) + '</b><small>' + esc(p.plugin) + (p.version ? ' · v' + p.version : '') + ' · ' + kb(p.size) + ' · ' + day(p.added) + '</small></div>' +
+      '<button class="sw' + (p.on ? ' on' : '') + '" data-sw="' + esc(p.id) + '" aria-label="Aç / kapat"></button></div>' +
+      '<div class="prov">' + prov + '</div>' +
+      (editing === p.id
+        ? '<div class="edit"><input class="t" id="ren" value="' + esc(p.label) + '"><button class="btn p" data-save="' + esc(p.id) + '">Kaydet</button></div>'
+        : '<div class="acts"><button class="btn" data-ren="' + esc(p.id) + '">İsim ver</button><button class="btn d" data-del="' + esc(p.id) + '">Sil</button></div>') +
+      '</div>';
+  }).join('') : '<div class="empty">Henüz dosyadan yüklenen eklenti yok.</div>';
+  bind();
+}
+function bind() {
+  Array.prototype.forEach.call(document.querySelectorAll('[data-sw]'), function (b) {
+    b.onclick = function () { var id = b.getAttribute('data-sw'), p = find(id); b.disabled = true; F.setOn(++token, id, !p.on); };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-ren]'), function (b) {
+    b.onclick = function () { editing = b.getAttribute('data-ren'); draw(); var i = $('ren'); if (i) { i.focus(); i.select(); } };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-save]'), function (b) {
+    b.onclick = function () { var v = $('ren').value.trim(); if (v) { F.rename(b.getAttribute('data-save'), v); toast('İsim kaydedildi'); } editing = null; load(); };
+  });
+  var ren = $('ren'); if (ren) ren.onkeydown = function (e) { if (e.key === 'Enter') document.querySelector('[data-save]').click(); };
+  Array.prototype.forEach.call(document.querySelectorAll('[data-del]'), function (b) {
+    b.onclick = function () {
+      if (b.getAttribute('data-sure')) { b.disabled = true; F.remove(++token, b.getAttribute('data-del')); return; }
+      b.setAttribute('data-sure', '1'); b.textContent = 'Emin misin? Sil';
+      setTimeout(function () { if (b.isConnected) { b.removeAttribute('data-sure'); b.textContent = 'Sil'; } }, 4000);
+    };
+  });
+}
+function find(id) { return items.filter(function (p) { return p.id === id; })[0] || {}; }
+
+// ---- picking files
+$('pick').onclick = function () { $('file').click(); };
+$('file').onchange = function () {
+  var files = Array.prototype.slice.call($('file').files || []);
+  $('file').value = '';
+  files.forEach(function (f) {
+    var r = new FileReader();
+    r.onload = function () { var t = ++token; waits[t] = 'inspect'; F.inspect(t, f.name, String(r.result || '')); };
+    r.readAsDataURL(f);
+  });
+};
+
+function drawPending() {
+  $('pending').innerHTML = pend.map(function (p, i) {
+    if (!p.ok) return '<div class="card"><h3>' + esc(p.fileName) + '</h3><div class="msg bad">' + esc(p.message) + '</div><button class="btn w" data-x="' + i + '">Tamam</button></div>';
+    return '<div class="card new"><h3>' + esc(p.plugin) + '</h3><div class="meta">' + esc(p.fileName) + (p.version ? ' · v' + p.version : '') + ' · ' + kb(p.size) + '</div>' +
+      (p.replaces ? '<div class="rep">Yüklü olan "' + esc(p.replacesLabel) + '" bununla değiştirilecek (güncelleme).</div>' : '') +
+      '<label class="l">İsim</label><input class="t" data-label="' + i + '" value="' + esc(p.label) + '">' +
+      '<div class="row2"><button class="btn" data-cancel="' + i + '">İptal</button><button class="btn p" data-ok="' + i + '"' + (p.busy ? ' disabled' : '') + '>' + (p.busy ? 'Yükleniyor…' : 'Yükle') + '</button></div>' +
+      (p.msg ? '<div class="msg bad">' + esc(p.msg) + '</div>' : '') + '</div>';
+  }).join('');
+  Array.prototype.forEach.call(document.querySelectorAll('[data-x]'), function (b) { b.onclick = function () { pend.splice(+b.getAttribute('data-x'), 1); drawPending(); }; });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-cancel]'), function (b) { b.onclick = function () { var p = pend[+b.getAttribute('data-cancel')]; F.cancel(p.pending); pend.splice(pend.indexOf(p), 1); drawPending(); }; });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-label]'), function (inp) { inp.oninput = function () { pend[+inp.getAttribute('data-label')].label = inp.value; }; });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-ok]'), function (b) {
+    b.onclick = function () { var p = pend[+b.getAttribute('data-ok')]; p.busy = true; p.msg = null; drawPending(); var t = ++token; waits[t] = p; F.install(t, p.pending, p.label); };
+  });
+}
+
+window.onFpResult = function (t, json) {
+  var r = {}; try { r = JSON.parse(json); } catch (e) {}
+  var w = waits[t]; delete waits[t];
+  if (w === 'inspect') { pend.push(r); drawPending(); return; }
+  if (w && w.pending) {
+    pend.splice(pend.indexOf(w), 1); toast(r.message);
+    drawPending(); load(); return;
+  }
+  if (r.message) toast(r.message);
+  load();
+};
+
+$('back').onclick = function () { try { app.close(); } catch (e) { history.back(); } };
+load();
+</script>
+</body>
+</html>
