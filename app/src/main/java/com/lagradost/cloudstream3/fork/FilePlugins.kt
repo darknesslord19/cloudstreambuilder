@@ -103,6 +103,43 @@ object FilePlugins {
         return ok
     }
 
+    /**
+     * A source from a file and one from a repository with the same name cannot both be used (the app
+     * finds sources by name): the one from the file wins, the other one waits until the file one is
+     * switched off or deleted.
+     */
+    fun <T : com.lagradost.cloudstream3.MainAPI> preferFileCopies(list: List<T>): List<T> {
+        val fromFiles = list.filter { SourceGroups.isFilePlugin(it) }.map { it.name }.toSet()
+        if (fromFiles.isEmpty()) return list
+        return list.filter { SourceGroups.isFilePlugin(it) || it.name !in fromFiles }
+    }
+
+    /** Puts the copies from files before the others in the list of sources right away. */
+    private fun preferNow() {
+        try {
+            val now = APIHolder.apis.toList()
+            val inList = now.toHashSet()
+            val missing = APIHolder.allProviders.withLock { APIHolder.allProviders.filter { SourceGroups.isFilePlugin(it) && it !in inList } }
+            APIHolder.apis.withLock { APIHolder.apis = com.lagradost.cloudstream3.utils.AtomicList(preferFileCopies(now + missing)) }
+            APIHolder.apiMap = null
+        } catch (t: Throwable) {
+        }
+    }
+
+    /** The other installed sources with the same name as the ones of this plugin */
+    private fun replaced(context: Context, id: String): List<String> {
+        val path = fileOf(context, id).absolutePath
+        return try {
+            APIHolder.allProviders.withLock {
+                val mine = APIHolder.allProviders.filter { it.sourcePlugin == path }.map { it.name }.toSet()
+                APIHolder.allProviders.filter { it.sourcePlugin != path && it.name in mine && !SourceGroups.isFilePlugin(it) }
+                    .map { it.name }.distinct()
+            }
+        } catch (t: Throwable) {
+            emptyList()
+        }
+    }
+
     /** The sources of a plugin, and why the home page picker would not show one. */
     fun sourcesOf(context: Context, id: String): JSONArray {
         val path = fileOf(context, id).absolutePath
@@ -124,6 +161,7 @@ object FilePlugins {
         val out = JSONArray()
         apis.forEach { api ->
             val why = when {
+                APIHolder.apis.none { it === api } -> "Aynı isimli başka bir kaynak öncelikli; uygulamayı yeniden aç"
                 !api.hasMainPage -> "Ana sayfası yok, sadece aramada çıkar"
                 langs != null && !langs.contains(com.lagradost.cloudstream3.AllLanguagesName) && !langs.contains(api.lang) ->
                     "Dil ayarı gizliyor (${api.lang})"
@@ -141,6 +179,7 @@ object FilePlugins {
     }
 
     private suspend fun refresh() = withContext(Dispatchers.Main) {
+        preferNow()
         try {
             MainActivity.afterPluginsLoadedEvent.invoke(false)
         } catch (t: Throwable) {
@@ -176,6 +215,7 @@ object FilePlugins {
             val a = JSONArray()
             FilePlugins.list(activity).forEach { e ->
                 a.put(e.json().put("loaded", isLoaded(activity, e.id)).put("sources", sourcesOf(activity, e.id))
+                    .put("replaces", JSONArray(if (e.on) replaced(activity, e.id) else emptyList()))
                     .put("error", errors[e.id] ?: JSONObject.NULL))
             }
             return a.toString()

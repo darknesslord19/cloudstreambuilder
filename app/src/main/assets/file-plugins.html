@@ -53,7 +53,7 @@ label.l{display:block;font-size:12px;color:var(--muted);margin:8px 0 5px}
 .prov span{font-size:11px;font-weight:700;padding:3px 8px;border-radius:7px;background:var(--field);color:var(--accent)}
 .prov span.no{color:var(--muted)}
 .prov span.hid{color:var(--warn);background:rgba(243,180,90,.12)}
-.why{font-size:11.5px;color:var(--warn);margin-top:6px;line-height:1.4}.why.bad{color:var(--bad);word-break:break-word}
+.why{font-size:11.5px;color:var(--warn);margin-top:6px;line-height:1.4}.why.bad{color:var(--bad);word-break:break-word}.why.info{color:var(--muted)}
 .acts{display:flex;gap:6px;margin-top:10px}
 .acts .btn{min-height:36px;padding:7px 12px;font-size:12px}
 .edit{display:flex;gap:6px;margin-top:10px}
@@ -105,6 +105,7 @@ function draw() {
     var prov = src.length ? src.map(function (x) { return '<span' + (x.why ? ' class="hid"' : '') + '>' + esc(x.name) + (x.lang ? ' · ' + esc(x.lang) : '') + '</span>'; }).join('') : '<span class="no">' + (p.on ? (p.loaded ? 'Kaynak eklemedi' : 'Yüklenemedi') : 'Kapalı') + '</span>';
     var whys = src.filter(function (x) { return x.why; }).map(function (x) { return '<div class="why">' + esc(x.name) + ': ' + esc(x.why) + '</div>'; }).join('');
     if (p.on && !p.loaded && p.error) whys += '<div class="why bad">' + esc(p.error) + '</div>';
+    if (p.replaces && p.replaces.length) whys += '<div class="why info">Repodaki ' + esc(p.replaces.join(', ')) + ' yerine bu kopya kullanılıyor; kapatınca repodaki geri gelir.</div>';
     return '<div class="pl' + (p.on ? '' : ' off') + '" data-id="' + esc(p.id) + '">' +
       '<div class="top"><div class="av">' + esc((p.label || '?').charAt(0).toUpperCase()) + '</div>' +
       '<div class="tx"><b>' + esc(p.label) + '</b><small>' + esc(p.plugin) + (p.version ? ' · v' + p.version : '') + ' · ' + kb(p.size) + ' · ' + day(p.added) + '</small></div>' +

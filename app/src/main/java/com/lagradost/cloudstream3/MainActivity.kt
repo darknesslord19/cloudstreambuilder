@@ -868,9 +868,11 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
                             }
                         }
                         // it.hashCode() is not enough to make sure they are distinct
-                        apis = allProviders.distinctBy {
-                            it.lang + it.name + it.mainUrl + it::class.qualifiedName
-                        }
+                        // Plus > Dosyadan eklentiler: a copy picked from a file goes before the same plugin from a repository
+                        apis = com.lagradost.cloudstream3.utils.AtomicList(com.lagradost.cloudstream3.fork.FilePlugins.preferFileCopies(
+                            allProviders.toList().sortedBy { if (com.lagradost.cloudstream3.fork.SourceGroups.isFilePlugin(it)) 0 else 1 }
+                                .distinctBy { it.lang + it.name + it.mainUrl + it::class.qualifiedName }
+                        ))
                         APIHolder.apiMap = null
                     } catch (e: Exception) {
                         logError(e)
@@ -1705,7 +1707,7 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
         ioSafe {
             initAll()
             // No duplicates (which can happen by registerMainAPI)
-            apis = allProviders.distinctBy { it }
+            apis = com.lagradost.cloudstream3.utils.AtomicList(com.lagradost.cloudstream3.fork.FilePlugins.preferFileCopies(allProviders.toList().distinctBy { it }))
         }
 
         //  val navView: BottomNavigationView = findViewById(R.id.nav_view)
