@@ -965,6 +965,8 @@
     <string name="scr_des">Bir siteyi JSON ile tarif et (HTML ya da API), kaynak olarak çıksın</string>
     <string name="fp_section">DOSYADAN EKLENTİLER</string>
     <string name="fp_title">Dosyadan eklentiler</string>
+    <string name="zp_title">Zip plugin</string>
+    <string name="zp_des">Eklenti paketini (.zip) indir, şifresini gir, içindekileri toplu yükle</string>
     <string name="fp_des">Telefondaki .cs3 dosyalarını yükle, isim ver, aç kapat ya da sil</string>
     <string name="vpn_title">VPN</string>
     <string name="vpn_des">Sunucusuz DPI aşma, WARP ya da kendi sunucun; engelli siteleri açar</string>

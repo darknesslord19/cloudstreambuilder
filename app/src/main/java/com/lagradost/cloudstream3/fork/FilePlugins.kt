@@ -199,6 +199,54 @@ object FilePlugins {
         }
     }
 
+    // ---------------------------------------------------------------- shared with Plus > Zip plugin
+
+    /** A .cs3 (as bytes) is checked and kept until it is confirmed with [installPending]. */
+    fun inspectBytes(context: Context, fileName: String?, bytes: ByteArray): JSONObject {
+        val out = JSONObject().put("fileName", fileName ?: "")
+        val id = System.currentTimeMillis().toString(36) + (1000..9999).random()
+        val f = File(pending(context), "$id.cs3").apply { writeBytes(bytes) }
+        val m = manifest(f)
+        if (m == null) {
+            f.delete()
+            return out.put("ok", false).put("message", "Bu bir CloudStream eklentisi (.cs3) değil")
+        }
+        val same = list(context).firstOrNull { it.plugin.equals(m.first, true) }
+        return out.put("ok", true).put("pending", id).put("plugin", m.first).put("version", m.second).put("size", bytes.size)
+            .put("replaces", same?.id ?: JSONObject.NULL).put("replacesLabel", same?.label ?: JSONObject.NULL)
+            .put("label", (fileName ?: m.first).substringAfterLast('/').substringBeforeLast(".cs3").substringBeforeLast(".CS3").ifBlank { m.first })
+    }
+
+    fun cancelPending(context: Context, pendingId: String?) {
+        File(pending(context), "${pendingId ?: return}.cs3").delete()
+    }
+
+    suspend fun installPending(context: Context, pendingId: String, label: String?): JSONObject {
+        val out = JSONObject()
+        lock.withLock {
+            val src = File(pending(context), "$pendingId.cs3")
+            val m = if (src.exists()) manifest(src) else null
+            if (m == null) return out.put("ok", false).put("message", "Dosya bulunamadı, tekrar seç")
+            // a newer copy of the same plugin takes the place of the old one
+            list(context).filter { it.plugin.equals(m.first, true) }.forEach { old ->
+                unload(context, old.id)
+                fileOf(context, old.id).apply { setWritable(true) }.delete()
+                save(context, list(context).filter { it.id != old.id })
+            }
+            val dest = fileOf(context, pendingId)
+            src.copyTo(dest, overwrite = true)
+            src.delete()
+            val e = Entry(pendingId, label?.trim()?.ifBlank { null } ?: m.first, src.name, m.first, m.second, dest.length(), System.currentTimeMillis(), true)
+            save(context, list(context) + e)
+            val ok = load(context, e)
+            refresh()
+            val n = sourcesOf(context, e.id).length()
+            out.put("ok", ok).put("label", e.label).put("message", if (!ok) "Yüklenemedi: " + (errors[e.id] ?: "uyumsuz eklenti")
+                else if (n == 0) "${e.label} yüklendi ama kaynak eklemedi" else "${e.label} yüklendi · $n kaynak")
+        }
+        return out
+    }
+
     // ---------------------------------------------------------------- the page
 
     class Bridge(private val activity: FragmentActivity) {
@@ -225,23 +273,11 @@ object FilePlugins {
         @JavascriptInterface
         fun inspect(token: Int, fileName: String?, base64: String?) {
             scope.launch {
-                val out = JSONObject().put("fileName", fileName ?: "")
-                try {
+                val out = try {
                     val bytes = Base64.decode(base64?.substringAfter("base64,") ?: "", Base64.DEFAULT)
-                    val id = System.currentTimeMillis().toString(36) + (100..999).random()
-                    val f = File(pending(activity), "$id.cs3").apply { writeBytes(bytes) }
-                    val m = manifest(f)
-                    if (m == null) {
-                        f.delete()
-                        out.put("ok", false).put("message", "Bu bir CloudStream eklentisi (.cs3) değil")
-                    } else {
-                        val same = FilePlugins.list(activity).firstOrNull { it.plugin.equals(m.first, true) }
-                        out.put("ok", true).put("pending", id).put("plugin", m.first).put("version", m.second).put("size", bytes.size)
-                            .put("replaces", same?.id ?: JSONObject.NULL).put("replacesLabel", same?.label ?: JSONObject.NULL)
-                            .put("label", (fileName ?: m.first).substringBeforeLast(".cs3").substringBeforeLast(".CS3").ifBlank { m.first })
-                    }
+                    inspectBytes(activity, fileName, bytes)
                 } catch (t: Throwable) {
-                    out.put("ok", false).put("message", "Dosya okunamadı")
+                    JSONObject().put("fileName", fileName ?: "").put("ok", false).put("message", "Dosya okunamadı")
                 }
                 answer(token, out)
             }
@@ -250,40 +286,12 @@ object FilePlugins {
         @JavascriptInterface
         fun install(token: Int, pendingId: String?, label: String?) {
             pendingId ?: return
-            scope.launch {
-                val out = JSONObject()
-                lock.withLock {
-                    val src = File(pending(activity), "$pendingId.cs3")
-                    val m = if (src.exists()) manifest(src) else null
-                    if (m == null) {
-                        answer(token, out.put("ok", false).put("message", "Dosya bulunamadı, tekrar seç"))
-                        return@launch
-                    }
-                    // a newer copy of the same plugin takes the place of the old one
-                    FilePlugins.list(activity).filter { it.plugin.equals(m.first, true) }.forEach { old ->
-                        unload(activity, old.id)
-                        fileOf(activity, old.id).apply { setWritable(true) }.delete()
-                        save(activity, FilePlugins.list(activity).filter { it.id != old.id })
-                    }
-                    val dest = fileOf(activity, pendingId)
-                    src.copyTo(dest, overwrite = true)
-                    src.delete()
-                    val e = Entry(pendingId, label?.trim()?.ifBlank { null } ?: m.first, src.name, m.first, m.second, dest.length(), System.currentTimeMillis(), true)
-                    save(activity, FilePlugins.list(activity) + e)
-                    val ok = load(activity, e)
-                    refresh()
-                    val n = sourcesOf(activity, e.id).length()
-                    out.put("ok", ok).put("message", if (!ok) "Yüklenemedi: " + (errors[e.id] ?: "uyumsuz eklenti")
-                        else if (n == 0) "${e.label} yüklendi ama kaynak eklemedi" else "${e.label} yüklendi · $n kaynak")
-                }
-                answer(token, out)
-            }
+            scope.launch { answer(token, installPending(activity, pendingId, label)) }
         }
 
         @JavascriptInterface
         fun cancel(pendingId: String?) {
-            pendingId ?: return
-            File(pending(activity), "$pendingId.cs3").delete()
+            cancelPending(activity, pendingId)
         }
 
         @JavascriptInterface

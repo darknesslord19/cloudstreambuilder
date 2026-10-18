@@ -144,6 +144,7 @@ object RemoteRules {
         VPN_DPI("vpn_dpi"),
         VPN_DEVICE("vpn_device"),
         ADULT("adult"),
+        ZIP_PLUGIN("zip_plugin"),
     }
 
     /**

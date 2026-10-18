@@ -1001,6 +1001,8 @@
     <string name="scr_des">Describe a site with JSON (HTML or API), it becomes a source</string>
     <string name="fp_section">FROM FILES</string>
     <string name="fp_title">Plugins from files</string>
+    <string name="zp_title">Zip plugin</string>
+    <string name="zp_des">Download the plugin pack (.zip), enter its password and load what is inside</string>
     <string name="fp_des">Load .cs3 files from the phone, name them, switch them off or delete them</string>
     <string name="vpn_title">VPN</string>
     <string name="vpn_des">DPI bypass without a server, WARP or your own server; opens blocked sites</string>

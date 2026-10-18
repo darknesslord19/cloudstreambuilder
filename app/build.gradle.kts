@@ -298,6 +298,7 @@ dependencies {
 
     // Deprecated; will be removed once extensions have time to migrate from using it
     implementation("me.xdrop:fuzzywuzzy:1.4.0")
+    implementation("net.lingala.zip4j:zip4j:2.11.5") // Zip plugin: password zips (AES / ZipCrypto)
 
     // Torrent Support
     implementation(libs.torrentserver)
