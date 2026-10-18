@@ -1048,11 +1048,11 @@
     <string name="adblock_allow">tap: allow</string>
     <string name="adblock_allowed">allowed · tap: block</string>
     <string name="adblock_blocked" formatted="true">%s announcement blocked</string>
-    <string name="adblock_note_des">A short note says which plugin's window was closed</string>
+    <string name="adblock_note_des">A short note says which plugin\'s window was closed</string>
     <string name="adblock_none_des">When a plugin opens an announcement it shows up here by name</string>
     <string name="adblock_state_blocked">Blocked</string>
     <string name="adblock_state_allowed">Allowed</string>
-    <string name="adblock_tap_allow">Tap: allow this plugin's windows</string>
+    <string name="adblock_tap_allow">Tap: allow this plugin\'s windows</string>
     <string name="adblock_tap_block">Tap: block again</string>
     <string name="adblock_clear">Clear the list</string>
     <string name="adblock_plugin">Plugin</string>
