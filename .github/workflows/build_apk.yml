@@ -73,7 +73,7 @@ jobs:
         git -C /tmp/hev submodule update --init --recursive -q
         mkdir -p /tmp/hevmk
         printf '%s\n' 'APP_OPTIM := release' 'APP_PLATFORM := android-21' 'APP_ABI := armeabi-v7a arm64-v8a' \
-          'APP_CFLAGS := -O3 -DPKGNAME=com/lagradost/cloudstream3/fork/vpn -DCLSNAME=HevTunnel' \
+          'APP_CFLAGS := -O3 -DPKGNAME=com/lagradost/cloudstream3/fork/vpn -DCLSNAME=HevTunnel -DLWIP_ERRNO_STDINCLUDE=1' \
           'NDK_TOOLCHAIN_VERSION := clang' 'APP_LDFLAGS := -Wl,-z,max-page-size=16384' > /tmp/hevmk/Application.mk
         "$NDK/ndk-build" -j4 NDK_PROJECT_PATH=/tmp/hevbuild APP_BUILD_SCRIPT=/tmp/hev/Android.mk \
           NDK_APPLICATION_MK=/tmp/hevmk/Application.mk NDK_LIBS_OUT=/tmp/hevlibs
