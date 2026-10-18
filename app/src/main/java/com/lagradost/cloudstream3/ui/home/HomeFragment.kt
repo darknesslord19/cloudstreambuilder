@@ -965,15 +965,24 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
                         val d = data.value
                         // Trakt: "Sana özel" on top, drawn again when the suggestions arrive
                         fun submitRows() {
-                            val sourceRows = d.values.map {
+                            val allRows = d.values.map {
                                 it.copy(
                                     list = it.list.copy(list = it.list.list.toMutableList())
                                 )
                             }
+                            // +18 rows of the plugins: hidden unless Plus > +18 Kategoriler is on
+                            val (sourceRows, adultCards) = context?.let { ctx ->
+                                com.lagradost.cloudstream3.fork.Adult.split(
+                                    ctx, homeViewModel.apiName.value, allRows, { it.list.name }, { it.list.list }
+                                )
+                            } ?: (allRows to emptyList())
+                            val adultSet = adultCards.map { it.url }.toHashSet()
+                            val plainCards = allRows.flatMap { it.list.list }.filter { it.url !in adultSet }
+                            com.lagradost.cloudstream3.fork.RowOrder.lastItems = plainCards
                             // extra categories chosen for this source, made from its own items
                             val extra = context?.let { ctx ->
                                 com.lagradost.cloudstream3.fork.GenreRows.rows(
-                                    ctx, homeViewModel.apiName.value, sourceRows.flatMap { it.list.list }
+                                    ctx, homeViewModel.apiName.value, plainCards, adultCards
                                 )
                             }.orEmpty().filter { e -> sourceRows.none { it.list.name == e.name } }
                             val rows = sourceRows + extra.map { HomeViewModel.ExpandableHomepageList(it, 1, false) }

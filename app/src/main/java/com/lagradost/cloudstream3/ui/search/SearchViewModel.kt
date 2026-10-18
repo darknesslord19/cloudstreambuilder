@@ -236,8 +236,9 @@ class SearchViewModel : ViewModel() {
                     if (currentSearchIndex != currentIndex) return@amap
                     if (search is Resource.Success) {
                         val searchValue = search.value
-                        expandableSearches[a.name] =
-                            ExpandableSearchList(searchValue.items, 1, searchValue.hasNext)
+                        // Plus > +18 Kategoriler: +18 results stay out while it is off
+                        if (com.lagradost.cloudstream3.fork.Adult.searchAllowed(a.name)) expandableSearches[a.name] =
+                            ExpandableSearchList(com.lagradost.cloudstream3.fork.Adult.filterSearch(searchValue.items), 1, searchValue.hasNext)
                     }
 
                     _currentSearch.postValue(expandableSearches)

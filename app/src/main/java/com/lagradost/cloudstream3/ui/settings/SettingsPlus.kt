@@ -57,6 +57,11 @@ class SettingsPlus : BasePreferenceFragmentCompat() {
             activity?.let { com.lagradost.cloudstream3.fork.Iptv.show(it) }
             true
         }
+        findPreference<Preference>("fork_plus_adult")?.isVisible = com.lagradost.cloudstream3.fork.Adult.available(context)
+        findPreference<Preference>("fork_plus_adult")?.setOnPreferenceClickListener {
+            activity?.let { com.lagradost.cloudstream3.fork.AdultPage.show(it) }
+            true
+        }
         findPreference<Preference>("fork_plus_scraper")?.isVisible = com.lagradost.cloudstream3.fork.scraper.Scrapers.available(context)
         findPreference<Preference>("fork_plus_scraper")?.setOnPreferenceClickListener {
             activity?.let { com.lagradost.cloudstream3.fork.scraper.Scrapers.show(it) }

@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>+18 Kategoriler</title>
+<!--
+  Plus > +18 Kategoriler. The app does the work through window.Adult:
+  data(), setOn(on), setCat(name, on), setRow(api, name, on), unlock(pin), setPin(pin), removePin(),
+  lock(), addCustom(name, words), removeCustom(name).
+-->
+<style>
+:root{--bg:#0f0d12;--ink:#f3eef6;--card:#1c1920;--field:#262229;--line:rgba(255,255,255,.1);--muted:#a49cab;--accent:#cdb0ff;--ok:#5fd394;--bad:#ff7d7d;--adult:#ff6b8a}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{padding:10px 0 40px}
+.hdr{display:flex;align-items:center;gap:12px;padding:8px 16px 6px}
+.hdr h1{font-size:24px;font-weight:750;flex:1}
+.back{background:none;border:0;color:var(--accent);font-size:24px;line-height:1;padding:4px 8px;border-radius:10px}
+.wrap{padding:0 14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px;margin-top:12px}
+.card h3{font-size:15px;margin-bottom:4px}
+.card>p{font-size:12px;color:var(--muted);line-height:1.45;margin-bottom:8px}
+.grow{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
+.grow:first-child{border-top:0;padding-top:2px}
+.grow .tx{flex:1;min-width:0}.grow b{font-size:14.5px;display:block}.grow small{font-size:12px;color:var(--muted);line-height:1.35;display:block}
+.sw{width:44px;height:26px;border-radius:26px;background:var(--line);position:relative;flex:0 0 44px;border:0}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--muted);transition:.2s}
+.sw.on{background:var(--adult)}.sw.on::after{left:21px;background:#fff}
+.sw.a.on{background:var(--accent)}.sw.a.on::after{background:var(--bg)}
+.btn{border:1px solid var(--line);background:var(--field);color:var(--ink);border-radius:12px;padding:10px 12px;font-weight:800;font-size:13px;font-family:inherit;min-height:44px}
+.btn.p{background:var(--adult);border-color:var(--adult);color:#fff}
+.btn.w{width:100%;margin-top:10px}
+.small{min-height:36px;padding:6px 12px}
+input.t{width:100%;margin-top:8px;background:var(--bg);border:1px solid var(--line);border-radius:12px;color:var(--ink);padding:11px 12px;font-size:14px;font-family:inherit;outline:none}
+input.t:focus{border-color:var(--adult)}
+.hint{font-size:11.5px;color:var(--muted);line-height:1.45;margin-top:8px}
+.msg{font-size:12.5px;margin-top:8px}.msg.ok{color:var(--ok)}.msg.bad{color:var(--bad)}
+.tag{font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;background:var(--field);color:var(--muted);margin-left:6px;vertical-align:1px}
+.x{background:none;border:0;color:var(--muted);font-size:16px;padding:6px 8px;border-radius:9px}
+.lock{text-align:center;padding:24px 14px}
+.lock .ic{width:64px;height:64px;border-radius:20px;background:rgba(255,107,138,.14);color:var(--adult);display:grid;place-items:center;margin:0 auto 12px;font-size:22px;font-weight:900}
+.dots{display:flex;gap:12px;justify-content:center;margin:14px 0 6px}
+.dots i{width:14px;height:14px;border-radius:50%;border:2px solid var(--muted)}
+.dots i.f{background:var(--adult);border-color:var(--adult)}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:280px;margin:14px auto 0}
+.pad button{min-height:56px;border-radius:16px;border:1px solid var(--line);background:var(--field);color:var(--ink);font-size:20px;font-weight:700;font-family:inherit}
+.dim{opacity:.4;pointer-events:none}
+.btn:focus-visible,.back:focus-visible,.sw:focus-visible,.x:focus-visible,.pad button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="hdr"><button class="back" id="back" aria-label="Geri">←</button><h1>+18 Kategoriler</h1></div>
+<div class="wrap">
+
+  <div class="card lock" id="lockCard" hidden>
+    <div class="ic">18</div><b>PIN gir</b>
+    <div class="dots" id="dots"></div>
+    <div class="msg bad" id="lockMsg"></div>
+    <div class="pad" id="pad"></div>
+  </div>
+
+  <div id="body" hidden>
+    <div class="card">
+      <div class="grow"><div class="tx"><b>+18 içerikleri göster</b><small>Kapalıyken eklentilerin +18 satırları ana sayfada ve aramada gizlenir.</small></div><button class="sw" id="master" aria-label="+18 içerikleri göster"></button></div>
+      <div class="grow"><div class="tx"><b>PIN ile kilitle</b><small id="pinSub">+18 satırları ve bu sayfa, uygulama her açıldığında bir kez PIN ile açılır.</small></div><button class="sw a" id="pinSw" aria-label="PIN ile kilitle"></button></div>
+      <div id="pinBox" hidden>
+        <input class="t" id="pinNew" inputmode="numeric" maxlength="8" placeholder="Yeni PIN (4–8 rakam)" type="password">
+        <input class="t" id="pinAgain" inputmode="numeric" maxlength="8" placeholder="Tekrar" type="password">
+        <button class="btn p w" id="pinSave">PIN'i kaydet</button>
+      </div>
+      <button class="btn w" id="lockNow" hidden>Şimdi kilitle</button>
+      <div class="msg" id="pinMsg"></div>
+    </div>
+
+    <div id="inner">
+      <div class="card">
+        <h3>Kategoriler</h3>
+        <p>Seçtiklerin, ana sayfada "Kategori ekle" bölümünde ayrı bir "18 ·" grubu olarak çıkar; oradan satır olarak eklersin.</p>
+        <div id="cats"></div>
+        <div class="hint" id="keyHint" hidden>Tür ve ülkeye göre olanlar için TMDB anahtarı gerekir (Plus › TMDB).</div>
+      </div>
+
+      <div class="card">
+        <h3>Eklentilerde bulunan +18 satırlar</h3>
+        <p>Adında +18, 18+, erotik, yetişkin, adult geçen satırlar ve +18 eklentilerin satırları. Ana sayfa açıldıkça burada listelenir.</p>
+        <div id="seen"></div>
+      </div>
+
+      <div class="card">
+        <h3>Kendi +18 kategorin</h3>
+        <p>+18 satırlardan, başlığında yazdığın kelimeler geçenler toplanır. Kelime yazmazsan hepsi alınır.</p>
+        <div id="mine"></div>
+        <input class="t" id="cName" placeholder="Kategori adı" maxlength="40">
+        <input class="t" id="cWords" placeholder="Başlıkta geçen kelimeler (virgülle, isteğe bağlı)" autocapitalize="off">
+        <button class="btn p w" id="cAdd">Ekle</button>
+        <div class="msg" id="cMsg"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="theme.js"></script>
+<script>
+var app = window.CloudStream, A = window.Adult;
+try { if (window.applyTheme && app && app.theme) applyTheme(app); } catch (e) {}
+function $(id) { return document.getElementById(id); }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+var d = {}, typed = '';
+
+function load() { try { d = JSON.parse(A.data()); } catch (e) { d = {}; } draw(); }
+
+function drawLock() {
+  var n = Math.max(4, typed.length);
+  var h = ''; for (var i = 0; i < n; i++) h += '<i class="' + (i < typed.length ? 'f' : '') + '"></i>';
+  $('dots').innerHTML = h;
+}
+(function pad() {
+  var keys = ['1','2','3','4','5','6','7','8','9','⌫','0','✓'];
+  $('pad').innerHTML = keys.map(function (k) { return '<button data-k="' + k + '">' + k + '</button>'; }).join('');
+  Array.prototype.forEach.call(document.querySelectorAll('#pad button'), function (b) {
+    b.onclick = function () {
+      var k = b.getAttribute('data-k'); $('lockMsg').textContent = '';
+      if (k === '⌫') typed = typed.slice(0, -1);
+      else if (k === '✓') { if (A.unlock(typed)) { typed = ''; load(); return; } $('lockMsg').textContent = 'PIN yanlış'; typed = ''; }
+      else if (typed.length < 8) { typed += k; if (typed.length >= 4 && A.unlock(typed)) { typed = ''; load(); return; } }
+      drawLock();
+    };
+  });
+})();
+
+function draw() {
+  $('lockCard').hidden = !d.locked; $('body').hidden = !!d.locked;
+  if (d.locked) { drawLock(); return; }
+  $('master').classList.toggle('on', !!d.on);
+  $('inner').classList.toggle('dim', !d.on);
+  $('pinSw').classList.toggle('on', !!d.pin);
+  $('lockNow').hidden = !d.pin;
+  $('pinSub').textContent = d.pin ? 'Açık · uygulama her açıldığında bir kez PIN sorulur.' : '+18 satırları ve bu sayfa, uygulama her açıldığında bir kez PIN ile açılır.';
+  $('keyHint').hidden = !!d.hasKey;
+  $('cats').innerHTML = (d.cats || []).map(function (c) {
+    var off = c.tmdb && !d.hasKey;
+    return '<div class="grow' + (off ? ' dim' : '') + '"><div class="tx"><b>' + esc(c.name) + (c.tmdb ? '<span class="tag">TMDB</span>' : '') + '</b><small>' + esc(c.des) + '</small></div><button class="sw' + (c.on ? ' on' : '') + '" data-cat="' + esc(c.name) + '" aria-label="' + esc(c.name) + '"></button></div>';
+  }).join('');
+  Array.prototype.forEach.call(document.querySelectorAll('[data-cat]'), function (s) {
+    s.onclick = function () { var on = !s.classList.contains('on'); A.setCat(s.getAttribute('data-cat'), on); s.classList.toggle('on', on); };
+  });
+  var seen = d.seen || [];
+  $('seen').innerHTML = seen.length ? seen.map(function (r, i) {
+    return '<div class="grow"><div class="tx"><b>' + esc(r.name) + '</b><small>' + esc(r.api) + ' · ' + r.count + ' içerik</small></div><button class="sw' + (r.on ? ' on' : '') + '" data-row="' + i + '" aria-label="' + esc(r.name) + '"></button></div>';
+  }).join('') : '<div class="hint">Henüz +18 satır görülmedi. Ana sayfada bir eklenti açınca burada çıkar.</div>';
+  Array.prototype.forEach.call(document.querySelectorAll('[data-row]'), function (s) {
+    s.onclick = function () { var r = seen[+s.getAttribute('data-row')]; var on = !s.classList.contains('on'); A.setRow(r.api, r.name, on); s.classList.toggle('on', on); };
+  });
+  var mine = d.mine || [];
+  $('mine').innerHTML = mine.map(function (m) {
+    return '<div class="grow"><div class="tx"><b>' + esc(m.name) + '</b><small>' + esc(m.summary || 'Bütün +18 satırlardan') + '</small></div><button class="x" data-x="' + esc(m.name) + '" aria-label="Sil">✕</button></div>';
+  }).join('');
+  Array.prototype.forEach.call(document.querySelectorAll('[data-x]'), function (b) { b.onclick = function () { A.removeCustom(b.getAttribute('data-x')); load(); }; });
+}
+
+$('master').onclick = function () { A.setOn(!d.on); load(); };
+$('pinSw').onclick = function () {
+  if (d.pin) { A.removePin(); $('pinMsg').className = 'msg ok'; $('pinMsg').textContent = 'PIN kaldırıldı'; load(); return; }
+  $('pinBox').hidden = !$('pinBox').hidden; if (!$('pinBox').hidden) $('pinNew').focus();
+};
+$('pinSave').onclick = function () {
+  var a = $('pinNew').value.trim(), b = $('pinAgain').value.trim(), m = $('pinMsg');
+  if (!/^\d{4,8}$/.test(a)) { m.className = 'msg bad'; m.textContent = 'PIN 4–8 rakam olmalı'; return; }
+  if (a !== b) { m.className = 'msg bad'; m.textContent = 'İki PIN aynı değil'; return; }
+  if (A.setPin(a)) { m.className = 'msg ok'; m.textContent = 'PIN kaydedildi'; $('pinBox').hidden = true; $('pinNew').value = $('pinAgain').value = ''; }
+  load();
+};
+$('lockNow').onclick = function () { A.lock(); load(); };
+$('cAdd').onclick = function () {
+  var n = $('cName').value.trim(), m = $('cMsg');
+  if (!n) { $('cName').focus(); return; }
+  if (A.addCustom(n, $('cWords').value)) { m.className = 'msg ok'; m.textContent = n + ' eklendi · ana sayfada "Kategori ekle"de çıkar'; $('cName').value = $('cWords').value = ''; }
+  load();
+};
+$('back').onclick = function () { try { app.close(); } catch (e) { history.back(); } };
+load();
+</script>
+</body>
+</html>

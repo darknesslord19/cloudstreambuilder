@@ -232,6 +232,66 @@ object TmdbPosters {
         return found
     }
 
+    /** What the categories need to know of a title: genres, year, rating, language, countries, adult. */
+    class Info(
+        val genres: Set<Int>, val year: Int?, val rating: Double, val lang: String,
+        val countries: Set<String>, val adult: Boolean, val movie: Boolean?,
+    )
+
+    private fun infoFrom(o: JSONObject, fallbackYear: Int?): Info {
+        val g = o.optJSONArray("g")
+        val c = o.optJSONArray("c")
+        return Info(
+            (0 until (g?.length() ?: 0)).map { g!!.optInt(it) }.toSet(),
+            o.optInt("y", 0).takeIf { it > 0 } ?: fallbackYear,
+            o.optDouble("r", 0.0),
+            o.optString("l"),
+            (0 until (c?.length() ?: 0)).map { c!!.optString(it).uppercase() }.toSet(),
+            o.optBoolean("a"),
+            if (o.has("m")) o.optBoolean("m") else null,
+        )
+    }
+
+    /** The TMDB details of a card (from the search, one request, kept). With [adult], +18 titles are found too. */
+    suspend fun infoOf(context: Context, card: SearchResponse, adult: Boolean = false): Info? {
+        val key = key(context) ?: return null
+        val (name, nameYear) = clean(card.name)
+        if (name.isBlank()) return null
+        val year = yearOf(card) ?: nameYear
+        val kind = kindOf(card.type)
+        val cacheKey = "i|" + (if (adult) "a|" else "") + kind + "|" + name.lowercase() + "|" + (year ?: "")
+        kept(context, cacheKey)?.let { v ->
+            if (v.isEmpty()) return null
+            return try { infoFrom(JSONObject(v), year) } catch (t: Throwable) { null }
+        }
+        val found = try {
+            gate.withPermit {
+                val params = hashMapOf("query" to name, "language" to "tr-TR", "include_adult" to adult.toString())
+                val results = request(key, "search/$kind", params)?.optJSONArray("results")
+                val list = (0 until (results?.length() ?: 0)).mapNotNull { results?.optJSONObject(it) }
+                    .filter { kind != "multi" || it.optString("media_type") in setOf("movie", "tv") }
+                val pick = (if (year != null) list.firstOrNull { r -> yearOfResult(r)?.let { kotlin.math.abs(it - year) <= 1 } == true } else null)
+                    ?: list.firstOrNull()
+                pick?.let { r ->
+                    val o = JSONObject()
+                    r.optJSONArray("genre_ids")?.let { o.put("g", it) }
+                    yearOfResult(r)?.let { o.put("y", it) }
+                    o.put("r", r.optDouble("vote_average", 0.0))
+                    o.put("l", r.optString("original_language"))
+                    r.optJSONArray("origin_country")?.let { o.put("c", it) }
+                    o.put("a", r.optBoolean("adult"))
+                    val m = when (kind) { "movie" -> true; "tv" -> false; else -> r.optString("media_type") == "movie" }
+                    o.put("m", m)
+                    o
+                }
+            }
+        } catch (t: Throwable) {
+            null
+        }
+        keep(context, cacheKey, found?.toString() ?: (NONE + System.currentTimeMillis()))
+        return found?.let { infoFrom(it, year) }
+    }
+
     fun posterOf(path: String?): String? = path?.takeIf { it.isNotBlank() && it != "null" }?.let { POSTER + it }
 
     /** Tries a key, true when TMDB accepts it. */

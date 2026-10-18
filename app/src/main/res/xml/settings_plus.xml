@@ -21,6 +21,12 @@
         android:title="@string/iptv_title" />
 
     <Preference
+        android:icon="@drawable/video_locked"
+        android:key="fork_plus_adult"
+        android:summary="@string/adult_des"
+        android:title="@string/adult_title" />
+
+    <Preference
         android:icon="@drawable/ic_baseline_public_24"
         android:key="fork_plus_scraper"
         android:summary="@string/scr_des"

@@ -31,6 +31,10 @@ object RowOrder {
     @Volatile
     var lastRows: List<String> = emptyList()
 
+    /** The cards of the source shown last (not the +18 ones), for the count of a written category. */
+    @Volatile
+    var lastItems: List<com.lagradost.cloudstream3.SearchResponse> = emptyList()
+
     /** Told when the order changed, the home page draws its rows again. */
     @Volatile
     var onChanged: (() -> Unit)? = null
@@ -198,29 +202,71 @@ object RowOrder {
         })
         val picked = GenreRows.chosen(activity, api).toMutableList()
         val chips = com.google.android.material.chip.ChipGroup(activity).apply { chipSpacingVertical = 2.toPx }
-        GenreRows.genres.forEach { g ->
-            chips.addView(com.google.android.material.chip.Chip(activity).apply {
-                this.text = g.name
+        val adultColor = 0xFFFF6B8A.toInt()
+
+        fun chip(label: String, id: String, accent: Int, onLong: (() -> Unit)? = null) =
+            com.google.android.material.chip.Chip(activity).apply {
+                this.text = label
                 isCheckable = true
-                isChecked = g.name in picked
+                isChecked = id in picked
                 isFocusable = true
-                setTextColor(text)
+                setTextColor(if (accent == primary) text else accent)
                 chipBackgroundColor = android.content.res.ColorStateList(
                     arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
-                    intArrayOf(primary and 0x00FFFFFF or 0x55000000, box)
+                    intArrayOf(accent and 0x00FFFFFF or 0x55000000, box)
                 )
                 chipStrokeWidth = 1.toPx.toFloat()
                 chipStrokeColor = android.content.res.ColorStateList(
-                    arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()), intArrayOf(primary, gray)
+                    arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()), intArrayOf(accent, if (accent == primary) gray else accent)
                 )
                 setOnCheckedChangeListener { _, on ->
-                    if (on) { if (g.name !in picked) picked.add(g.name) } else picked.remove(g.name)
+                    if (on) { if (id !in picked) picked.add(id) } else picked.remove(id)
                     GenreRows.setChosen(activity, api, picked)
                     onChanged?.invoke()
                 }
+                if (onLong != null) setOnLongClickListener { onLong(); true }
+            }
+
+        fun drawChips() {
+            chips.removeAllViews()
+            if (GenreRows.canWork(activity)) GenreRows.genres.forEach { g -> chips.addView(chip(g.name, g.name, primary)) }
+            val showAdult = Adult.visible(activity)
+            GenreRows.customs(activity).filter { !it.adult || showAdult }.forEach { c ->
+                chips.addView(chip("✎ " + c.name, c.name, primary) {
+                    CategoryForm.show(activity, api, c) { removedOrRenamed ->
+                        removedOrRenamed?.let { (old, now) ->
+                            val at = picked.indexOf(old)
+                            if (at >= 0) { if (now == null) picked.removeAt(at) else picked[at] = now }
+                            GenreRows.setChosen(activity, api, picked)
+                        }
+                        drawChips(); onChanged?.invoke()
+                    }
+                })
+            }
+            if (showAdult) Adult.cats.filter { it.name in Adult.chosenCats(activity) }.forEach { cat ->
+                chips.addView(chip("18 · " + cat.name, GenreRows.ADULT_PREFIX + cat.name, adultColor))
+            }
+            chips.addView(com.google.android.material.chip.Chip(activity).apply {
+                setText(R.string.cat_write)
+                isFocusable = true
+                setTextColor(activity.colorFromAttribute(R.attr.primaryBlackBackground))
+                chipBackgroundColor = android.content.res.ColorStateList.valueOf(primary)
+                setOnClickListener {
+                    CategoryForm.show(activity, api, null) { made ->
+                        made?.second?.let { name -> if (name !in picked) { picked.add(name); GenreRows.setChosen(activity, api, picked) } }
+                        drawChips(); onChanged?.invoke()
+                    }
+                }
             })
         }
+        drawChips()
         list.addView(chips)
+        list.addView(TextView(activity).apply {
+            setText(R.string.cat_long_press)
+            textSize = 11.5f
+            setTextColor(gray)
+            setPadding(0, 4.toPx, 0, 0)
+        })
 
         list.addView(TextView(activity).apply {
             setText(R.string.row_order_reset)

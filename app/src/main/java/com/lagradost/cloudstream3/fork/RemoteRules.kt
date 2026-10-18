@@ -143,6 +143,7 @@ object RemoteRules {
         SCRAPER("scraper"),
         VPN_DPI("vpn_dpi"),
         VPN_DEVICE("vpn_device"),
+        ADULT("adult"),
     }
 
     /**
