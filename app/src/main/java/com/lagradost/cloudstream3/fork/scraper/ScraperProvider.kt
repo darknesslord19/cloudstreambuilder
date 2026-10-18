@@ -277,10 +277,19 @@ class ScraperProvider(val id: String, val cfg: JSONObject) : MainAPI() {
         val s = cfg.optJSONObject("search") ?: JSONObject()
         val url = cat.optString("url").ifBlank { null }
         if (url == null && page > 1) return newHomePageResponse(request.name, emptyList(), false)
-        val full = abs((url ?: cfg.optString("homeUrl").ifBlank { "/" }).replace("{page}", page.toString()))!!
-        val cards = htmlCards(getDoc(full), cat.optString("item").ifBlank { s.optString("item") },
-            cat.optString("title").ifBlank { s.optString("title") }, cat.optString("href").ifBlank { s.optString("href") },
-            cat.optString("poster").ifBlank { s.optString("poster") }, type)
+        val template = url ?: cfg.optString("homeUrl").ifBlank { "/" }
+        suspend fun cardsOf(u: String) = try {
+            htmlCards(getDoc(abs(u)!!), cat.optString("item").ifBlank { s.optString("item") },
+                cat.optString("title").ifBlank { s.optString("title") }, cat.optString("href").ifBlank { s.optString("href") },
+                cat.optString("poster").ifBlank { s.optString("poster") }, type)
+        } catch (t: Throwable) {
+            if (page > 1) emptyList() else throw t
+        }
+        // many sites have no "/1" for the first page: that one is tried without the number first
+        var cards = if (page == 1 && template.contains("{page}"))
+            cardsOf(template.replace("page/{page}", "").replace("{page}", "").replace(Regex("(?<!:)//+"), "/"))
+        else emptyList()
+        if (cards.isEmpty()) cards = cardsOf(template.replace("{page}", page.toString()))
         return newHomePageResponse(HomePageList(request.name, cards), url?.contains("{page}") == true && cards.isNotEmpty())
     }
 
@@ -437,7 +446,7 @@ class ScraperProvider(val id: String, val cfg: JSONObject) : MainAPI() {
         for (frame in all(s.optString("iframe").ifBlank { "iframe@src" })) {
             val f = abs(frame) ?: continue
             if (!seen.add(f)) continue
-            if (loadExtractor(f, url, sub, cb)) found = true
+            if (extract(f, url, sub, cb)) found = true
         }
         // links hidden in the page's code: found with a regex, decoded step by step
         for ((label, link) in scriptLinks(s, html)) {
@@ -452,9 +461,44 @@ class ScraperProvider(val id: String, val cfg: JSONObject) : MainAPI() {
                     quality = getQualityFromName(label.ifBlank { l })
                     headers = hdrs()
                 })
-            } else if (loadExtractor(l, url, sub, cb)) found = true
+            } else if (extract(l, url, sub, cb)) found = true
         }
         return found
+    }
+
+    /** the extractors of the app and of the loaded plugins that could open a host ("vidmoxy.net" -> VidMoxy) */
+    fun extractorsFor(link: String): List<com.lagradost.cloudstream3.utils.ExtractorApi> {
+        val host = link.substringAfter("//").substringBefore('/').removePrefix("www.").lowercase()
+        val core = host.substringBefore('.')
+        if (core.length < 3) return emptyList()
+        val all = try {
+            com.lagradost.cloudstream3.utils.extractorApis.toList()
+        } catch (t: Throwable) {
+            emptyList()
+        }
+        return all.filter { e ->
+            val m = e.mainUrl.substringAfter("//").removePrefix("www.").lowercase()
+            m.startsWith(host) || m.substringBefore('.') == core || e.name.lowercase().replace(" ", "") == core
+        }.reversed()
+    }
+
+    /** loadExtractor, and when it finds nothing an extractor with the same name on another domain */
+    private suspend fun extract(link: String, referer: String, sub: (SubtitleFile) -> Unit, cb: (ExtractorLink) -> Unit): Boolean {
+        var got = false
+        val wrap: (ExtractorLink) -> Unit = { got = true; cb(it) }
+        try {
+            loadExtractor(link, referer, sub, wrap)
+        } catch (t: Throwable) {
+        }
+        if (got) return true
+        for (e in extractorsFor(link)) {
+            try {
+                e.getUrl(link, referer, sub, wrap)
+            } catch (t: Throwable) {
+            }
+            if (got) return true
+        }
+        return false
     }
 
     /** "rot13", "base64", "base64url", "reverse", "urldecode", "hex", "unescape" */

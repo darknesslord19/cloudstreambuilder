@@ -202,8 +202,13 @@ object Scrapers {
                     try {
                         val decoded = p.scriptLinksOf(d)
                         if (decoded.isNotEmpty()) {
-                            val hosts = decoded.mapNotNull { (_, l) -> l.substringAfter("//").substringBefore('/').ifBlank { null } }.distinct().take(4)
-                            hidden = " · şifreli kaynaktan ${decoded.size} link çözüldü (${hosts.joinToString(", ")}) ama açacak çözücü yok; bu sunucuların çözücüsü olan eklenti yüklü olmalı"
+                            val parts = decoded.map { it.second }.distinctBy { it.substringAfter("//").substringBefore('/') }.take(4).map { l ->
+                                val host = l.substringAfter("//").substringBefore('/')
+                                val ex = p.extractorsFor(l).firstOrNull()
+                                if (ex != null) "$host → ${ex.name} çözücüsü var ama video vermedi" else "$host → çözücü yok"
+                            }
+                            hidden = " · şifreli kaynaktan ${decoded.size} link çözüldü: " + parts.joinToString("; ") +
+                                (if (parts.any { it.endsWith("çözücü yok") }) ". Bu sunucunun çözücüsünü içeren eklentiyi (ör. sitenin .cs3'ü) Dosyadan eklentiler'den yükle" else "")
                         }
                     } catch (t: Throwable) {
                     }
