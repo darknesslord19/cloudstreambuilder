@@ -149,14 +149,13 @@ object RemoteRules {
 
     /**
      * What is switched on: the general document, e.g. { "stremio": true, "nuvio": false, ... },
-     * with the "features" object of this device's entry in the access list on top of it.
-     * Anything not named in either stays on.
+     * is the main switch for everyone; the "features" object of this device's entry in the access
+     * list can only switch more things off. Anything not named in either stays on.
      */
     fun features(general: JsonNode?, user: JsonNode?): Map<Feature, Boolean> {
         val own = user?.takeIf { it.isObject }?.get("features")
         return Feature.values().associateWith { feature ->
-            val base = general.flag(true, feature.key)
-            own.flag(base, feature.key)
+            general.flag(true, feature.key) && own.flag(true, feature.key)
         }
     }
 

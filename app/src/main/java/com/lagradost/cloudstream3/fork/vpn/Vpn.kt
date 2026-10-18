@@ -476,6 +476,20 @@ object Vpn {
         }
     }
 
+    /** The admin switched something about the VPN: what is not allowed any more stops now. */
+    fun featuresChanged(context: Context, dpiChanged: Boolean) {
+        val ctx = context.applicationContext
+        if (!available(ctx)) {
+            if (ForkVpnService.active) stopDevice(ctx)
+            if (running) stop()
+            onState?.invoke()
+            return
+        }
+        if (!deviceAvailable(ctx) && ForkVpnService.active) stopDevice(ctx)
+        if (dpiChanged && running) scope.launch { restart(ctx) }
+        onState?.invoke()
+    }
+
     fun init(context: Context) {
         val ctx = context.applicationContext
         appContext = ctx

@@ -84,6 +84,18 @@ object ForkFeatures {
         }
     }
 
+    @Volatile
+    private var lastRefresh = 0L
+
+    /** True (and taken) when the last read is older than [minutes]; on return to the app. */
+    @Synchronized
+    fun due(minutes: Int = 5): Boolean {
+        val now = System.currentTimeMillis()
+        if (now - lastRefresh < minutes * 60_000L) return false
+        lastRefresh = now
+        return true
+    }
+
     /**
      * Reads both documents again.
      * @return the features that changed, empty if nothing changed or nothing could be read.

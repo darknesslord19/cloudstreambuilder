@@ -652,8 +652,41 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
         com.lagradost.cloudstream3.fork.AdBlock.touched()
     }
 
+    /**
+     * Reads the switches of the admin again and applies what changed right away (not only at the
+     * next start): add-on kinds, the icon, the VPN, domains and the rows of the home page.
+     */
+    private fun forkRefreshRemote() {
+        ioSafe {
+            val changed = ForkFeatures.refresh(this@MainActivity)
+            val kinds = setOf(RemoteRules.Feature.STREMIO, RemoteRules.Feature.NUVIO, RemoteRules.Feature.SKYSTREAM)
+            if (changed.any { it in kinds }) {
+                AndroidAddons.ensureInitialised(this@MainActivity)
+                AddonManager.reapply()
+            }
+            if (changed.contains(RemoteRules.Feature.ICONS)) Looks.syncIcon(this@MainActivity)
+            val vpn = setOf(RemoteRules.Feature.VPN, RemoteRules.Feature.VPN_DPI, RemoteRules.Feature.VPN_DEVICE)
+            if (changed.any { it in vpn }) {
+                com.lagradost.cloudstream3.fork.vpn.Vpn.featuresChanged(this@MainActivity, RemoteRules.Feature.VPN_DPI in changed)
+            }
+            if (RemoteRules.Feature.DOMAINS in changed) {
+                try { com.lagradost.cloudstream3.fork.Domains.apply(this@MainActivity) } catch (t: Throwable) {}
+            }
+            val rows = setOf(RemoteRules.Feature.CATEGORIES, RemoteRules.Feature.HOME_TWEAKS, RemoteRules.Feature.TMDB_POSTERS,
+                RemoteRules.Feature.ADULT, RemoteRules.Feature.MOTION, RemoteRules.Feature.CATEGORY_EFFECTS)
+            if (changed.any { it in rows }) {
+                com.lagradost.cloudstream3.fork.GenreRows.forget()
+                com.lagradost.cloudstream3.fork.Adult.redraw()
+            }
+            // The categories the developer gives everyone
+            com.lagradost.cloudstream3.fork.Categories.refreshRemote(this@MainActivity)
+        }
+    }
+
     override fun onResume() {
         super.onResume()
+        // Back in the app after a while: the admin may have switched something
+        if (ForkFeatures.due()) forkRefreshRemote()
         // The theme reached the screen, and the glow of its corners
         com.lagradost.cloudstream3.fork.ThemePack.started(this)
         // Plugin announcements are closed, Trakt suggests something when nothing was watched for a while
@@ -2055,17 +2088,7 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
         // What is switched on in this build: the icon follows at once, the add-on kinds as
         // soon as the switches are read, themes and fonts at the next start
         Looks.syncIcon(this)
-        ioSafe {
-            val changed = ForkFeatures.refresh(this@MainActivity)
-            val kinds = setOf(RemoteRules.Feature.STREMIO, RemoteRules.Feature.NUVIO, RemoteRules.Feature.SKYSTREAM)
-            if (changed.any { it in kinds }) {
-                AndroidAddons.ensureInitialised(this@MainActivity)
-                AddonManager.reapply()
-            }
-            if (changed.contains(RemoteRules.Feature.ICONS)) Looks.syncIcon(this@MainActivity)
-            // The categories the developer gives everyone
-            com.lagradost.cloudstream3.fork.Categories.refreshRemote(this@MainActivity)
-        }
+        if (ForkFeatures.due(0)) forkRefreshRemote()
 
         FcastManager().init(this, false)
 
