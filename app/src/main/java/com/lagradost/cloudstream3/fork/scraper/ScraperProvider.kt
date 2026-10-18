@@ -511,7 +511,7 @@ class ScraperProvider(val id: String, val cfg: JSONObject) : MainAPI() {
         val rest = parts.drop(1)
         when (node) {
             is JSONObject -> if (head == "*") node.keys().forEach { k -> collect(node.opt(k), rest, k, out) }
-                else if (node.has(head)) collect(node.opt(head), rest, if (head.toIntOrNull() != null) key else head, out)
+                else if (node.has(head)) collect(node.opt(head), rest, key, out)
             is JSONArray -> if (head == "*") for (i in 0 until node.length()) collect(node.opt(i), rest, key, out)
                 else head.toIntOrNull()?.let { collect(node.opt(it), rest, key, out) }
         }
