@@ -109,23 +109,71 @@ class ScraperProvider(val id: String, val cfg: JSONObject) : MainAPI() {
         return el.attr(attr).takeIf { it.isNotBlank() }
     }
 
-    /** "css@attr", "@attr", "data-ep" (attribute), "css" (text) */
+    /** "a, b@src, c": the parts at the top level (not inside [..], (..) or quotes) */
+    fun alternatives(selector: String): List<String> {
+        val out = ArrayList<String>()
+        val cur = StringBuilder()
+        var depth = 0
+        var quote: Char? = null
+        for (ch in selector) {
+            when {
+                quote != null -> { if (ch == quote) quote = null; cur.append(ch) }
+                ch == '\'' || ch == '"' -> { quote = ch; cur.append(ch) }
+                ch == '[' || ch == '(' -> { depth++; cur.append(ch) }
+                ch == ']' || ch == ')' -> { depth--; cur.append(ch) }
+                ch == ',' && depth == 0 -> { out.add(cur.toString().trim()); cur.clear() }
+                else -> cur.append(ch)
+            }
+        }
+        out.add(cur.toString().trim())
+        return out.filter { it.isNotEmpty() }
+    }
+
+    /** where "css@attr" splits: the last @ outside [..] and quotes, -1 when there is none */
+    private fun attrAt(s: String): Int {
+        var depth = 0
+        var quote: Char? = null
+        var at = -1
+        s.forEachIndexed { i, ch ->
+            when {
+                quote != null -> if (ch == quote) quote = null
+                ch == '\'' || ch == '"' -> quote = ch
+                ch == '[' || ch == '(' -> depth++
+                ch == ']' || ch == ')' -> depth--
+                ch == '@' && depth == 0 -> at = i
+            }
+        }
+        return at
+    }
+
+    private fun pickOne(el: Element, s: String): String? = try {
+        val at = attrAt(s)
+        when {
+            s == "text" -> el.text()
+            s == "ownText" -> el.ownText()
+            s.startsWith("@") -> attrOf(el, s.substring(1))
+            at > 0 -> {
+                val css = s.substring(0, at).trim()
+                val attr = s.substring(at + 1).trim()
+                val target = el.selectFirst(css) ?: return null
+                if (attr == "text") target.text() else attrOf(target, attr)
+            }
+            attrLike.matches(s) && el.hasAttr(s) -> el.attr(s)
+            attrLike.matches(s) -> el.selectFirst("[$s]")?.attr(s)
+            else -> el.selectFirst(s)?.text()
+        }?.trim()?.takeIf { it.isNotEmpty() }
+    } catch (t: Throwable) {
+        null
+    }
+
+    /**
+     * "css@attr", "@attr", "data-ep" (attribute), "css" (text), "text" (the item's own text).
+     * Several can be given with commas: the first one that finds something is used.
+     */
     fun pick(el: Element, selector: String?): String? {
         val s = selector?.trim()?.takeIf { it.isNotEmpty() } ?: return null
-        return try {
-            when {
-                s.startsWith("@") -> attrOf(el, s.substring(1))
-                s.lastIndexOf('@') > 0 -> {
-                    val at = s.lastIndexOf('@')
-                    el.selectFirst(s.substring(0, at))?.let { attrOf(it, s.substring(at + 1)) }
-                }
-                attrLike.matches(s) && el.hasAttr(s) -> el.attr(s)
-                attrLike.matches(s) -> el.selectFirst("[$s]")?.attr(s) ?: el.selectFirst(s)?.text()
-                else -> el.selectFirst(s)?.text()?.trim()
-            }?.trim()?.takeIf { it.isNotEmpty() }
-        } catch (t: Throwable) {
-            null
-        }
+        for (alt in alternatives(s)) pickOne(el, alt)?.let { return it }
+        return null
     }
 
     private fun htmlCards(doc: Document, item: String?, title: String?, href: String?, poster: String?, type: TvType): List<SearchResponse> {
@@ -260,8 +308,10 @@ class ScraperProvider(val id: String, val cfg: JSONObject) : MainAPI() {
         val poster = abs(pick(doc, d.optString("poster").ifBlank { "meta[property=og:image]@content" }))
         val plot = pick(doc, d.optString("overview").ifBlank { "meta[name=description]@content" })
         val episodes = htmlEpisodes(url, doc)
-        val type = typeOf(d.optString("type").ifBlank { if (episodes.isEmpty()) "movie" else "series" })
-        return if (episodes.isEmpty() || type == TvType.Movie) {
+        // "detail.type" is only the default: a page with episodes is a series
+        val type = if (episodes.isNotEmpty()) typeOf(d.optString("type")).let { if (it == TvType.Movie) TvType.TvSeries else it }
+        else typeOf(d.optString("type").ifBlank { "movie" })
+        return if (episodes.isEmpty()) {
             newMovieLoadResponse(title, url, if (type == TvType.Movie) TvType.Movie else type, url) { posterUrl = poster; this.plot = plot }
         } else {
             newTvSeriesLoadResponse(title, url, type, episodes) { posterUrl = poster; this.plot = plot }
@@ -371,13 +421,15 @@ class ScraperProvider(val id: String, val cfg: JSONObject) : MainAPI() {
         }
         fun all(sel: String?): List<String> {
             val v = sel?.trim()?.takeIf { it.isNotEmpty() } ?: return emptyList()
-            val at = v.lastIndexOf('@')
-            return try {
-                if (at > 0) doc.select(v.substring(0, at)).mapNotNull { attrOf(it, v.substring(at + 1)) }
-                else doc.select(v).mapNotNull { it.text().takeIf { t -> t.isNotBlank() } }
-            } catch (t: Throwable) {
-                emptyList()
-            }
+            return alternatives(v).flatMap { alt ->
+                val at = attrAt(alt)
+                try {
+                    if (at > 0) doc.select(alt.substring(0, at)).mapNotNull { attrOf(it, alt.substring(at + 1).trim()) }
+                    else doc.select(alt).mapNotNull { it.text().takeIf { t -> t.isNotBlank() } }
+                } catch (t: Throwable) {
+                    emptyList()
+                }
+            }.distinct()
         }
         all(s.optString("video")).forEach { direct(it) }
         all(s.optString("m3u8")).forEach { direct(it) }
