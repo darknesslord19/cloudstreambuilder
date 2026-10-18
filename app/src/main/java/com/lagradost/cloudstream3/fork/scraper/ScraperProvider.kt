@@ -277,11 +277,12 @@ class ScraperProvider(val id: String, val cfg: JSONObject) : MainAPI() {
             val href = abs(pick(el, e.optString("href").ifBlank { "a@href" }) ?: return@mapIndexedNotNull null) ?: return@mapIndexedNotNull null
             val num = pick(el, e.optString("number"))?.let { Regex("\\d+").find(it)?.value?.toIntOrNull() } ?: (i + 1)
             val season = pick(el, e.optString("season"))?.let { Regex("\\d+").find(it)?.value?.toIntOrNull() }
-            newEpisode(href, fix = false) {
+            val epName = pick(el, e.optString("name").ifBlank { e.optString("title") })
+            newEpisode(href, initializer = {
                 episode = num
                 this.season = season
-                name = pick(el, e.optString("name").ifBlank { e.optString("title") })
-            }
+                name = epName
+            }, fix = false)
         }.distinctBy { it.data }
     }
 
@@ -329,10 +330,10 @@ class ScraperProvider(val id: String, val cfg: JSONObject) : MainAPI() {
                 val num = field(o, a.optString("episodeNumber"), "number", "episode", "ep", "episodeNumber")?.toDoubleOrNull()?.toInt() ?: (out.size + 1)
                 val epId = field(o, a.optString("episodeId"), "id", "episodeId") ?: num.toString()
                 val epName = field(o, a.optString("episodeName"), "title", "name")
-                out.add(newEpisode(JSONObject().put("id", itemId).put("ep", num).put("epId", epId).toString(), fix = false) {
+                out.add(newEpisode(JSONObject().put("id", itemId).put("ep", num).put("epId", epId).toString(), initializer = {
                     episode = num
                     name = epName
-                })
+                }, fix = false))
             }
             val hasNext = a.optString("episodesHasNext").takeIf { it.isNotBlank() }?.let { k ->
                 textOf(path(root, k) ?: path(root, "data.$k"))?.let { it == "true" || (it.toIntOrNull() ?: 0) > page }
