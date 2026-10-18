@@ -171,6 +171,12 @@ function validate() {
     if (!cats.some(function (c) { return c.url; })) out.push(["warn", "Kataloglarda adres yok; ana sayfa <code>homeUrl</code>'den arama seçicileriyle okunur (her kataloğa <code>url</code> + <code>item</code> eklenebilir)"]);
     out.push([j.episodes && j.episodes.item ? "ok" : "warn", "Bölümler: <code>" + esc(j.episodes && j.episodes.item || "yok · film gibi açılır") + "</code>"]);
     out.push([j.streams ? "ok" : "warn", "Kaynak: " + esc(Object.keys(j.streams || {}).join(", ") || "sayfadaki m3u8 / iframe aranır") + " (iframe'ler uygulamanın çözücüleriyle açılır)"]);
+    var sc = j.streams && j.streams.script; if (sc && !Array.isArray(sc)) sc = [sc];
+    (sc || []).forEach(function (x) {
+      var dec = Array.isArray(x.decode) ? x.decode.join(" › ") : (x.decode || "çözme yok");
+      var bad = !x.regex; if (!bad) { try { new RegExp(x.regex); } catch (e) { bad = true; } }
+      out.push([bad ? "bad" : "ok", "Şifreli kaynak: <code>" + esc(x.regex || "regex yok") + "</code> · " + esc((x.paths || [x.path || "hepsi"]).join(", ")) + " · " + esc(dec)]);
+    });
   }
   $("check").innerHTML = out.map(function (o) { return '<div class="ck ' + o[0] + '"><i>' + (o[0] === "ok" ? "✓" : o[0] === "bad" ? "✕" : "!") + '</i><span>' + o[1] + '</span></div>'; }).join("");
   return out.some(function (o) { return o[0] === "bad"; }) ? null : j;

@@ -439,7 +439,136 @@ class ScraperProvider(val id: String, val cfg: JSONObject) : MainAPI() {
             if (!seen.add(f)) continue
             if (loadExtractor(f, url, sub, cb)) found = true
         }
+        // links hidden in the page's code: found with a regex, decoded step by step
+        for ((label, link) in scriptLinks(s, html)) {
+            val l = abs(link) ?: continue
+            if (!seen.add(l)) continue
+            val path = l.substringBefore('?').lowercase()
+            if (path.endsWith(".m3u8") || path.endsWith(".mp4")) {
+                found = true
+                cb(newExtractorLink(name, if (label.isBlank()) name else "$name · $label", l,
+                    if (path.endsWith(".m3u8")) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO) {
+                    referer = url
+                    quality = getQualityFromName(label.ifBlank { l })
+                    headers = hdrs()
+                })
+            } else if (loadExtractor(l, url, sub, cb)) found = true
+        }
         return found
+    }
+
+    /** "rot13", "base64", "base64url", "reverse", "urldecode", "hex", "unescape" */
+    fun decode(value: String, steps: List<String>): String? {
+        var v = value
+        for (step in steps) {
+            v = when (step.trim().lowercase()) {
+                "rot13" -> v.map { c ->
+                    when (c) {
+                        in 'a'..'z' -> 'a' + (c - 'a' + 13) % 26
+                        in 'A'..'Z' -> 'A' + (c - 'A' + 13) % 26
+                        else -> c
+                    }
+                }.joinToString("")
+                "base64", "atob" -> try {
+                    String(android.util.Base64.decode(v.trim(), android.util.Base64.DEFAULT), Charsets.UTF_8)
+                } catch (t: Throwable) {
+                    return null
+                }
+                "base64url" -> try {
+                    String(android.util.Base64.decode(v.trim(), android.util.Base64.URL_SAFE), Charsets.UTF_8)
+                } catch (t: Throwable) {
+                    return null
+                }
+                "reverse" -> v.reversed()
+                "urldecode" -> try {
+                    URLDecoder.decode(v, "UTF-8")
+                } catch (t: Throwable) {
+                    v
+                }
+                "hex" -> try {
+                    String(v.trim().chunked(2).map { it.toInt(16).toByte() }.toByteArray(), Charsets.UTF_8)
+                } catch (t: Throwable) {
+                    return null
+                }
+                "unescape" -> v.replace("\\/", "/").replace("\\u0026", "&")
+                else -> v
+            }
+        }
+        return v
+    }
+
+    /** every text under [node] following [parts] ("*" = every key), with the key it was under */
+    private fun collect(node: Any?, parts: List<String>, key: String, out: MutableList<Pair<String, String>>) {
+        if (parts.isEmpty()) {
+            when (node) {
+                is String -> out.add(key to node)
+                is JSONArray -> for (i in 0 until node.length()) collect(node.opt(i), parts, key, out)
+                is JSONObject -> node.keys().forEach { k -> collect(node.opt(k), parts, k, out) }
+            }
+            return
+        }
+        val head = parts.first()
+        val rest = parts.drop(1)
+        when (node) {
+            is JSONObject -> if (head == "*") node.keys().forEach { k -> collect(node.opt(k), rest, k, out) }
+                else if (node.has(head)) collect(node.opt(head), rest, if (head.toIntOrNull() != null) key else head, out)
+            is JSONArray -> if (head == "*") for (i in 0 until node.length()) collect(node.opt(i), rest, key, out)
+                else head.toIntOrNull()?.let { collect(node.opt(it), rest, key, out) }
+        }
+    }
+
+    /**
+     * "streams.script": { "regex": "scx = (.*?);", "paths": ["*.sx.t"], "decode": ["rot13", "base64"] }
+     * (or a list of them). The regex finds the hidden part (group 1); when it is JSON, the texts at
+     * "paths" are taken; each one is decoded with the steps in order. Returns (label, link).
+     */
+    fun scriptLinks(streams: JSONObject, html: String): List<Pair<String, String>> {
+        val specs = when (val v = streams.opt("script")) {
+            is JSONObject -> listOf(v)
+            is JSONArray -> (0 until v.length()).mapNotNull { v.optJSONObject(it) }
+            else -> emptyList()
+        }
+        val out = ArrayList<Pair<String, String>>()
+        for (spec in specs) {
+            val pattern = spec.optString("regex")
+            if (pattern.isBlank()) continue
+            val regex = try {
+                Regex(pattern, RegexOption.DOT_MATCHES_ALL)
+            } catch (t: Throwable) {
+                continue
+            }
+            val steps = when (val d = spec.opt("decode")) {
+                is JSONArray -> (0 until d.length()).map { d.optString(it) }
+                is String -> d.split(',', '>', '|').map { it.trim() }.filter { it.isNotEmpty() }
+                else -> emptyList()
+            }
+            val paths = when (val p = spec.opt("paths") ?: spec.opt("path")) {
+                is JSONArray -> (0 until p.length()).map { p.optString(it) }
+                is String -> listOf(p)
+                else -> emptyList()
+            }
+            for (m in regex.findAll(html)) {
+                val raw = (m.groups[1]?.value ?: m.value).trim()
+                val found = ArrayList<Pair<String, String>>()
+                val parsed: Any? = try {
+                    if (raw.startsWith("{")) JSONObject(raw) else if (raw.startsWith("[")) JSONArray(raw) else null
+                } catch (t: Throwable) {
+                    null
+                }
+                if (parsed != null) {
+                    if (paths.isEmpty()) collect(parsed, emptyList(), "", found)
+                    else paths.forEach { collect(parsed, it.split('.').filter { s -> s.isNotEmpty() }, "", found) }
+                } else {
+                    found.add("" to raw.trim('"', '\''))
+                }
+                for ((label, value) in found) {
+                    val d = decode(value, steps)?.trim() ?: continue
+                    // a decoded value can hold several links
+                    Regex("""(?:https?:)?//[^\s"'<>,]+""").findAll(d).forEach { out.add(label to it.value) }
+                }
+            }
+        }
+        return out.distinctBy { it.second }
     }
 
     private suspend fun linksApi(data: String, sub: (SubtitleFile) -> Unit, cb: (ExtractorLink) -> Unit): Boolean {
@@ -507,4 +636,11 @@ class ScraperProvider(val id: String, val cfg: JSONObject) : MainAPI() {
     }
 
     suspend fun docOf(url: String) = getDoc(url)
+
+    /** For the test page: what the "script" part decodes on a page. */
+    suspend fun scriptLinksOf(url: String): List<Pair<String, String>> {
+        val s = cfg.optJSONObject("streams") ?: return emptyList()
+        if (!s.has("script")) return emptyList()
+        return scriptLinks(s, getText(url))
+    }
 }

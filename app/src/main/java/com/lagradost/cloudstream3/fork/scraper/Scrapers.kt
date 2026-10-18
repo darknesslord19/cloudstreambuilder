@@ -197,7 +197,18 @@ object Scrapers {
                 val links = ArrayList<com.lagradost.cloudstream3.utils.ExtractorLink>()
                 var subs = 0
                 withTimeout(45_000) { p.loadLinks(d, false, { subs++ }, { links.add(it) }) }
-                val text = if (links.isEmpty()) "Video bulunamadı (video / m3u8 / iframe seçicilerini kontrol et)" else
+                var hidden = ""
+                if (links.isEmpty() && !p.isApi) {
+                    try {
+                        val decoded = p.scriptLinksOf(d)
+                        if (decoded.isNotEmpty()) {
+                            val hosts = decoded.mapNotNull { (_, l) -> l.substringAfter("//").substringBefore('/').ifBlank { null } }.distinct().take(4)
+                            hidden = " · şifreli kaynaktan ${decoded.size} link çözüldü (${hosts.joinToString(", ")}) ama açacak çözücü yok; bu sunucuların çözücüsü olan eklenti yüklü olmalı"
+                        }
+                    } catch (t: Throwable) {
+                    }
+                }
+                val text = if (links.isEmpty()) "Video bulunamadı (video / m3u8 / iframe / script kısmını kontrol et)$hidden" else
                     links.take(4).joinToString(" · ") { (if (it.type == ExtractorLinkType.M3U8) "m3u8 " else "") + it.name } +
                         (if (links.size > 4) " · +${links.size - 4}" else "") + (if (subs > 0) " · $subs altyazı" else "")
                 put(step(5, "Kaynaklar", if (links.isEmpty()) "warn" else "ok", null, text))
