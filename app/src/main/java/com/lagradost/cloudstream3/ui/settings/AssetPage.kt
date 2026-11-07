@@ -235,6 +235,7 @@ object AssetPage {
         cancelable: Boolean = true,
         bridges: Map<String, Any> = emptyMap(),
         quiet: Boolean = false,
+        onDismiss: (() -> Unit)? = null,
     ): Handle? {
         val webView = try {
             WebView(activity)
@@ -378,6 +379,11 @@ object AssetPage {
             }
         }
         dialog.setOnDismissListener {
+            try {
+                onDismiss?.invoke()
+            } catch (t: Throwable) {
+                logError(t)
+            }
             try {
                 webView.stopLoading()
                 container.removeView(webView)

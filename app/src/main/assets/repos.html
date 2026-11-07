@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Depolar</title>
+<!--
+  Extensions > repositories. window.Repos: list(), loadCounts(), setOrder(json), clipboard(),
+  separator(), open(url), openPlugins(), search(), repoList(), remove(url), undo(url),
+  add(token, url, name). Calls back: onReposChanged(), onRepoCount(url, n),
+  onRepoAdded(token, json), addFromList(url, name).
+-->
+<style>
+:root{--bg:#0b0b0d;--ink:#f1efe9;--card:#151518;--field:#1d1d21;--line:rgba(255,255,255,.1);--muted:#9a978f;--accent:#e2c391;--bad:#e5736a;
+  --t-cs:#6fa8ff;--t-nv:#b48cff;--t-st:#7ad7a3;--t-sk:#ffb36b;
+  --mono:ui-monospace,"SFMono-Regular",Menlo,"Roboto Mono",monospace;--r:16px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px;line-height:1.4;-webkit-font-smoothing:antialiased}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.app{max-width:520px;margin:0 auto;min-height:100vh;padding:10px 16px 120px}
+
+.top{display:flex;align-items:center;gap:8px}
+.top h1{font-size:24px;font-weight:700;letter-spacing:-.01em;flex:1}
+.top .count{font-size:13px;color:var(--muted)}
+.hbtn{width:42px;height:42px;border:0;border-radius:12px;background:transparent;color:var(--accent);display:grid;place-items:center;flex:none}
+.hbtn svg{width:22px;height:22px}
+.hbtn.s{color:var(--ink)}
+
+.chips{display:flex;gap:8px;overflow-x:auto;padding:14px 4px 4px;margin:0 -4px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:transparent;font-size:13px;color:var(--muted);white-space:nowrap}
+.chip .dot{width:8px;height:8px;border-radius:50%}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip .n{opacity:.7}
+
+.sortbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0 8px}
+.sortbar .label{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.seg{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:3px}
+.seg button{border:0;background:transparent;padding:6px 10px;border-radius:7px;font-size:13px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--field);color:var(--ink)}
+.hint{font-size:12px;color:var(--muted);margin:0 0 8px}
+
+.list{list-style:none;display:flex;flex-direction:column;gap:2px}
+.row{position:relative;display:flex;align-items:center;gap:10px;padding:10px 4px 10px 0;border-radius:14px;background:var(--bg);touch-action:pan-y}
+.row.dragging{background:var(--field);box-shadow:0 12px 30px rgba(0,0,0,.55);z-index:5}
+.handle{width:28px;height:40px;display:grid;place-items:center;border:0;background:transparent;color:var(--muted);touch-action:none;border-radius:8px;flex:none}
+.handle svg{width:16px;height:16px}
+.pos{font-family:var(--mono);font-size:11px;color:var(--muted);width:22px;text-align:right;flex:none}
+.ico{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-weight:700;font-size:15px;color:#111;flex:none;overflow:hidden;position:relative}
+.ico img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:var(--card)}
+.meta{min-width:0;flex:1;border:0;background:none;text-align:left;padding:2px 4px;border-radius:10px}
+.meta .name{font-size:16px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meta .sub{display:flex;align-items:center;gap:8px;margin-top:3px;min-width:0}
+.tag{flex:none;font-size:11px;font-weight:600;padding:2px 7px;border-radius:6px;border:1px solid currentColor;line-height:1.3}
+.url{font-family:var(--mono);font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.plug{flex:none;font-size:11.5px;color:var(--muted)}
+.actions{display:flex;align-items:center;gap:2px;flex:none}
+.iconbtn{width:38px;height:38px;border:0;border-radius:10px;background:transparent;color:var(--muted);display:grid;place-items:center}
+.iconbtn svg{width:20px;height:20px}
+.mv{display:flex;flex-direction:column}
+.mv .iconbtn{width:30px;height:20px;border-radius:6px}
+.mv .iconbtn svg{width:14px;height:14px}
+.empty{padding:40px 12px;text-align:center;color:var(--muted)}
+
+.closedhead{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;margin-top:18px;padding:12px 4px;border:0;border-top:1px solid var(--line);background:none;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+.closedhead svg{width:16px;height:16px;transition:transform .2s}
+.closedhead[aria-expanded="true"] svg{transform:rotate(180deg)}
+.closednote{font-size:12px;color:var(--muted);margin:0 4px 8px}
+.row.off .ico,.row.off .meta{opacity:.42;filter:grayscale(.7)}
+.offtag{flex:none;font-size:11px;font-weight:600;color:var(--bad)}
+
+.stats{display:block;width:100%;text-align:left;margin-top:20px;padding:16px;border-radius:var(--r);background:var(--card);border:1px solid var(--line)}
+.stats h2{font-size:15px;font-weight:600;margin:0 0 12px;display:flex;justify-content:space-between}
+.stats h2 small{font-size:12px;color:var(--muted);font-weight:500}
+.bar{display:flex;height:8px;border-radius:99px;overflow:hidden;background:var(--field);gap:2px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;font-size:13px;color:var(--muted)}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:6px;vertical-align:middle}
+
+.fab{position:fixed;right:20px;bottom:calc(24px + env(safe-area-inset-bottom,0px));height:56px;padding:0 22px 0 18px;border-radius:18px;border:0;background:var(--accent);color:var(--bg);font-weight:600;font-size:15px;display:flex;align-items:center;gap:8px;box-shadow:0 10px 30px rgba(0,0,0,.45);z-index:10}
+.fab svg{width:22px;height:22px}
+
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.6);opacity:0;pointer-events:none;transition:opacity .2s;z-index:20}
+.scrim.open{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;max-width:520px;margin:0 auto;transform:translateY(105%);transition:transform .28s cubic-bezier(.2,.8,.2,1);z-index:21;
+  background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:24px 24px 0 0;padding:10px 20px calc(20px + env(safe-area-inset-bottom,0px));max-height:92vh;overflow-y:auto}
+.sheet.open{transform:translateY(0)}
+.grab{width:40px;height:4px;border-radius:9px;background:var(--line);margin:0 auto 14px}
+.sheet h2{font-size:22px;font-weight:700}
+.sheet .lead{color:var(--muted);font-size:14px;margin:4px 0 18px}
+.flabel{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}
+.types{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px}
+.type{position:relative;text-align:left;display:flex;align-items:center;gap:10px;padding:12px;border-radius:14px;border:1.5px solid var(--line);background:var(--bg)}
+.type .tico{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;font-weight:700;font-size:12px;color:#111;flex:none}
+.type .ttext{display:flex;flex-direction:column;gap:2px;min-width:0;padding-right:22px}
+.type .tname{font-weight:600;font-size:14.5px;line-height:1.2}
+.type .tdesc{font-size:12px;color:var(--muted);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.type .chk{position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center}
+.type .chk svg{width:12px;height:12px;opacity:0}
+.type[aria-checked="true"]{border-color:var(--c)}
+.type[aria-checked="true"] .chk{background:var(--c);border-color:var(--c);color:#111}
+.type[aria-checked="true"] .chk svg{opacity:1}
+.type.locked{opacity:.38}
+.type.locked .tdesc{color:var(--bad)}
+.auto{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--accent);margin:-6px 0 14px}
+.auto:empty{display:none}
+.auto svg{width:14px;height:14px}
+.field{margin-bottom:14px}
+.inputwrap{display:flex;align-items:center;gap:6px;background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:0 6px 0 14px}
+.inputwrap:focus-within{border-color:var(--accent)}
+.inputwrap.err{border-color:var(--bad)}
+.inputwrap input{flex:1;min-width:0;border:0;background:transparent;padding:13px 0;outline:none;font-size:15px}
+.inputwrap input.mono{font-family:var(--mono);font-size:13.5px}
+.inputwrap input::placeholder{color:var(--muted);opacity:.7}
+.small{border:0;background:var(--field);color:var(--ink);font-size:12.5px;padding:7px 10px;border-radius:8px;white-space:nowrap}
+.msg{font-size:12.5px;margin-top:6px;color:var(--muted)}
+.msg:empty{display:none}
+.msg.err{color:var(--bad)}
+.btns{display:grid;grid-template-columns:1.5fr 1.2fr 1fr;gap:8px;margin-top:6px}
+.btns.nolist{grid-template-columns:1.6fr 1fr}
+.btn{height:52px;border-radius:10px;border:0;font-weight:600;font-size:15px;white-space:nowrap;padding:0 6px;display:flex;align-items:center;justify-content:center;min-width:0}
+.btn.list{background:var(--accent);color:var(--bg)}
+.btn.primary{background:var(--ink);color:var(--bg)}
+.btn.primary:disabled{background:var(--field);color:var(--muted)}
+.btn.ghost{background:var(--field);color:var(--ink)}
+.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;font-weight:500;transition:all .2s;z-index:30;pointer-events:none;max-width:calc(100% - 32px);display:flex;align-items:center;gap:10px}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast span{min-width:0}
+.toast button{white-space:nowrap;border:0;background:none;color:var(--accent);font-weight:700;padding:4px}
+@media (max-width:380px){.types{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <button class="hbtn" id="back" aria-label="Geri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <h1>Depolar</h1>
+    <span class="count" id="count"></span>
+    <button class="hbtn s" id="search" aria-label="Eklentilerde ara"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button>
+  </div>
+
+  <div class="chips" id="chips" role="toolbar" aria-label="Türe göre filtrele"></div>
+
+  <div class="sortbar">
+    <span class="label">Sıralama</span>
+    <div class="seg" role="group" aria-label="Sıralama">
+      <button data-sort="manual" aria-pressed="true">Sıram</button>
+      <button data-sort="name" aria-pressed="false">Ad</button>
+      <button data-sort="type" aria-pressed="false">Tür</button>
+    </div>
+  </div>
+  <p class="hint" id="hint"></p>
+
+  <ul class="list" id="list"></ul>
+  <div id="closed"></div>
+
+  <button class="stats" id="stats" hidden aria-label="Tüm eklentiler">
+    <h2>Eklentiler <small>Tümünü gör ›</small></h2>
+    <div class="bar" id="sbar"></div>
+    <div class="legend" id="slegend"></div>
+  </button>
+</div>
+
+<button class="fab" id="fab" aria-haspopup="dialog">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+  Depo ekle
+</button>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+  <div class="grab"></div>
+  <h2 id="sheet-title">Depo ekle</h2>
+  <p class="lead">Türü seçin ya da adresi yapıştırın, tür otomatik algılanır.</p>
+  <span class="flabel" id="types-label">Depo türü</span>
+  <div class="types" id="types" role="radiogroup" aria-labelledby="types-label"></div>
+  <div class="auto" id="auto" aria-live="polite"></div>
+  <div class="field">
+    <label class="flabel" for="f-name">Depo adı <span style="text-transform:none;letter-spacing:0">(isteğe bağlı)</span></label>
+    <div class="inputwrap"><input id="f-name" type="text" autocomplete="off" placeholder="Boş bırakılırsa depodan alınır"></div>
+  </div>
+  <div class="field">
+    <label class="flabel" for="f-url">Adres</label>
+    <div class="inputwrap" id="url-wrap">
+      <input id="f-url" class="mono" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://…/repo.json">
+      <button class="small" id="paste" type="button">Yapıştır</button>
+    </div>
+    <div class="msg" id="url-msg"></div>
+  </div>
+  <div class="btns" id="btns">
+    <button class="btn list" id="browse" type="button">Depo listesi</button>
+    <button class="btn primary" id="add" type="button" disabled>Depo ekle</button>
+    <button class="btn ghost" id="cancel" type="button">İptal</button>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="theme.js"></script>
+<script>
+var app = window.CloudStream, R = window.Repos;
+try { if (window.applyTheme && app && app.theme) applyTheme(app); } catch (e) {}
+
+var TYPES = {
+  cs:{name:"CloudStream", short:"CS", desc:"repo.json · .cs3", color:"var(--t-cs)"},
+  nv:{name:"Nuvio", short:"NV", desc:"Nuvio deposu", color:"var(--t-nv)"},
+  st:{name:"Stremio", short:"ST", desc:"manifest.json", color:"var(--t-st)"},
+  sk:{name:"SkyStream", short:"SK", desc:"plugins.json", color:"var(--t-sk)"}
+};
+var ORDER = ["cs","nv","st","sk"];
+var repos = [], allowed = ORDER.slice(), stats = null, showList = true;
+var filter = "all", sortMode = "manual", selType = null, autoType = null, closedOpen = false, busy = false, token = 0;
+function $(s) { return document.querySelector(s); }
+var ICON = {
+  grip:'<svg viewBox="0 0 16 16" fill="currentColor"><circle cx="5.5" cy="3.5" r="1.4"/><circle cx="10.5" cy="3.5" r="1.4"/><circle cx="5.5" cy="8" r="1.4"/><circle cx="10.5" cy="8" r="1.4"/><circle cx="5.5" cy="12.5" r="1.4"/><circle cx="10.5" cy="12.5" r="1.4"/></svg>',
+  up:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>',
+  down:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
+  trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'
+};
+function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+function isOn(t) { return allowed.indexOf(t) >= 0; }
+
+// ---------------------------------------------------------------- data
+function load() {
+  var d = {};
+  try { d = JSON.parse(R.list()); } catch (e) {}
+  var counts = {};
+  repos.forEach(function (r) { if (r.count >= 0) counts[r.url] = r.count; });
+  repos = (d.repos || []).map(function (r) { if (r.count === -1 && counts[r.url] != null) r.count = counts[r.url]; return r; });
+  allowed = d.allowed || ["cs"];
+  stats = d.stats || null;
+  showList = d.repoList !== false;
+  render();
+}
+window.onReposChanged = function () { load(); };
+window.onRepoCount = function (url, n) {
+  repos.forEach(function (r) { if (r.url === url) r.count = n; });
+  var el = document.querySelector('.row[data-url="' + cssEsc(url) + '"] .plug');
+  if (el) el.textContent = countText(repos.filter(function (r) { return r.url === url; })[0]);
+};
+function cssEsc(s) { return String(s).replace(/["\\]/g, "\\$&"); }
+function saveOrder() { try { R.setOrder(JSON.stringify(repos.map(function (r) { return r.url; }))); } catch (e) {} }
+function countText(r) {
+  if (!r) return "";
+  if (r.count === -2) return "Eklenti";
+  if (r.count < 0) return "…";
+  return r.count + " eklenti";
+}
+
+// ---------------------------------------------------------------- list
+function visible() {
+  var r = repos.filter(function (x) { return isOn(x.type) && (filter === "all" || x.type === filter); });
+  if (sortMode === "name") r = r.slice().sort(function (a, b) { return a.name.localeCompare(b.name, "tr"); });
+  if (sortMode === "type") r = r.slice().sort(function (a, b) { return ORDER.indexOf(a.type) - ORDER.indexOf(b.type) || repos.indexOf(a) - repos.indexOf(b); });
+  return r;
+}
+function icon(r) {
+  var t = TYPES[r.type];
+  return '<div class="ico" style="background:' + t.color + '">' + t.short +
+    (r.icon ? '<img alt="" src="' + esc(r.icon) + '" onerror="this.remove()">' : '') + '</div>';
+}
+function renderChips() {
+  var open = ORDER.filter(isOn);
+  if (filter !== "all" && !isOn(filter)) filter = "all";
+  var counts = { all: repos.filter(function (r) { return isOn(r.type); }).length };
+  open.forEach(function (k) { counts[k] = repos.filter(function (r) { return r.type === k; }).length; });
+  $("#chips").innerHTML = [["all", "Tümü", null]].concat(open.filter(function (k) { return counts[k]; }).map(function (k) { return [k, TYPES[k].name, TYPES[k].color]; }))
+    .map(function (x) { return '<button class="chip" data-f="' + x[0] + '" aria-pressed="' + (filter === x[0]) + '">' + (x[2] ? '<span class="dot" style="background:' + x[2] + '"></span>' : '') + x[1] + ' <span class="n">' + counts[x[0]] + '</span></button>'; }).join("");
+  $("#count").textContent = counts.all + " depo";
+}
+function renderStats() {
+  if (!stats) { $("#stats").hidden = true; return; }
+  $("#stats").hidden = false;
+  var a = stats.downloaded || 0, b = stats.disabled || 0, c = stats.notDownloaded || 0;
+  $("#sbar").innerHTML = (a + b + c === 0) ? '<span style="flex:1;background:var(--field)"></span>' :
+    '<span style="flex:' + a + ';background:var(--ink)"></span><span style="flex:' + b + ';background:var(--accent)"></span><span style="flex:' + c + ';background:var(--field)"></span>';
+  $("#slegend").innerHTML = '<span><i style="background:var(--ink)"></i>' + esc(stats.downloadedText) + '</span>' +
+    '<span><i style="background:var(--accent)"></i>' + esc(stats.disabledText) + '</span>' +
+    '<span><i style="background:var(--field);border:1px solid var(--line)"></i>' + esc(stats.notDownloadedText) + '</span>';
+}
+function renderClosed() {
+  var off = repos.filter(function (r) { return !isOn(r.type); });
+  if (!off.length) { $("#closed").innerHTML = ""; return; }
+  var kinds = off.map(function (r) { return TYPES[r.type].name; }).filter(function (v, i, a) { return a.indexOf(v) === i; }).join(", ");
+  $("#closed").innerHTML = '<button class="closedhead" id="closedBtn" aria-expanded="' + closedOpen + '"><span>Kapalı türler · ' + off.length + ' depo</span>' + ICON.down + '</button>' +
+    (closedOpen ? '<p class="closednote">' + esc(kinds) + ' admin tarafından kapatıldı. Bu depolar çalışmaz, aramada ve ana sayfada görünmez. Açıldığında kaldığı yerden geri gelir.</p><ul class="list">' +
+      off.map(function (r) { var t = TYPES[r.type]; return '<li class="row off" data-url="' + esc(r.url) + '"><span class="pos"></span>' + icon(r) +
+        '<div class="meta"><div class="name">' + esc(r.name) + '</div><div class="sub"><span class="tag" style="color:' + t.color + '">' + t.name + '</span><span class="offtag">Admin kapattı</span></div></div>' +
+        '<div class="actions"><button class="iconbtn" data-del aria-label="' + esc(r.name) + ' deposunu sil">' + ICON.trash + '</button></div></li>'; }).join("") + '</ul>' : '');
+  $("#closedBtn").onclick = function () { closedOpen = !closedOpen; renderClosed(); $("#closedBtn").focus(); };
+}
+function render() {
+  renderChips(); renderClosed(); renderStats();
+  $("#btns").classList.toggle("nolist", !showList); $("#browse").hidden = !showList;
+  var manual = sortMode === "manual";
+  $("#hint").textContent = manual ? "Tutamaçtan sürükleyerek ya da oklarla sırala." : "Sürükleyerek sıralamak için “Sıram”ı seçin.";
+  var items = visible();
+  if (!items.length) {
+    $("#list").innerHTML = '<li class="empty">' + (repos.length ? "Bu türde depo yok." : "Henüz depo yok. Sağ alttan ekleyebilirsin.") + '</li>';
+    return;
+  }
+  $("#list").innerHTML = items.map(function (r, i) {
+    var t = TYPES[r.type];
+    return '<li class="row" data-url="' + esc(r.url) + '">' +
+      (manual ? '<button class="handle" tabindex="-1" aria-hidden="true">' + ICON.grip + '</button>' : '<span class="pos">' + (i + 1) + '</span>') +
+      icon(r) +
+      '<button class="meta" data-open aria-label="' + esc(r.name) + ' aç"><div class="name">' + esc(r.name) + '</div>' +
+      '<div class="sub"><span class="tag" style="color:' + t.color + '">' + t.name + '</span><span class="plug">' + countText(r) + '</span><span class="url">' + esc(r.url.replace(/^https?:\/\//, "")) + '</span></div></button>' +
+      '<div class="actions">' +
+      (manual ? '<div class="mv"><button class="iconbtn" data-mv="-1" aria-label="Yukarı taşı">' + ICON.up + '</button><button class="iconbtn" data-mv="1" aria-label="Aşağı taşı">' + ICON.down + '</button></div>' : '') +
+      '<button class="iconbtn" data-del aria-label="' + esc(r.name) + ' deposunu sil">' + ICON.trash + '</button></div></li>';
+  }).join("");
+}
+function byUrl(u) { for (var i = 0; i < repos.length; i++) if (repos[i].url === u) return i; return -1; }
+function move(url, dir) {
+  var vis = visible(), vi = -1;
+  for (var i = 0; i < vis.length; i++) if (vis[i].url === url) vi = i;
+  var target = vis[vi + dir]; if (!target) return;
+  var a = byUrl(url), b = byUrl(target.url), tmp = repos[a]; repos[a] = repos[b]; repos[b] = tmp;
+  saveOrder(); render();
+  var btn = document.querySelector('.row[data-url="' + cssEsc(url) + '"] [data-mv="' + dir + '"]'); if (btn) btn.focus();
+}
+function del(url) {
+  var i = byUrl(url); if (i < 0) return;
+  var gone = repos[i];
+  repos.splice(i, 1); render(); R.remove(url);
+  toast(gone.name + " silindi", function () { R.undo(url); repos.splice(Math.min(i, repos.length), 0, gone); render(); });
+}
+function onRowClick(e) {
+  var row = e.target.closest(".row"); if (!row) return;
+  var url = row.getAttribute("data-url");
+  var mv = e.target.closest("[data-mv]"); if (mv) return move(url, +mv.getAttribute("data-mv"));
+  if (e.target.closest("[data-del]")) return del(url);
+  if (e.target.closest("[data-open]")) R.open(url);
+}
+$("#list").addEventListener("click", onRowClick);
+$("#closed").addEventListener("click", function (e) { if (e.target.closest("[data-del]")) onRowClick(e); });
+
+// drag (touch and mouse)
+var drag = null;
+$("#list").addEventListener("pointerdown", function (e) {
+  var h = e.target.closest(".handle"); if (!h) return;
+  e.preventDefault();
+  var row = h.closest(".row");
+  try { h.setPointerCapture(e.pointerId); } catch (x) {}
+  drag = { row: row, startY: e.clientY };
+  row.classList.add("dragging");
+});
+$("#list").addEventListener("pointermove", function (e) {
+  if (!drag) return;
+  var dy = e.clientY - drag.startY;
+  drag.row.style.transform = "translateY(" + dy + "px)";
+  var rows = [].slice.call(document.querySelectorAll("#list .row"));
+  var me = rows.indexOf(drag.row), sib = dy > 0 ? rows[me + 1] : rows[me - 1];
+  if (!sib) return;
+  var r = sib.getBoundingClientRect(), mid = r.top + r.height / 2, my = drag.row.getBoundingClientRect();
+  if (dy > 0 ? my.bottom > mid : my.top < mid) {
+    var before = drag.row.getBoundingClientRect().top;
+    if (dy > 0) sib.parentNode.insertBefore(drag.row, sib.nextSibling); else sib.parentNode.insertBefore(drag.row, sib);
+    drag.row.style.transform = "";
+    var after = drag.row.getBoundingClientRect().top;
+    drag.startY += after - before;
+    drag.row.style.transform = "translateY(" + (e.clientY - drag.startY) + "px)";
+  }
+});
+function endDrag() {
+  if (!drag) return;
+  drag = null;
+  var urls = [].slice.call(document.querySelectorAll("#list .row")).map(function (r) { return r.getAttribute("data-url"); });
+  var shown = {}; urls.forEach(function (u) { shown[u] = 1; });
+  var slots = []; repos.forEach(function (r, i) { if (shown[r.url]) slots.push(i); });
+  var moved = urls.map(function (u) { return repos[byUrl(u)]; });
+  slots.forEach(function (slot, k) { repos[slot] = moved[k]; });
+  saveOrder(); render();
+}
+$("#list").addEventListener("pointerup", endDrag);
+$("#list").addEventListener("pointercancel", endDrag);
+
+$("#chips").addEventListener("click", function (e) { var c = e.target.closest(".chip"); if (!c) return; filter = c.getAttribute("data-f"); render(); });
+$(".seg").addEventListener("click", function (e) {
+  var b = e.target.closest("button"); if (!b) return; sortMode = b.getAttribute("data-sort");
+  [].forEach.call(document.querySelectorAll(".seg button"), function (x) { x.setAttribute("aria-pressed", x === b); }); render();
+});
+$("#stats").onclick = function () { R.openPlugins(); };
+$("#search").onclick = function () { R.search(); };
+
+// ---------------------------------------------------------------- add sheet
+function renderTypes() {
+  $("#types").innerHTML = ORDER.map(function (k) {
+    var t = TYPES[k], lk = !isOn(k);
+    return '<button class="type' + (lk ? ' locked' : '') + '" type="button" role="radio" data-t="' + k + '" aria-checked="false" aria-disabled="' + lk + '" style="--c:' + t.color + '">' +
+      '<span class="tico" style="background:' + t.color + '">' + t.short + '</span>' +
+      '<span class="ttext"><span class="tname">' + t.name + '</span><span class="tdesc">' + (lk ? "Şu an kapalı" : t.desc) + '</span></span>' +
+      '<span class="chk">' + ICON.check + '</span></button>';
+  }).join("");
+}
+function detect(u) {
+  var s = u.toLowerCase(); if (!s) return null;
+  if (/^skystream:\/\//.test(s) || /skystream/.test(s) || /plugins\.json(\?|$)/.test(s)) return "sk";
+  if (/^stremio:\/\//.test(s) || /strem\.(fun|io)|stremio/.test(s)) return "st";
+  if (/nuvio/.test(s)) return "nv";
+  if (/repo\.json|\.cs3|cloudstream|\/builds\//.test(s)) return "cs";
+  if (/manifest\.json(\?|$)/.test(s)) return "st";
+  return null;
+}
+function validate() {
+  var raw = $("#f-url").value.trim(), wrap = $("#url-wrap"), msg = $("#url-msg"), ok = false;
+  wrap.classList.remove("err"); msg.className = "msg"; msg.textContent = "";
+  if (raw) {
+    var u = null; try { u = new URL(raw); } catch (e) {}
+    var known = repos.some(function (r) { return r.url.toLowerCase() === raw.toLowerCase(); });
+    if (known) { wrap.classList.add("err"); msg.className = "msg err"; msg.textContent = "Bu depo zaten listede."; }
+    else if (!u) ok = /^[a-z0-9!_-]{2,}$/i.test(raw); // a short code
+    else if (!/^(https?|stremio|skystream):$/.test(u.protocol)) { wrap.classList.add("err"); msg.className = "msg err"; msg.textContent = "Adres https:// ile başlamalı."; }
+    else if ((u.pathname === "/" || u.pathname === "") && /^https?:$/.test(u.protocol) && !selType) { msg.textContent = "Bu bir site ana sayfası gibi görünüyor. Depo dosyasının tam adresini gir ya da türü seç."; ok = true; }
+    else ok = true;
+  }
+  autoType = detect(raw);
+  var auto = $("#auto");
+  if (autoType && !selType) auto.innerHTML = ICON.check + " Otomatik algılandı: " + TYPES[autoType].name;
+  else if (autoType && selType && autoType !== selType) auto.textContent = "Adres " + TYPES[autoType].name + " deposuna benziyor.";
+  else auto.textContent = "";
+  var t = selType || autoType;
+  if (t && !isOn(t)) {
+    wrap.classList.add("err"); msg.className = "msg err"; auto.textContent = "";
+    msg.textContent = "Bu bir " + TYPES[t].name + " adresi. " + TYPES[t].name + " depoları şu an kapalı, eklenemez.";
+    ok = false;
+  }
+  var shown = selType || autoType;
+  [].forEach.call(document.querySelectorAll(".type"), function (b) { b.setAttribute("aria-checked", b.getAttribute("data-t") === shown && isOn(shown)); });
+  $("#add").disabled = busy || !ok;
+}
+function fillFrom(text) {
+  text = (text || "").trim(); if (!text) return false;
+  var sep = ""; try { sep = R.separator(); } catch (e) {}
+  if (sep && text.indexOf(sep) > 0) {
+    var i = text.indexOf(sep);
+    $("#f-name").value = text.slice(0, i).trim(); $("#f-url").value = text.slice(i + sep.length).trim();
+    return true;
+  }
+  if (/^(https?|stremio|skystream):\/\//i.test(text)) { $("#f-url").value = text; return true; }
+  return false;
+}
+function openSheet(prefill) {
+  selType = null; busy = false; $("#f-url").value = ""; $("#f-name").value = ""; $("#add").textContent = "Depo ekle";
+  renderTypes();
+  if (!prefill) { try { fillFrom(R.clipboard()); } catch (e) {} }
+  validate();
+  $("#sheet").classList.add("open"); $("#scrim").classList.add("open");
+  // the back key of the phone closes the sheet first
+  try { history.pushState({ sheet: 1 }, ""); } catch (e) {}
+  setTimeout(function () { $("#f-url").focus(); }, 260);
+}
+function closeSheet(fromBack) {
+  if (!sheetOpen()) return;
+  $("#sheet").classList.remove("open"); $("#scrim").classList.remove("open"); $("#fab").focus();
+  if (fromBack !== true) { try { if (history.state && history.state.sheet) history.back(); } catch (e) {} }
+}
+window.addEventListener("popstate", function () { if (sheetOpen()) closeSheet(true); });
+function sheetOpen() { return $("#sheet").classList.contains("open"); }
+$("#fab").onclick = function () { openSheet(false); };
+$("#cancel").onclick = function () { closeSheet(); };
+$("#scrim").onclick = function () { if (!busy) closeSheet(); };
+$("#types").addEventListener("click", function (e) {
+  var b = e.target.closest(".type"); if (!b) return;
+  var k = b.getAttribute("data-t");
+  if (!isOn(k)) return toast(TYPES[k].name + " depoları şu an eklenemez");
+  selType = selType === k ? null : k; validate();
+});
+$("#f-url").addEventListener("input", validate);
+$("#f-url").addEventListener("keydown", function (e) { if (e.key === "Enter" && !$("#add").disabled) $("#add").click(); });
+$("#paste").onclick = function () {
+  var t = ""; try { t = R.clipboard(); } catch (e) {}
+  if (fillFrom(t) || (t && ($("#f-url").value = t))) { validate(); toast("Panodaki adres yapıştırıldı"); }
+  else toast("Panoda adres yok");
+};
+$("#browse").onclick = function () { R.repoList(); };
+window.addFromList = function (url, name) {
+  if (!sheetOpen()) openSheet(true);
+  $("#f-url").value = url; $("#f-name").value = name || ""; selType = null; validate();
+  if (!$("#add").disabled) $("#add").click();
+};
+$("#add").onclick = function () {
+  if (busy) return;
+  busy = true; $("#add").disabled = true; $("#add").textContent = "Ekleniyor…";
+  R.add(++token, $("#f-url").value.trim(), $("#f-name").value.trim());
+};
+window.onRepoAdded = function (t, json) {
+  var r = {}; try { r = JSON.parse(json); } catch (e) {}
+  if (r.ok) {
+    busy = false; closeSheet(); filter = "all"; load(); toast(r.message || "Eklendi");
+    return;
+  }
+  if (!sheetOpen()) { if (r.message) toast(r.message); return; }
+  busy = false; $("#add").textContent = "Depo ekle"; validate();
+  if (r.message) { $("#url-wrap").classList.add("err"); $("#url-msg").className = "msg err"; $("#url-msg").textContent = r.message; }
+};
+
+// ---------------------------------------------------------------- toast, back
+var tt;
+function toast(m, undo) {
+  var el = $("#toast");
+  el.innerHTML = "<span>" + esc(m) + "</span>" + (undo ? '<button id="undo">Geri al</button>' : "");
+  el.style.pointerEvents = undo ? "auto" : "none";
+  el.classList.add("show");
+  if (undo) $("#undo").onclick = function () { undo(); el.classList.remove("show"); };
+  clearTimeout(tt); tt = setTimeout(function () { el.classList.remove("show"); }, undo ? 4000 : 2200);
+}
+$("#back").onclick = function () {
+  if (sheetOpen()) { if (!busy) closeSheet(); return; }
+  try { app.close(); } catch (e) {}
+};
+document.addEventListener("keydown", function (e) { if (e.key === "Escape" && sheetOpen() && !busy) closeSheet(); });
+
+load();
+try { R.loadCounts(); } catch (e) {}
+</script>
+</body>
+</html>

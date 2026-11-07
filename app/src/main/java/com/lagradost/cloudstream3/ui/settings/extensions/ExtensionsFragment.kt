@@ -66,9 +66,22 @@ class ExtensionsFragment : BaseFragment<FragmentExtensionsBinding>(
         this.layoutParams = param
     }
 
+    /** The new repository page (Plus > Görünüm > Yeni depo ekranı), over this screen. */
+    private var repoPage: RepoScreen.Page? = null
+    private var searchMenuItem: MenuItem? = null
+
     override fun onResume() {
         super.onResume()
         afterRepositoryLoadedEvent += ::reloadRepositories
+        // back from a plugin list: the page comes again
+        if (searchMenuItem?.isActionViewExpanded != true) repoPage?.reveal()
+        repoPage?.reload()
+    }
+
+    override fun onDestroyView() {
+        repoPage?.destroy()
+        repoPage = null
+        super.onDestroyView()
     }
 
     override fun onStop() {
@@ -172,6 +185,7 @@ class ExtensionsFragment : BaseFragment<FragmentExtensionsBinding>(
             binding.repoRecyclerView.isVisible = repos.isNotEmpty()
             binding.blankRepoScreen.isVisible = repos.isEmpty()
             (binding.repoRecyclerView.adapter as? RepoAdapter)?.submitList(repos.toList())
+            repoPage?.reload()
             // Only CloudStream repositories have a list of .cs3 plugins
             val addonUrls = AddonManager.sourceUrls()
             pluginViewModel.updatePluginList(
@@ -201,6 +215,7 @@ class ExtensionsFragment : BaseFragment<FragmentExtensionsBinding>(
                 pluginDisabledTxt.setText(value.disabledText)
                 pluginDownloadTxt.setText(value.downloadedText)
             }
+            repoPage?.reload()
         }
 
         binding.pluginStorageAppbar.setOnClickListener {
@@ -238,11 +253,14 @@ class ExtensionsFragment : BaseFragment<FragmentExtensionsBinding>(
         binding.settingsToolbar.apply {
             val searchItem = menu?.findItem(R.id.search_button)
             val searchView = searchItem?.actionView as? SearchView
+            searchMenuItem = searchItem
 
             searchItem?.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
                 override fun onMenuItemActionCollapse(p0: MenuItem): Boolean {
                     binding.pluginRecyclerView.isVisible = false
                     binding.repoRecyclerView.isVisible = true
+                    // the search was opened from the repository page
+                    repoPage?.reveal()
                     return true
 
                 }
@@ -420,5 +438,22 @@ class ExtensionsFragment : BaseFragment<FragmentExtensionsBinding>(
             addRepoButtonImageview.setOnClickListener(addRepositoryClick)
         }
         reloadRepositories()
+
+        if (RepoScreen.available(binding.root.context)) {
+            repoPage = RepoScreen.Page(
+                this,
+                stats = {
+                    extensionViewModel.pluginStats.value?.let { v ->
+                        val c = context
+                        org.json.JSONObject().put("downloaded", v.downloaded).put("disabled", v.disabled).put("notDownloaded", v.notDownloaded)
+                            .put("downloadedText", c?.let { v.downloadedText.asString(it) } ?: "")
+                            .put("disabledText", c?.let { v.disabledText.asString(it) } ?: "")
+                            .put("notDownloadedText", c?.let { v.notDownloadedText.asString(it) } ?: "")
+                    }
+                },
+                onChanged = { reloadRepositories() },
+                search = { searchMenuItem?.expandActionView() ?: repoPage?.reveal() },
+            ).also { it.show() }
+        }
     }
 }
