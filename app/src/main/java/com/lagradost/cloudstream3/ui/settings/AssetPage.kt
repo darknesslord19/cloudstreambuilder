@@ -414,7 +414,8 @@ object AssetPage {
 (function(){
  if (window.__remoteNav) return; window.__remoteNav = true;
  var st = document.createElement('style');
- st.textContent = '.rn-focus,:focus-visible{outline:3px solid #fff !important;outline-offset:2px !important;border-radius:10px}';
+ st.textContent = '.rn-focus,:focus-visible{outline:3px solid #fff !important;outline-offset:2px !important;border-radius:10px}' +
+    'input:not([type=checkbox]):not([type=radio]):not([type=range]):focus,textarea:focus{outline:none !important}';
  document.head.appendChild(st);
  function items(){
   var all = document.querySelectorAll('a[href],button,input,select,textarea,[tabindex],[onclick],[role=button],.chip,.cv,.poster,.card,.btn');

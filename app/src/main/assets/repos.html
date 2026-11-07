@@ -110,6 +110,7 @@ button{cursor:pointer}
 .field{margin-bottom:14px}
 .inputwrap{display:flex;align-items:center;gap:6px;background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:0 6px 0 14px}
 .inputwrap:focus-within{border-color:var(--accent)}
+.inputwrap input:focus,.inputwrap input:focus-visible,.inputwrap input.rn-focus{outline:none!important}
 .inputwrap.err{border-color:var(--bad)}
 .inputwrap input{flex:1;min-width:0;border:0;background:transparent;padding:13px 0;outline:none;font-size:15px}
 .inputwrap input.mono{font-family:var(--mono);font-size:13.5px}
@@ -432,15 +433,18 @@ function validate() {
   [].forEach.call(document.querySelectorAll(".type"), function (b) { b.setAttribute("aria-checked", b.getAttribute("data-t") === shown && isOn(shown)); });
   $("#add").disabled = busy || !ok;
 }
+// only a single address (or "name : address" shared from the app) is taken from the clipboard
+var ADDR = /^(https?|stremio|skystream):\/\/\S+$/i;
 function fillFrom(text) {
-  text = (text || "").trim(); if (!text) return false;
+  text = (text || "").trim();
+  if (!text || text.length > 600 || /[\r\n<>]/.test(text)) return false;
   var sep = ""; try { sep = R.separator(); } catch (e) {}
   if (sep && text.indexOf(sep) > 0) {
-    var i = text.indexOf(sep);
-    $("#f-name").value = text.slice(0, i).trim(); $("#f-url").value = text.slice(i + sep.length).trim();
-    return true;
+    var i = text.lastIndexOf(sep), name = text.slice(0, i).trim(), url = text.slice(i + sep.length).trim();
+    if (ADDR.test(url) && name.length <= 80) { $("#f-name").value = name; $("#f-url").value = url; return true; }
+    return false;
   }
-  if (/^(https?|stremio|skystream):\/\//i.test(text)) { $("#f-url").value = text; return true; }
+  if (ADDR.test(text)) { $("#f-url").value = text; return true; }
   return false;
 }
 function openSheet(prefill) {
@@ -473,8 +477,8 @@ $("#f-url").addEventListener("input", validate);
 $("#f-url").addEventListener("keydown", function (e) { if (e.key === "Enter" && !$("#add").disabled) $("#add").click(); });
 $("#paste").onclick = function () {
   var t = ""; try { t = R.clipboard(); } catch (e) {}
-  if (fillFrom(t) || (t && ($("#f-url").value = t))) { validate(); toast("Panodaki adres yapıştırıldı"); }
-  else toast("Panoda adres yok");
+  if (fillFrom(t)) { validate(); toast("Panodaki adres yapıştırıldı"); }
+  else toast("Panoda depo adresi yok");
 };
 $("#browse").onclick = function () { R.repoList(); };
 window.addFromList = function (url, name) {
